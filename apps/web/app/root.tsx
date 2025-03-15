@@ -9,6 +9,7 @@ import {
 } from 'react-router';
 
 import { AppNav } from './app-nav';
+import './styles/global.css';
 
 export const meta: MetaFunction = () => [
   {
