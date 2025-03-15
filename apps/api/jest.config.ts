@@ -1,5 +1,5 @@
 export default {
-  displayName: 'api',
+  displayName: 'taskito-api',
   preset: '../../jest.preset.js',
   testEnvironment: 'node',
   transform: {
