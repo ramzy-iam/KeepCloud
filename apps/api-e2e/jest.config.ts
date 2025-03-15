@@ -1,5 +1,5 @@
 export default {
-  displayName: 'taskito-api-e2e',
+  displayName: 'tackito-api-e2e',
   preset: '../../jest.preset.js',
   globalSetup: '<rootDir>/src/support/global-setup.ts',
   globalTeardown: '<rootDir>/src/support/global-teardown.ts',
@@ -14,5 +14,5 @@ export default {
     ],
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
-  coverageDirectory: '../../coverage/taskito-api-e2e',
+  coverageDirectory: '../../coverage/tackito-api-e2e',
 };

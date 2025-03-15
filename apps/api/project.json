@@ -1,5 +1,5 @@
 {
-  "name": "taskito-api",
+  "name": "tackito-api",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/api/src",
   "projectType": "application",
@@ -22,15 +22,15 @@
       "defaultConfiguration": "development",
       "dependsOn": ["build"],
       "options": {
-        "buildTarget": "taskito-api:build",
+        "buildTarget": "tackito-api:build",
         "runBuildTargetDependencies": false
       },
       "configurations": {
         "development": {
-          "buildTarget": "taskito-api:build:development"
+          "buildTarget": "tackito-api:build:development"
         },
         "production": {
-          "buildTarget": "taskito-api:build:production"
+          "buildTarget": "tackito-api:build:production"
         }
       }
     },

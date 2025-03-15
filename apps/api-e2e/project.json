@@ -1,8 +1,8 @@
 {
-  "name": "taskito-api-e2e",
+  "name": "tackito-api-e2e",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
-  "implicitDependencies": ["taskito-api"],
+  "implicitDependencies": ["tackito-api"],
   "targets": {
     "e2e": {
       "executor": "@nx/jest:jest",
@@ -11,7 +11,7 @@
         "jestConfig": "apps/api-e2e/jest.config.ts",
         "passWithNoTests": true
       },
-      "dependsOn": ["taskito-api:build"]
+      "dependsOn": ["tackito-api:build"]
     }
   }
 }
