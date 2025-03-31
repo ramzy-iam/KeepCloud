@@ -14,7 +14,22 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "strictPropertyInitialization": false,
+    "esModuleInterop": true,
+    "paths": {
+      "@keepcloud/commons/constants": [
+        "libs/commons/src/lib/constants/index.ts"
+      ],
+      "@keepcloud/commons/helpers": ["libs/commons/src/lib/helpers/index.ts"],
+      "@keepcloud/commons/helpers/backend": [
+        "libs/commons/helpers/backend/src/index.ts"
+      ],
+      "@keepcloud/commons/types": ["libs/commons/src/lib/types/index.ts"],
+      "@keepcloud/core/db": ["libs/core/db/src/index.ts"],
+      "@keepcloud/files/api": ["libs/files/api/src/index.ts"],
+      "@keepcloud/users/api": ["libs/users/api/src/index.ts"]
+    }
   },
+  "include": ["./env.d.ts", "**/*.ts"],
   "exclude": ["node_modules", "tmp"]
 }

@@ -1,0 +1,38 @@
+{
+  "name": "core-db",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/core/db/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/core/db",
+        "main": "libs/core/db/src/index.ts",
+        "tsConfig": "libs/core/db/tsconfig.lib.json",
+        "assets": ["libs/core/db/*.md"]
+      }
+    },
+    "migrations:generate": {
+      "executor": "nx:run-commands",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "envFile": ".env",
+        "commands": [
+          "npx ts-node -P ./libs/core/db/tsconfig.migrations.json -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -d ./libs/core/db/typeorm.config.ts ./libs/core/db/migrations/migration"
+        ]
+      }
+    },
+    "migrations:run": {
+      "executor": "nx:run-commands",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "commands": [
+          "npx ts-node -P ./libs/core/db/tsconfig.migrations.json -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -d ./libs/core/db/typeorm.config.ts"
+        ]
+      }
+    }
+  }
+}
