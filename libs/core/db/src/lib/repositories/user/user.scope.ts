@@ -13,4 +13,9 @@ export class UserScope extends SelectQueryBuilder<User> {
       email,
     });
   }
+  filterByAuthProviderId(authProviderId: string) {
+    return this.andWhere('User.authProviderId = :authProviderId', {
+      authProviderId,
+    });
+  }
 }

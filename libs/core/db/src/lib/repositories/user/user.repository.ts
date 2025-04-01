@@ -5,7 +5,7 @@ import { UserScope } from './user.scope';
 import { User } from '../../entities';
 
 @Injectable()
-export class UsersRepository extends Repository<User> {
+export class UserRepository extends Repository<User> {
   constructor(
     @InjectRepository(User)
     private readonly repository: Repository<User>

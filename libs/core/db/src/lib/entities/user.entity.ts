@@ -11,4 +11,7 @@ export class User extends AppBaseEntity {
 
   @Column({ unique: true })
   email: string;
+
+  @Column({ nullable: true, default: null })
+  picture: string | null;
 }

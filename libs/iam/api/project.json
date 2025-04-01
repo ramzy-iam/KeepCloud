@@ -1,0 +1,20 @@
+{
+  "name": "iam-api",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/iam/api/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/iam/api",
+        "tsConfig": "libs/iam/api/tsconfig.lib.json",
+        "packageJson": "libs/iam/api/package.json",
+        "main": "libs/iam/api/src/index.ts",
+        "assets": ["libs/iam/api/*.md"]
+      }
+    }
+  }
+}

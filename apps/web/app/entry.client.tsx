@@ -7,12 +7,15 @@
 import { HydratedRouter } from 'react-router/dom';
 import { startTransition, StrictMode } from 'react';
 import { hydrateRoot } from 'react-dom/client';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 startTransition(() => {
   hydrateRoot(
     document,
     <StrictMode>
-      <HydratedRouter />
+      <GoogleOAuthProvider clientId="891323425060-04b3e85k7gl00prd9a4cno5vngtljc7m.apps.googleusercontent.com">
+        <HydratedRouter />
+      </GoogleOAuthProvider>
     </StrictMode>
   );
 });

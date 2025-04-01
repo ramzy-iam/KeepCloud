@@ -1,5 +1,5 @@
 {
-  "name": "@keepcloud/users/api",
+  "name": "@keepcloud/iam",
   "version": "0.0.1",
   "private": true,
   "type": "commonjs",

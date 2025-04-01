@@ -1,15 +1,71 @@
-import { Button } from './components';
-import { Loader2 } from 'lucide-react';
+import { Button, ModeToggle, ThemeProvider } from './components';
+import {
+  GoogleLogin,
+  useGoogleLogin,
+  useGoogleOneTapLogin,
+} from '@react-oauth/google';
+import axios from 'axios';
 
 export function App() {
+  const login = useGoogleLogin({
+    flow: 'auth-code',
+    onSuccess: async (tokenResponse) => {
+      const {
+        data: { accessToken, refreshToken },
+      } = await axios.post<{
+        accessToken: string;
+        refreshToken: string;
+      }>(`http://localhost:3000/api/auth/google`, {
+        code: tokenResponse.code,
+      });
+      console.log({ accessToken, refreshToken });
+    },
+  });
   return (
-    <div>
-      <h1 className="text-3xl font-bold underline">Bonjour le monde!!</h1>
-      <Button disabled={true} variant="destructive">
-        <Loader2 className="animate-spin" />
-        Create
-      </Button>
-    </div>
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <div className="flex items-center text-p gap-2">
+        <Button>Hello</Button>
+
+        <Button variant="secondary" onClick={() => login()}>
+          <svg
+            width="19"
+            height="18"
+            viewBox="0 0 19 18"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M17.3758 9.1749C17.3758 8.5274 17.3222 8.0549 17.2061 7.56491H9.6615V10.4874H14.09C14.0008 11.2136 13.5186 12.3074 12.4472 13.0424L12.4322 13.1402L14.8176 14.9512L14.9829 14.9674C16.5007 13.5936 17.3758 11.5724 17.3758 9.1749"
+              fill="#4285F4"
+            />
+            <path
+              d="M9.66099 16.875C11.8306 16.875 13.652 16.175 14.9824 14.9675L12.4467 13.0424C11.7681 13.5062 10.8574 13.8299 9.66099 13.8299C7.53601 13.8299 5.73246 12.4562 5.08954 10.5574L4.9953 10.5653L2.51486 12.4465L2.48242 12.5349C3.80383 15.1074 6.51811 16.875 9.66099 16.875Z"
+              fill="#34A853"
+            />
+            <path
+              d="M5.09004 10.5575C4.9204 10.0675 4.82223 9.54245 4.82223 8.99997C4.82223 8.45744 4.9204 7.93246 5.08112 7.44247L5.07662 7.33811L2.56509 5.42664L2.48291 5.46494C1.9383 6.53245 1.62579 7.73123 1.62579 8.99997C1.62579 10.2687 1.9383 11.4674 2.48291 12.5349L5.09004 10.5575"
+              fill="#FBBC05"
+            />
+            <path
+              d="M9.66103 4.16998C11.1699 4.16998 12.1878 4.80873 12.7682 5.34251L15.036 3.1725C13.6432 1.90375 11.8306 1.125 9.66103 1.125C6.51814 1.125 3.80384 2.89249 2.48242 5.46497L5.08063 7.44249C5.73248 5.54375 7.53604 4.16998 9.66103 4.16998"
+              fill="#EB4335"
+            />
+          </svg>{' '}
+          <span>Connect with Google</span>
+        </Button>
+        <GoogleLogin
+          onSuccess={(credentialResponse) => {
+            console.log(credentialResponse);
+          }}
+          onError={() => {
+            console.log('Login Failed');
+          }}
+          useOneTap
+        />
+        <Button variant="danger">Delete</Button>
+        <ModeToggle />
+      </div>
+    </ThemeProvider>
   );
 }
 
