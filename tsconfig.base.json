@@ -26,6 +26,7 @@
       ],
       "@keepcloud/commons/types": ["libs/commons/src/lib/types/index.ts"],
       "@keepcloud/core/db": ["libs/core/db/src/index.ts"],
+      "@keepcloud/core/services": ["libs/core/services/src/index.ts"],
       "@keepcloud/files/api": ["libs/files/api/src/index.ts"],
       "@keepcloud/iam/api": ["libs/iam/api/src/index.ts"],
       "@keepcloud/users/api": ["libs/users/api/src/index.ts"]

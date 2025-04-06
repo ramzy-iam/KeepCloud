@@ -1,14 +1,17 @@
-import { User, UserRepository } from '@keepcloud/core/db';
+import { APP_GUARD } from '@nestjs/core';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
-import { UserService } from './user/user.service';
-import { AuthService } from './auth';
-import { AuthController } from './auth/auth.controller';
-import { UserController } from './user/user.controller';
 import { PassportModule } from '@nestjs/passport';
-import { JwtStrategy } from './auth/jwt.strategy';
-import { AuthGuard } from './auth/auth.guard';
+import { User, UserRepository } from '@keepcloud/core/db';
+import {
+  UserService,
+  AuthService,
+  AuthGuard,
+  JwtStrategy,
+} from '@keepcloud/core/services';
+import { AuthController } from './auth.controller';
+import { UserController } from './user.controller';
 
 @Module({
   imports: [
@@ -23,6 +26,10 @@ import { AuthGuard } from './auth/auth.guard';
     AuthGuard,
     JwtStrategy,
     JwtService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
   ],
 })
 export class IamApiModule {}

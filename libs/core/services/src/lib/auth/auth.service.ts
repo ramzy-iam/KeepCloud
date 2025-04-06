@@ -125,4 +125,12 @@ export class AuthService {
       throw new BadRequestException('Invalid refresh token');
     }
   }
+
+  async getUserProfile({ email, id }: { email: string; id: number }) {
+    const user = await this.userService.findOne({ email, id });
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+    return user;
+  }
 }
