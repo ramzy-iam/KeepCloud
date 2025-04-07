@@ -14,9 +14,9 @@ export default function Login() {
 
   return (
     <div className="grid grid-cols-12 gap-4 p-2 max-h-screen h-screen">
-      <LoginRightContent />
-      <div className="col-span-6 rounded-[12px] relative flex flex-col justify-center items-center">
-        <div className="flex flex-col justify-center items-center gap-6 w-[350px]">
+      <LoginRightContent className="hidden md:block md:col-span-6" />
+      <div className="col-span-full md:col-span-6 rounded-[12px] relative flex flex-col justify-center items-center">
+        <div className="flex flex-col justify-center items-center gap-6 w-full max-w-[360px] md:w-[350px] md:max-w-full">
           <img
             src={'/assets/svg/full-logo-light.svg'}
             alt="logo"
@@ -29,7 +29,7 @@ export default function Login() {
               KeepCloud
             </span>
           </h1>
-          <div className="w-full">
+          <div className="w-full mx-auto">
             <Button
               className="w-full"
               variant="secondary"

@@ -1,6 +1,7 @@
+import { cn } from '../../../libs/utils';
 import { useEffect, useRef, useState } from 'react';
 
-export const LoginRightContent = () => {
+export const LoginRightContent = ({ className }: { className?: string }) => {
   const [images] = useState([
     '/assets/svg/testimonial-container.svg',
     '/assets/svg/statistics-container.svg',
@@ -104,7 +105,10 @@ export const LoginRightContent = () => {
   return (
     <div
       ref={carouselParentRef}
-      className="col-span-6 rounded-[12px] flex flex-col items-center h-full max-h-full relative overflow-hidden"
+      className={cn(
+        ' rounded-[12px] flex flex-col items-center h-full max-h-full relative overflow-hidden',
+        className
+      )}
     >
       <div className="absolute top-0 left-0 w-full h-full">
         <img
