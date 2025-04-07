@@ -42,7 +42,7 @@ export default function Login() {
             </Button>
           </div>
         </div>
-        <div className="absolute bottom-0 w-full text-[12px] flex justify-between items-center text-neutral-400">
+        <div className="absolute bottom-0 w-full text-[12px] flex justify-center gap-x-5 gap-y-2 md:justify-between flex-wrap items-center text-neutral-400">
           <span>&copy; 2025 - KeepCloud All Rights Reserved</span>
           <span>Privacy Policy &#183; Terms & Conditions</span>
         </div>
