@@ -1,5 +1,5 @@
 import { useGoogleAuth } from '../../libs/hooks';
-import { Button, LoginRightContent } from '../components';
+import { Button, LoginRightContent, ModeToggle } from '../components';
 import { useGoogleLogin } from '@react-oauth/google';
 
 export default function Login() {
@@ -16,6 +16,9 @@ export default function Login() {
     <div className="grid grid-cols-12 gap-4 p-2 max-h-screen h-screen">
       <LoginRightContent className="hidden md:block md:col-span-6" />
       <div className="col-span-full md:col-span-6 rounded-[12px] relative flex flex-col justify-center items-center">
+        <div className="absolute top-0 right-2 flex  items-center">
+          <ModeToggle />
+        </div>
         <div className="flex flex-col justify-center items-center gap-6 w-full max-w-[360px] md:w-[350px] md:max-w-full">
           <img
             src={'/assets/svg/full-logo-light.svg'}
