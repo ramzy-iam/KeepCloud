@@ -8,18 +8,15 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import { User } from '@keepcloud/core/db';
-import { OAuth2Client, TokenPayload } from 'google-auth-library';
+import { TokenPayload } from 'google-auth-library';
+import { OAuthService } from './oauth.service';
 
-const {
-  VITE_GOOGLE_CLIENT_ID,
-  GOOGLE_CLIENT_SECRET,
-  JWT_REFRESH_SECRET,
-  JWT_SECRET,
-} = process.env;
+const { JWT_REFRESH_SECRET, JWT_SECRET } = process.env;
 
 @Injectable()
 export class AuthService {
   private readonly logger: Logger;
+
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService
@@ -54,37 +51,12 @@ export class AuthService {
   }
 
   private async verifyGoogleCode(code: string): Promise<TokenPayload> {
-    const client = new OAuth2Client(
-      VITE_GOOGLE_CLIENT_ID,
-      GOOGLE_CLIENT_SECRET,
-      'postmessage'
-    );
-
-    const { tokens } = await client.getToken(code);
-    if (!tokens?.id_token) {
-      throw new BadRequestException(
-        'Google authentication failed: ID token not found'
-      );
-    }
-
-    const ticket = await client.verifyIdToken({
-      idToken: tokens.id_token,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
-
-    const payload = ticket.getPayload();
-    if (!payload) {
-      throw new BadRequestException(
-        'Google authentication failed: Invalid token payload'
-      );
-    }
-
+    const payload = await OAuthService.verifyGoogleCode(code); // Updated to call static method
     if (!payload.email || !payload.email_verified) {
       throw new BadRequestException(
         'Google authentication failed: Email not verified'
       );
     }
-
     return payload;
   }
 
