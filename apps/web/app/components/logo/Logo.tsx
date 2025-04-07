@@ -3,7 +3,6 @@ import { useTheme } from '../ui';
 export const Logo = () => {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
-  console.log('isDark', isDark);
 
   if (isDark)
     return (

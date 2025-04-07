@@ -6,16 +6,19 @@ type ThemeProviderProps = {
   children: React.ReactNode;
   defaultTheme?: Theme;
   storageKey?: string;
+  selectedTheme?: Theme;
 };
 
 type ThemeProviderState = {
   theme: Theme;
   setTheme: (theme: Theme) => void;
+  selectedTheme: Theme;
 };
 
 const initialState: ThemeProviderState = {
   theme: 'system',
   setTheme: () => null,
+  selectedTheme: 'system',
 };
 
 const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
@@ -29,6 +32,7 @@ export function ThemeProvider({
   const [theme, setTheme] = useState<Theme>(
     () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
   );
+  const [selectedTheme, setSelectedTheme] = useState<Theme>(theme);
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -42,6 +46,7 @@ export function ThemeProvider({
         : 'light';
 
       root.classList.add(systemTheme);
+      setTheme(systemTheme);
       return;
     }
 
@@ -52,8 +57,10 @@ export function ThemeProvider({
     theme,
     setTheme: (theme: Theme) => {
       localStorage.setItem(storageKey, theme);
+      setSelectedTheme(theme);
       setTheme(theme);
     },
+    selectedTheme,
   };
 
   return (
