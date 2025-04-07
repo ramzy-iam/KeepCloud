@@ -1,8 +1,6 @@
 declare global {
   namespace NodeJS {
     interface ProcessEnv {
-      NX_AUTH_PUBLIC_URL: string;
-
       DATABASE_HOST: string;
       DATABASE_PORT: string;
       DATABASE_USERNAME: string;
@@ -13,7 +11,7 @@ declare global {
       JWT_SECRET: string;
       JWT_REFRESH_SECRET: string;
       GOOGLE_CLIENT_ID: string;
-      GOOGLE_CLIENT_SECRET: string;
+      VITE_GOOGLE_CLIENT_ID: string;
       API_BASE_URL: string;
     }
   }

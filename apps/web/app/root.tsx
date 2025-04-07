@@ -40,7 +40,7 @@ export function Layout({ children }: { readonly children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        <AppNav />
+        {/* <AppNav /> */}
         {children}
         <ScrollRestoration />
         <Scripts />

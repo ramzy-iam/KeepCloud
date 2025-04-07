@@ -183,6 +183,17 @@
   --color-sidebar-ring: var(--sidebar-ring);
   --color-error: var(--error-400);
 
+  --color-neutral-50: var(--neutral-50);
+  --color-neutral-100: var(--neutral-100);
+  --color-neutral-200: var(--neutral-200);
+  --color-neutral-300: var(--neutral-300);
+  --color-neutral-400: var(--neutral-400);
+  --color-neutral-500: var(--neutral-500);
+  --color-neutral-600: var(--neutral-600);
+  --color-neutral-700: var(--neutral-700);
+  --color-neutral-800: var(--neutral-800);
+  --color-neutral-900: var(--neutral-900);
+
   /* --text-xs: 0.75rem;
   --text-xs--line-height: calc(1 / 0.75);
   --text-sm: 0.875rem;
@@ -206,4 +217,7 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }

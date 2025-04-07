@@ -12,7 +12,7 @@ import { OAuth2Client, TokenPayload } from 'google-auth-library';
 
 const {
   GOOGLE_CLIENT_ID,
-  GOOGLE_CLIENT_SECRET,
+  VITE_GOOGLE_CLIENT_ID,
   JWT_REFRESH_SECRET,
   JWT_SECRET,
 } = process.env;
@@ -56,7 +56,7 @@ export class AuthService {
   private async verifyGoogleCode(code: string): Promise<TokenPayload> {
     const client = new OAuth2Client(
       GOOGLE_CLIENT_ID,
-      GOOGLE_CLIENT_SECRET,
+      VITE_GOOGLE_CLIENT_ID,
       'postmessage'
     );
 

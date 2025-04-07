@@ -3,9 +3,10 @@ import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 import { cn } from '../../../libs/utils';
+import { Loader2 } from 'lucide-react';
 
 const buttonVariants = cva(
-  "inline-flex items-center cursor-pointer px-[24px] py-[13px] justify-center gap-2 whitespace-nowrap rounded-[8px] border border-1 text-sm wshadow-[0px_4px_8px_rgba(0,0,0,0.16)] font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none ",
+  "inline-flex items-center cursor-pointer px-[24px] py-[13px] justify-center gap-2 whitespace-nowrap rounded-[8px] border border-1 text-sm shadow-[0px_4px_8px_rgba(0,0,0,0.04)] font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none ",
   {
     variants: {
       variant: {
@@ -14,7 +15,7 @@ const buttonVariants = cva(
         danger:
           'border-error text-white  bg-linear-to-t from-[#B63542] to-[#E95858]  hover:bg-error/90 focus-visible:ring-error/20 dark:focus-visible:ring-error/40 dark:bg-destructive/60',
         secondary:
-          'text-secondary-foreground bg-white border-[#E1E0E5]   dark:bg-linear-to-t dark:from-[#202022] dark:to-[#242426] dark-shadow-[0px_2px_14px_rgba(0, 0, 0, 0.2)] dark:border-[#2D2D2F] ',
+          'text-secondary-foreground bg-white border-[#E1E0E5] hover:bg-[#f0f0f0]/20   dark:bg-linear-to-t dark:from-[#202022] dark:to-[#242426] dark-shadow-[0px_2px_14px_rgba(0, 0, 0, 0.2)] dark:border-[#2D2D2F] ',
       },
 
       size: {
@@ -36,10 +37,13 @@ function Button({
   className,
   variant,
   size,
+  loading,
   asChild = false,
+  disabled,
   ...props
 }: React.ComponentProps<'button'> &
   VariantProps<typeof buttonVariants> & {
+    loading?: boolean;
     asChild?: boolean;
   }) {
   const Comp = asChild ? Slot : 'button';
@@ -47,9 +51,24 @@ function Button({
   return (
     <Comp
       data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }))}
+      className={cn(buttonVariants({ variant, size, className }), 'relative')}
+      disabled={disabled || loading}
+      {...(asChild && {
+        'data-state': loading ? 'loading' : undefined,
+      })}
+      {...(loading && {
+        disabled: true,
+        'aria-disabled': true,
+      })}
       {...props}
-    />
+    >
+      {loading && (
+        <div className="absolute flex h-full w-full items-center justify-center">
+          <Loader2 className="animate-spin" />
+        </div>
+      )}
+      {props.children}
+    </Comp>
   );
 }
 
