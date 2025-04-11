@@ -1,5 +1,5 @@
-import { useGoogleAuth } from '../../libs/hooks';
-import { Button, LoginRightContent, Logo, ModeToggle } from '../components';
+import { useGoogleAuth } from '../../../libs/hooks';
+import { Button, LoginRightContent, Logo, ModeToggle } from '../../components';
 import { useGoogleLogin } from '@react-oauth/google';
 
 export default function Login() {
@@ -40,7 +40,7 @@ export default function Login() {
             </Button>
           </div>
         </div>
-        <div className="absolute bottom-0 w-full text-[12px] flex justify-center gap-x-5 gap-y-2 lg:justify-between flex-wrap items-center text-neutral-400 dark:text-300">
+        <div className="absolute bottom-0 w-full text-[12px] flex justify-center gap-x-5 gap-y-2 lg:justify-between flex-wrap items-center text-foreground dark:text-300">
           <span>&copy; 2025 - KeepCloud All Rights Reserved</span>
           <span>Privacy Policy &#183; Terms & Conditions</span>
         </div>
