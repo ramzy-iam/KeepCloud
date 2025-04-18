@@ -1,6 +1,6 @@
-import { OrderType } from '@keepcloud/commons/types';
 import { BOOLEAN_ENUM } from '@keepcloud/commons/constants';
 import { DayjsHelper } from './dayjs.helper';
+import { SortOrder } from '../../types';
 
 interface ToNumberOptions {
   default?: number;
@@ -53,12 +53,12 @@ const toNumber = (
   return newValue;
 };
 
-const toOrder = (value?: string): OrderType | undefined => {
+const toOrder = (value?: string): SortOrder | undefined => {
   if (!value) return;
 
   value = value.trim().toUpperCase();
 
-  return ['ASC', 'DESC'].includes(value) ? (value as OrderType) : undefined;
+  return ['ASC', 'DESC'].includes(value) ? (value as SortOrder) : undefined;
 };
 
 const toArray = (value?: string, sep = ','): string[] | undefined => {

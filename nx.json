@@ -78,7 +78,8 @@
       },
       "library": {
         "style": "none",
-        "linter": "eslint"
+        "linter": "eslint",
+        "unitTestRunner": "jest"
       }
     }
   },

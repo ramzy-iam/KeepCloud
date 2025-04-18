@@ -1,6 +1,7 @@
 import axios, { AxiosRequestConfig, AxiosResponse, AxiosInstance } from 'axios';
-import { ACCESS_TOKEN, REFRESH_TOKEN } from '../../constants';
-import { cookiesHelper } from '../../helpers';
+import { CookiesHelper } from '../../helpers';
+import { ACCESS_TOKEN, REFRESH_TOKEN } from '@keepcloud/commons/constants';
+import { AuthHelper } from '../../helpers/auth.helper';
 
 let tokenRefreshPromise: Promise<string | undefined> | null = null;
 
@@ -13,7 +14,7 @@ const refreshTokenInternal = async (): Promise<string | undefined> => {
   if (tokenRefreshPromise) return tokenRefreshPromise;
 
   tokenRefreshPromise = (async () => {
-    const refreshToken = cookiesHelper.get(REFRESH_TOKEN);
+    const refreshToken = CookiesHelper.get(REFRESH_TOKEN);
 
     if (!refreshToken) {
       redirectToLogin();
@@ -30,10 +31,10 @@ const refreshTokenInternal = async (): Promise<string | undefined> => {
       });
 
       const newAccessToken = data.accessToken.jwtToken;
-      cookiesHelper.set(ACCESS_TOKEN, newAccessToken);
+      CookiesHelper.set(ACCESS_TOKEN, newAccessToken);
       return newAccessToken;
     } catch (error) {
-      clearAuthCookies();
+      AuthHelper.clearCookies();
       redirectToLogin();
       return undefined;
     }
@@ -66,15 +67,6 @@ export const renewAccessToken = async (
   }
 
   return newAccessToken;
-};
-
-const clearAuthCookies = () => {
-  const domainOptions = {
-    path: '/',
-    domain: import.meta.env['VITE_DOMAIN_NAME'],
-  };
-  cookiesHelper.remove(ACCESS_TOKEN, domainOptions);
-  cookiesHelper.remove(REFRESH_TOKEN, domainOptions);
 };
 
 const redirectToLogin = () => {
