@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 @import 'tailwindcss';
+@source "../../../../libs/core/web/react/src";
 
 @plugin 'tailwindcss-animate';
 
@@ -178,6 +179,7 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
   --section-border: var(--stroke-200);
+  --placeholder:var(--neutral-200)
 
   font-family: 'Inter', sans-serif;
 }
@@ -214,6 +216,8 @@
   --sidebar-border: oklch(0.269 0 0);
   --sidebar-ring: oklch(0.439 0 0);
   --section-border: var(--neutral-800);
+  --placeholder:var(--neutral-400)
+
 }
 
 @theme inline {
@@ -268,8 +272,9 @@
   --color-neutral-800: var(--neutral-800);
   --color-neutral-900: var(--neutral-900);
   --color-stroke-200: var(--stroke-200);
-  --color-white-white-light: var(--white-white-light);
+  --color-white-light: var(--white-light);
   --color-section-border: var(--section-border);
+  --color-placeholder: var(--placeholder);
 
   /* Extend the default font family */
   --font-family-inter: Inter, sans-serif;

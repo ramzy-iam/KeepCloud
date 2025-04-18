@@ -1,7 +1,7 @@
 import { Provider } from 'jotai';
-import { ThemeProvider } from './components';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ThemeProvider } from '@keepcloud/web-core/react';
 
 export const Providers = ({ children }: { children: React.ReactNode }) => {
   return (

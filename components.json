@@ -5,7 +5,8 @@
   "tsx": true,
   "tailwind": {
     "config": "",
-    "css": "src/styles/globals.css",
+    "css": "apps/web/app/styles/globals.css",
+    "cssYO": "src/styles/globals.css",
     "baseColor": "neutral",
     "cssVariables": true,
     "prefix": ""
@@ -13,7 +14,7 @@
   "aliases": {
     "components": "@/components",
     "utils": "@/lib/utils",
-    "ui": "@/components/ui",
+    "ui": "libs/core/web/react/src/lib/components/ui",
     "lib": "@/lib",
     "hooks": "@/hooks"
   },

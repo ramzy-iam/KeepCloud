@@ -1,5 +1,7 @@
-import { Button, LoginRightContent, Logo, ModeToggle } from '../../components';
 import { useGoogleLogin } from '@react-oauth/google';
+import { LoginRightContent, Logo } from '../../components';
+
+import { Button, ModeToggle } from '@keepcloud/web-core/react';
 import {
   AuthHelper,
   useGetProfile,
@@ -9,7 +11,9 @@ import { Navigate } from 'react-router';
 
 export default function Login() {
   const { mutate: googleAuth, isPending } = useGoogleAuth();
-  const { refetch } = useGetProfile();
+  const { refetch } = useGetProfile({
+    enabled: false,
+  });
 
   const login = useGoogleLogin({
     flow: 'auth-code',
