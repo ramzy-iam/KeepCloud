@@ -1,4 +1,4 @@
-import { cn } from '../../../libs/utils';
+import { cn } from '@keepcloud/web-core/react';
 import { useEffect, useRef, useState } from 'react';
 
 export const LoginRightContent = ({ className }: { className?: string }) => {
