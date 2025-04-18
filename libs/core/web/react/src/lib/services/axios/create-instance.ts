@@ -4,9 +4,9 @@ import axios, {
   AxiosInstance,
   InternalAxiosRequestConfig,
 } from 'axios';
-import { ACCESS_TOKEN } from '../../constants';
-import { cookiesHelper } from '../../helpers';
+import { CookiesHelper } from '../../helpers';
 import { renewAccessToken } from './token.helper';
+import { ACCESS_TOKEN } from '@keepcloud/commons/constants';
 
 const axiosOptions = {
   headers: {
@@ -28,7 +28,7 @@ export const createAxiosInstance = (baseURL: string): AxiosInstance => {
 
   axiosInstance.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
-      const accessToken = cookiesHelper.get(ACCESS_TOKEN);
+      const accessToken = CookiesHelper.get(ACCESS_TOKEN);
       if (accessToken) {
         config.headers.Authorization = `Bearer ${accessToken}`;
       }

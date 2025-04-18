@@ -74,7 +74,7 @@
   resolved "https://registry.yarnpkg.com/@babel/compat-data/-/compat-data-7.26.8.tgz#821c1d35641c355284d4a870b8a4a7b0c141e367"
   integrity sha512-oH5UPLMWR3L2wEFLnFJ1TZXqHufiTKAiLfqw5zkhS4dKXLJ10yVztfil/twG8EDTA4F/tvVNw9nOl4ZMslB8rQ==
 
-"@babel/core@^7.11.6", "@babel/core@^7.12.3", "@babel/core@^7.21.3", "@babel/core@^7.21.8", "@babel/core@^7.23.2", "@babel/core@^7.23.7", "@babel/core@^7.23.9", "@babel/core@^7.26.0":
+"@babel/core@^7.11.6", "@babel/core@^7.12.3", "@babel/core@^7.14.5", "@babel/core@^7.21.3", "@babel/core@^7.21.8", "@babel/core@^7.23.2", "@babel/core@^7.23.7", "@babel/core@^7.23.9", "@babel/core@^7.26.0":
   version "7.26.10"
   resolved "https://registry.yarnpkg.com/@babel/core/-/core-7.26.10.tgz#5c876f83c8c4dcb233ee4b670c0606f2ac3000f9"
   integrity sha512-vMqyb7XCDMPvJFFOaT9kxtiRh42GwlZEg1/uIgtZshS5a/8OaduUfCi7kynKgc3Tw/6Uo2D+db9qBttghhmxwQ==
@@ -1001,7 +1001,7 @@
     "@babel/types" "^7.4.4"
     esutils "^2.0.2"
 
-"@babel/preset-react@^7.18.6":
+"@babel/preset-react@^7.14.5", "@babel/preset-react@^7.18.6":
   version "7.26.3"
   resolved "https://registry.yarnpkg.com/@babel/preset-react/-/preset-react-7.26.3.tgz#7c5e028d623b4683c1f83a0bd4713b9100560caa"
   integrity sha512-Nl03d6T9ky516DGK2YMxrTqvnpUW63TnJMOMonj+Zae0JiPC5BC9xPMSL6L8fiSpA5vP88qfygavVQvnLp+6Cw==
@@ -8438,6 +8438,11 @@ jiti@2.4.2, jiti@^2.4.2:
   version "2.4.2"
   resolved "https://registry.yarnpkg.com/jiti/-/jiti-2.4.2.tgz#d19b7732ebb6116b06e2038da74a55366faef560"
   integrity sha512-rg9zJN+G4n2nfJl5MW3BMygZX56zKPNVEYYqq7adpmMh4Jn2QNEwhvQlFy6jPVdcod7txZtKHWnyZiA3a0zP7A==
+
+jotai@^2.12.3:
+  version "2.12.3"
+  resolved "https://registry.yarnpkg.com/jotai/-/jotai-2.12.3.tgz#517ccfd92b35a3d98b944545166ddeecd29e7784"
+  integrity sha512-DpoddSkmPGXMFtdfnoIHfueFeGP643nqYUWC6REjUcME+PG2UkAtYnLbffRDw3OURI9ZUTcRWkRGLsOvxuWMCg==
 
 "js-tokens@^3.0.0 || ^4.0.0", js-tokens@^4.0.0:
   version "4.0.0"

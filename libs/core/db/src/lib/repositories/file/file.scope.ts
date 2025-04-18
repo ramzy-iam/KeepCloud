@@ -1,7 +1,7 @@
 import { SelectQueryBuilder } from 'typeorm';
 import { File } from '../../entities';
 import { FileFormat, FileSortField } from '@keepcloud/commons/constants';
-import { SortOrderType } from '@keepcloud/commons/types';
+import { SortOrder } from '@keepcloud/commons/types';
 
 export class FileScope extends SelectQueryBuilder<File> {
   filterById(id: number) {
@@ -62,10 +62,7 @@ export class FileScope extends SelectQueryBuilder<File> {
     });
   }
 
-  order(
-    field: string = FileSortField.CREATED_AT,
-    order: SortOrderType = 'DESC'
-  ) {
+  order(field: string = FileSortField.CREATED_AT, order: SortOrder = 'DESC') {
     return this.addOrderBy(`File.${field}`, order);
   }
 }

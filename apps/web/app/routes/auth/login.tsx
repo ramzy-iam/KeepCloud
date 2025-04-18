@@ -1,9 +1,15 @@
-import { useGoogleAuth } from '../../../libs/hooks';
 import { Button, LoginRightContent, Logo, ModeToggle } from '../../components';
 import { useGoogleLogin } from '@react-oauth/google';
+import {
+  AuthHelper,
+  useGetProfile,
+  useGoogleAuth,
+} from '@keepcloud/web-core/react';
+import { Navigate } from 'react-router';
 
 export default function Login() {
   const { mutate: googleAuth, isPending } = useGoogleAuth();
+  const { refetch } = useGetProfile();
 
   const login = useGoogleLogin({
     flow: 'auth-code',
@@ -11,6 +17,11 @@ export default function Login() {
       googleAuth({ code: tokenResponse.code });
     },
   });
+
+  if (AuthHelper.checkIfSessionValid()) {
+    refetch();
+    return <Navigate to="/app" />;
+  }
 
   return (
     <div className=" h-svh grid grid-cols-12 gap-4 p-2 max-h-svh ">

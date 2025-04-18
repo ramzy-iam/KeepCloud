@@ -7,21 +7,15 @@
 import { HydratedRouter } from 'react-router/dom';
 import { startTransition, StrictMode } from 'react';
 import { hydrateRoot } from 'react-dom/client';
-import { GoogleOAuthProvider } from '@react-oauth/google';
-import { ThemeProvider } from './components';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Providers } from './providers';
 
 startTransition(() => {
   hydrateRoot(
     document,
     <StrictMode>
-      <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-        <QueryClientProvider client={new QueryClient()}>
-          <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-            <HydratedRouter />
-          </GoogleOAuthProvider>
-        </QueryClientProvider>
-      </ThemeProvider>
+      <Providers>
+        <HydratedRouter />
+      </Providers>
     </StrictMode>
   );
 });

@@ -5,6 +5,8 @@
     "app/**/*.tsx",
     "app/**/*.js",
     "app/**/*.jsx",
+    "../../libs/core/web/react/**/*.ts",
+    "../../libs/core/web/react/**/*.tsx",
     "**/.server/**/*.ts",
     "**/.server/**/*.tsx",
     "**/.client/**/*.ts",

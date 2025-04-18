@@ -1,5 +1,12 @@
-import { Outlet } from 'react-router';
+import { Navigate, Outlet } from 'react-router';
 import { ModeToggle } from '../../components';
+import {
+  AuthHelper,
+  authState,
+  useGetProfile,
+} from '@keepcloud/web-core/react';
+import { useAtomValue } from 'jotai';
+import { UserProfileDto } from '@keepcloud/commons/dtos';
 // import HomeIcon from '../../../public/assets/svg/home-icon.svg';
 
 const HomeIcon = () => {
@@ -23,6 +30,18 @@ const HomeIcon = () => {
 };
 
 export default function Layout() {
+  const { isLoading } = useGetProfile();
+  const user = useAtomValue(authState)?.user as UserProfileDto;
+
+  if (!AuthHelper.checkIfSessionValid()) {
+    AuthHelper.clearCookies();
+    return <Navigate to="app/auth" />;
+  }
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className=" h-svh  flex ">
       <div className=" w-[88px] h-full  p-6 flex flex-col items-center gap-y-6 border-0 border-r-1 border-section-border">
@@ -32,7 +51,21 @@ export default function Layout() {
         </div>
       </div>
       <div className="w-[267px] p-6 h-full border-0 border-x border-section-border ">
-        profile
+        <div className="flex gap-3 items-center">
+          <img
+            src={user.picture as string}
+            alt="profile"
+            width={38}
+            height={38}
+            className="rounded-full"
+          />
+          <div className="flex flex-col">
+            <span className="text-16-medium text-neutral-500">
+              {user.firstName} {user.lastName}
+            </span>
+            <span className="text-12 text-foreground">{user.email}</span>
+          </div>
+        </div>
       </div>
       <div className="w-[calc(100%-267px-88px)] h-full flex flex-col border-0 border-x  border-section-border ">
         <div className="h-[72px] border-b border-section-border py-5 px-8 flex items-center justify-between">

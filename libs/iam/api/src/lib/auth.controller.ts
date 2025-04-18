@@ -7,7 +7,8 @@ import {
   Get,
 } from '@nestjs/common';
 import { Request } from 'express';
-import { AuthService, PublicRoute } from '@keepcloud/core/services';
+import { AuthService, PublicRoute, Serialize } from '@keepcloud/core/services';
+import { AuthGoogleResponseDto, UserProfileDto } from '@keepcloud/commons/dtos';
 
 @Controller('auth')
 export class AuthController {
@@ -15,6 +16,7 @@ export class AuthController {
 
   @PublicRoute()
   @Post('google')
+  @Serialize(AuthGoogleResponseDto)
   async googleAuthCallback(@Body() { code }: { code: string }) {
     if (!code) {
       throw new BadRequestException('Authorization code is required');
@@ -24,11 +26,13 @@ export class AuthController {
   }
 
   @PublicRoute()
+  @Serialize(AuthGoogleResponseDto)
   @Post('refresh-token')
   async refresh(@Body() { refreshToken }: { refreshToken: string }) {
     return this.authService.refreshAccessToken(refreshToken);
   }
 
+  @Serialize(UserProfileDto)
   @Get('me')
   getProfile(@Req() req: Request extends { user: infer U } ? U : any) {
     const { email, userId: id } = req.user;
