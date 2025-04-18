@@ -1,12 +1,26 @@
 import { Navigate, Outlet } from 'react-router';
-import { ModeToggle } from '../../components';
 import {
   AuthHelper,
   authState,
   useGetProfile,
+  ModeToggle,
+  PopoverContent,
+  PopoverTrigger,
+  Popover,
+  Button,
+  Command,
+  CommandList,
+  CommandGroup,
+  CommandItem,
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
 } from '@keepcloud/web-core/react';
 import { useAtomValue } from 'jotai';
 import { UserProfileDto } from '@keepcloud/commons/dtos';
+import { ChevronsUpDown } from 'lucide-react';
+import { UserProfileIcon } from '../../components';
 // import HomeIcon from '../../../public/assets/svg/home-icon.svg';
 
 const HomeIcon = () => {
@@ -30,7 +44,9 @@ const HomeIcon = () => {
 };
 
 export default function Layout() {
-  const { isLoading } = useGetProfile();
+  const { isLoading } = useGetProfile({
+    enabled: AuthHelper.checkIfSessionValid(),
+  });
   const user = useAtomValue(authState)?.user as UserProfileDto;
 
   if (!AuthHelper.checkIfSessionValid()) {
@@ -51,21 +67,7 @@ export default function Layout() {
         </div>
       </div>
       <div className="w-[267px] p-6 h-full border-0 border-x border-section-border ">
-        <div className="flex gap-3 items-center">
-          <img
-            src={user.picture as string}
-            alt="profile"
-            width={38}
-            height={38}
-            className="rounded-full"
-          />
-          <div className="flex flex-col">
-            <span className="text-16-medium text-neutral-500">
-              {user.firstName} {user.lastName}
-            </span>
-            <span className="text-12 text-foreground">{user.email}</span>
-          </div>
-        </div>
+        <UserProfileIcon user={user} />
       </div>
       <div className="w-[calc(100%-267px-88px)] h-full flex flex-col border-0 border-x  border-section-border ">
         <div className="h-[72px] border-b border-section-border py-5 px-8 flex items-center justify-between">
@@ -77,7 +79,7 @@ export default function Layout() {
               height={16}
               className="mr-2"
             />
-            <span>What are you looking for?</span>
+            <span className="text-placeholder">What are you looking for?</span>
           </div>
           <div>
             <ModeToggle />

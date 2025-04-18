@@ -1,4 +1,4 @@
-import { useTheme } from '../ui';
+import { useTheme } from '@keepcloud/web-core/react';
 
 export const Logo = () => {
   const { theme } = useTheme();

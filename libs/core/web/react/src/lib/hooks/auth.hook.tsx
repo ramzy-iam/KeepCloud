@@ -5,6 +5,7 @@ import { AxiosError } from 'axios';
 import { AuthGoogleResponseDto } from '@keepcloud/commons/dtos';
 import { authState } from '../store';
 import { useSetAtom } from 'jotai';
+import { useNavigate } from 'react-router';
 
 export const useGoogleAuth = () => {
   return useMutation<
@@ -22,7 +23,10 @@ export const useGoogleAuth = () => {
   });
 };
 
-export const useGetProfile = () => {
+interface GetProfileProps {
+  enabled?: boolean;
+}
+export const useGetProfile = ({ enabled }: GetProfileProps = {}) => {
   const setAuthState = useSetAtom(authState);
   return useQuery({
     queryKey: ['profile'],
@@ -31,14 +35,16 @@ export const useGetProfile = () => {
       setAuthState((prev) => ({ ...prev, user: data }));
       return data;
     },
-    enabled: AuthHelper.checkIfSessionValid(),
+    enabled,
     retry: false,
   });
 };
 
 export const useLogout = () => {
+  const navigate = useNavigate();
   const logout = () => {
     AuthHelper.clearCookies();
+    navigate('/');
   };
 
   return { logout };
