@@ -103,7 +103,7 @@ const Links = [
         />
       </svg>
     ),
-    label: 'All Folder',
+    label: 'Explorer',
     path: '#',
   },
   {

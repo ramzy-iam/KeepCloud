@@ -181,6 +181,7 @@
   --section-border: var(--stroke-200);
   --placeholder: var(--neutral-200);
   --sidebar-width: 355px;
+  --heading: var(--neutral-500);
 
   font-family: 'Inter', sans-serif;
 }
@@ -218,6 +219,7 @@
   --sidebar-ring: oklch(0.439 0 0);
   --section-border: var(--neutral-800);
   --placeholder: var(--neutral-400);
+  --heading: var(--white-light);
 }
 
 @theme inline {
@@ -260,6 +262,7 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-error: var(--error-400);
+  --color-heading: var(--heading);
 
   --color-neutral-50: var(--neutral-50);
   --color-neutral-100: var(--neutral-100);
