@@ -59,63 +59,54 @@ const OverviewIcon = () => {
     >
       <path
         d="M10 5.49967C10.4602 5.49967 10.8333 5.12658 10.8333 4.66634C10.8333 4.2061 10.4602 3.83301 10 3.83301C9.53976 3.83301 9.16667 4.2061 9.16667 4.66634C9.16667 5.12658 9.53976 5.49967 10 5.49967Z"
-        stroke="#737379"
         stroke-width="1.2"
         stroke-linecap="round"
         stroke-linejoin="round"
       />
       <path
         d="M10 11.333C10.4602 11.333 10.8333 10.9599 10.8333 10.4997C10.8333 10.0394 10.4602 9.66634 10 9.66634C9.53976 9.66634 9.16667 10.0394 9.16667 10.4997C9.16667 10.9599 9.53976 11.333 10 11.333Z"
-        stroke="#737379"
         stroke-width="1.2"
         stroke-linecap="round"
         stroke-linejoin="round"
       />
       <path
         d="M10 17.1663C10.4602 17.1663 10.8333 16.7932 10.8333 16.333C10.8333 15.8728 10.4602 15.4997 10 15.4997C9.53976 15.4997 9.16667 15.8728 9.16667 16.333C9.16667 16.7932 9.53976 17.1663 10 17.1663Z"
-        stroke="#737379"
         stroke-width="1.2"
         stroke-linecap="round"
         stroke-linejoin="round"
       />
       <path
         d="M15.8333 5.49967C16.2936 5.49967 16.6667 5.12658 16.6667 4.66634C16.6667 4.2061 16.2936 3.83301 15.8333 3.83301C15.3731 3.83301 15 4.2061 15 4.66634C15 5.12658 15.3731 5.49967 15.8333 5.49967Z"
-        stroke="#737379"
         stroke-width="1.2"
         stroke-linecap="round"
         stroke-linejoin="round"
       />
       <path
         d="M15.8333 11.333C16.2936 11.333 16.6667 10.9599 16.6667 10.4997C16.6667 10.0394 16.2936 9.66634 15.8333 9.66634C15.3731 9.66634 15 10.0394 15 10.4997C15 10.9599 15.3731 11.333 15.8333 11.333Z"
-        stroke="#737379"
         stroke-width="1.2"
         stroke-linecap="round"
         stroke-linejoin="round"
       />
       <path
         d="M15.8333 17.1663C16.2936 17.1663 16.6667 16.7932 16.6667 16.333C16.6667 15.8728 16.2936 15.4997 15.8333 15.4997C15.3731 15.4997 15 15.8728 15 16.333C15 16.7932 15.3731 17.1663 15.8333 17.1663Z"
-        stroke="#737379"
         stroke-width="1.2"
         stroke-linecap="round"
         stroke-linejoin="round"
       />
       <path
         d="M4.16667 5.49967C4.6269 5.49967 5 5.12658 5 4.66634C5 4.2061 4.6269 3.83301 4.16667 3.83301C3.70643 3.83301 3.33333 4.2061 3.33333 4.66634C3.33333 5.12658 3.70643 5.49967 4.16667 5.49967Z"
-        stroke="#737379"
         stroke-width="1.2"
         stroke-linecap="round"
         stroke-linejoin="round"
       />
       <path
         d="M4.16667 11.333C4.6269 11.333 5 10.9599 5 10.4997C5 10.0394 4.6269 9.66634 4.16667 9.66634C3.70643 9.66634 3.33333 10.0394 3.33333 10.4997C3.33333 10.9599 3.70643 11.333 4.16667 11.333Z"
-        stroke="#737379"
         stroke-width="1.2"
         stroke-linecap="round"
         stroke-linejoin="round"
       />
       <path
         d="M4.16667 17.1663C4.6269 17.1663 5 16.7932 5 16.333C5 15.8728 4.6269 15.4997 4.16667 15.4997C3.70643 15.4997 3.33333 15.8728 3.33333 16.333C3.33333 16.7932 3.70643 17.1663 4.16667 17.1663Z"
-        stroke="#737379"
         stroke-width="1.2"
         stroke-linecap="round"
         stroke-linejoin="round"
@@ -165,7 +156,7 @@ export default function Layout() {
             </div>
           ))}
         </div>
-        <div className="flex flex-col w-12 h-12 items-center rounded-[8px] gap-1 p-2 stroke-foreground hover:text-neutral-300 cursor-pointer hover:bg-stroke-200 dark:hover:bg-white/5 dark:hover:stroke-neutral-300">
+        <div className="grid items-center place-items-center rounded-[8px] gap-1 p-2 stroke-foreground hover:text-neutral-300 cursor-pointer hover:bg-stroke-200 dark:hover:bg-white/5 dark:hover:stroke-neutral-300">
           <OverviewIcon />
           <span className="text-12-medium">More</span>
         </div>
