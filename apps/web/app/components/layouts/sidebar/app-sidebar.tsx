@@ -12,7 +12,7 @@ import { useState } from 'react';
 import { UserProfileIcon } from '../../user';
 import { UserProfileDto } from '@keepcloud/commons/dtos';
 import { HomeMenu } from './menus/home';
-import { FolderMenu } from './menus/folder';
+import { FileTree } from './menus/folder';
 
 const HomeIcon = () => {
   return (
@@ -130,7 +130,7 @@ const SidebarItems = [
   },
 ];
 
-const contents = [<HomeMenu />, <FolderMenu />];
+const contents = [<HomeMenu />, <FileTree />];
 
 interface Props {
   user: UserProfileDto;
@@ -183,7 +183,9 @@ export function AppSidebar({ user }: Props) {
 
             <div className="relative flex h-full w-[267px] flex-col gap-8 border-0 border-x border-section-border p-6">
               <UserProfileIcon user={user} />
-              <div>{contents[selectedTab]}</div>
+              <div className="h-full overflow-auto">
+                {contents[selectedTab]}
+              </div>
             </div>
           </SidebarGroupContent>
         </SidebarGroup>
