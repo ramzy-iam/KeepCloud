@@ -84,7 +84,7 @@ export default function ExplorerComponent() {
         <h3 className="sticky top-0 z-[1] bg-background p-1.5 text-18-medium text-heading">
           Folders
         </h3>
-        <div className="flex flex-col flex-wrap gap-3 sm:flex-row">
+        <div className="flex flex-col flex-wrap gap-3 sm:flex-row md:gap-8">
           {folders.map((folder) => (
             <Button
               key={folder}
