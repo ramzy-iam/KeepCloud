@@ -9,8 +9,10 @@ import {
   useSidebar,
 } from '@keepcloud/web-core/react';
 import { useState } from 'react';
-import { UserProfileIcon } from '../user';
+import { UserProfileIcon } from '../../user';
 import { UserProfileDto } from '@keepcloud/commons/dtos';
+import { HomeMenu } from './menus/home';
+import { FolderMenu } from './menus/folder';
 
 const HomeIcon = () => {
   return (
@@ -128,7 +130,7 @@ const SidebarItems = [
   },
 ];
 
-const contents = ['Home', 'Folder'];
+const contents = [<HomeMenu />, <FolderMenu />];
 
 interface Props {
   user: UserProfileDto;
