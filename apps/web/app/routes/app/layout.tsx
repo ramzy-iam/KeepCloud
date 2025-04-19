@@ -4,11 +4,14 @@ import {
   authState,
   useGetProfile,
   ModeToggle,
+  Button,
+  cn,
 } from '@keepcloud/web-core/react';
 import { useAtomValue } from 'jotai';
 import { UserProfileDto } from '@keepcloud/commons/dtos';
 import { UserProfileIcon } from '../../components';
 import { Search } from 'lucide-react';
+import { useState } from 'react';
 
 const HomeIcon = () => {
   return (
@@ -126,11 +129,14 @@ const SidebarItems = [
   },
 ];
 
+const contents = ['Home', 'Folder'];
+
 export default function Layout() {
   const { isLoading } = useGetProfile({
     enabled: AuthHelper.checkIfSessionValid(),
   });
   const user = useAtomValue(authState)?.user as UserProfileDto;
+  const [selectedTab, setSelectedTab] = useState(0);
 
   if (!AuthHelper.checkIfSessionValid()) {
     AuthHelper.clearCookies();
@@ -142,30 +148,40 @@ export default function Layout() {
   }
 
   return (
-    <div className=" h-svh  flex ">
-      <div className=" w-[88px] h-full  p-6 flex flex-col items-center gap-y-6 border-0 border-r-1 border-section-border">
+    <div className="flex h-svh">
+      <div className="flex h-full w-[88px] flex-col items-center gap-y-6 border-0 border-r-1 border-section-border p-6">
         <img src="/assets/svg/logomark.svg" alt="logo" width={40} height={40} />
-        <div className=" flex  flex-col items-center justify-between  gap-6">
-          {SidebarItems.map((item) => (
-            <div
+        <div className="flex flex-col items-center justify-between gap-6">
+          {SidebarItems.map((item, index) => (
+            <Button
+              className={cn(
+                'group relative flex size-10 cursor-pointer flex-col items-center gap-1 stroke-foreground hover:stroke-primary hover:text-primary dark:hover:stroke-white-light dark:hover:text-white-light',
+                selectedTab === index &&
+                  'stroke-primary text-primary dark:stroke-white-light dark:text-white-light',
+              )}
+              variant="text"
               key={item.label}
-              className="group size-10 flex   flex-col items-center gap-1 cursor-pointer stroke-foreground hover:text-primary  hover:stroke-primary  dark:hover:stroke-white-light dark:hover:text-white-light"
+              onClick={() => setSelectedTab(index)}
             >
               {item.icon}
               <span className="text-12-medium">{item.label}</span>
-            </div>
+              {selectedTab === index && (
+                <div className="absolute -right-[21px] z-[2] h-10 border-[1.5px] border-primary"></div>
+              )}
+            </Button>
           ))}
         </div>
-        <div className="grid size-12 place-items-center rounded-[8px] gap-1 p-2 stroke-foreground hover:text-neutral-300 cursor-pointer hover:bg-stroke-200 dark:hover:bg-white/5 dark:hover:stroke-neutral-300">
+        <div className="grid size-12 cursor-pointer place-items-center gap-1 rounded-[8px] stroke-foreground p-2 hover:bg-stroke-200 hover:text-neutral-300 dark:hover:bg-white/5 dark:hover:stroke-neutral-300">
           <OverviewIcon />
           <span className="text-12-medium">More</span>
         </div>
       </div>
-      <div className="w-[267px] p-6 h-full border-0 border-x border-section-border ">
+      <div className="relative flex h-full w-[267px] flex-col gap-8 border-0 border-x border-section-border p-6">
         <UserProfileIcon user={user} />
+        <div>{contents[selectedTab]}</div>
       </div>
-      <div className="w-[calc(100%-267px-88px)] h-full flex flex-col border-0 border-x  border-section-border ">
-        <div className="h-[72px] border-b border-section-border py-5 px-8 flex items-center justify-between">
+      <div className="flex h-full w-[calc(100%-267px-88px)] flex-col border-0 border-x border-section-border">
+        <div className="flex h-[72px] items-center justify-between border-b border-section-border px-8 py-5">
           <div className="flex items-center gap-2.5 text-14">
             <Search className="text-foreground" size={16} />
             <span className="text-placeholder">What are you looking for?</span>
