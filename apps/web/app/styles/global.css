@@ -179,7 +179,8 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
   --section-border: var(--stroke-200);
-  --placeholder:var(--neutral-200)
+  --placeholder: var(--neutral-200);
+  --sidebar-width: 355px;
 
   font-family: 'Inter', sans-serif;
 }
@@ -216,8 +217,7 @@
   --sidebar-border: oklch(0.269 0 0);
   --sidebar-ring: oklch(0.439 0 0);
   --section-border: var(--neutral-800);
-  --placeholder:var(--neutral-400)
-
+  --placeholder: var(--neutral-400);
 }
 
 @theme inline {

@@ -5,3 +5,8 @@ export * from './mode-toggle';
 export * from './dropdown-menu';
 export * from './popover';
 export * from './command';
+export * from './sidebar';
+export * from './skeleton';
+export * from './tooltip';
+export * from './separator';
+export * from './avatar';
