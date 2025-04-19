@@ -14,8 +14,8 @@ const HomeIcon = () => {
   return (
     <svg
       width="20"
-      height="21"
-      viewBox="0 0 20 21"
+      height="20"
+      viewBox="0 0 20 20"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
@@ -33,8 +33,8 @@ const FolderIcon = () => {
   return (
     <svg
       width="20"
-      height="21"
-      viewBox="0 0 20 21"
+      height="20"
+      viewBox="0 0 20 20"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
@@ -52,8 +52,8 @@ const OverviewIcon = () => {
   return (
     <svg
       width="20"
-      height="21"
-      viewBox="0 0 20 21"
+      height="20"
+      viewBox="0 0 20 20"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
@@ -154,7 +154,7 @@ export default function Layout() {
     <div className=" h-svh  flex ">
       <div className=" w-[88px] h-full  p-6 flex flex-col items-center gap-y-6 border-0 border-r-1 border-section-border">
         <img src="/assets/svg/logomark.svg" alt="logo" width={40} height={40} />
-        <div className=" flex  flex-col items-center  gap-6">
+        <div className=" flex  flex-col items-center justify-between  gap-6">
           {SidebarItems.map((item) => (
             <div
               key={item.label}
@@ -165,9 +165,9 @@ export default function Layout() {
             </div>
           ))}
         </div>
-        <div className="flex flex-col items-center rounded-[8px] gap-1 p-2 cursor-pointer hover:bg-stroke-200 dark:hover:bg-white/5">
+        <div className="flex flex-col w-12 h-12 items-center rounded-[8px] gap-1 p-2 stroke-foreground hover:text-neutral-300 cursor-pointer hover:bg-stroke-200 dark:hover:bg-white/5 dark:hover:stroke-neutral-300">
           <OverviewIcon />
-          <span className="text-12-medium ">More</span>
+          <span className="text-12-medium">More</span>
         </div>
       </div>
       <div className="w-[267px] p-6 h-full border-0 border-x border-section-border ">
