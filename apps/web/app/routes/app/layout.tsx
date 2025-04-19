@@ -58,7 +58,7 @@ export default function Layout() {
         <AppSidebar user={user} />
         <main className="h-full w-full">
           <div className="flex h-full flex-col border-0 border-x border-section-border">
-            <div className="flex h-[72px] items-center justify-between border-b border-section-border px-8 py-5">
+            <div className="flex h-[72px] items-center justify-between border-b border-section-border px-2 py-5 md:px-8">
               <div className="flex items-center gap-2.5 text-14">
                 <LocalSidebarTrigger />
                 <Search className="text-foreground" size={16} />
