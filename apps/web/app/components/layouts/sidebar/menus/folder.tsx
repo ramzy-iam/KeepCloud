@@ -72,7 +72,7 @@ const Folder = ({
 
 export const FileTree = () => {
   return (
-    <Folder name="ALL FOLDERS" noIcon={true}>
+    <Folder name="My Storage" noIcon={true}>
       <Folder name="Folder A">
         <File name="File A1" />
       </Folder>
