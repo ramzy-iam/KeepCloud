@@ -71,7 +71,7 @@ export default function ExplorerComponent() {
         {actions.map((action) => (
           <button
             key={action.label}
-            className="group flex w-[100px] cursor-pointer flex-col items-center gap-2 rounded-[8px] border border-primary p-3 text-heading hover:bg-primary/5 md:w-[156px] md:items-start"
+            className="group border-stroke-500 flex w-[100px] cursor-pointer flex-col items-center gap-2 rounded-[8px] border p-3 text-heading hover:border-primary hover:bg-primary/5 md:w-[156px] md:items-start dark:border-neutral-600 dark:hover:border-primary"
           >
             <action.icon className="text-primary dark:group-hover:text-white-light" />
             <span className="text-14 group-hover:text-primary dark:group-hover:text-white-light">
