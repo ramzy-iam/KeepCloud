@@ -136,7 +136,7 @@ interface Props {
   user: UserProfileDto;
 }
 
-export function AppSidebar({ user }: Props) {
+export function AppSidebar({ user }: Readonly<Props>) {
   const [selectedTab, setSelectedTab] = useState(0);
   const { open, openMobile } = useSidebar();
 
