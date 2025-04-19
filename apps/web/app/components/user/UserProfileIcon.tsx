@@ -44,7 +44,7 @@ export const UserProfileIcon = ({ user, className }: Props) => {
             </span>
             <span className="text-12 text-foreground ">{user.email}</span>
           </div>
-          <ChevronsUpDown className="opacity-50" size={16} />
+          <ChevronsUpDown className=" text-foreground" size={16} />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
