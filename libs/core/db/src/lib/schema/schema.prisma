@@ -12,5 +12,5 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://postgres:postgres@localhost:5432/keepcloud?schema=prisma"
+  url      = env("DATABASE_URL")
 }
