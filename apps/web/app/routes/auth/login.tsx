@@ -1,7 +1,7 @@
 import { useGoogleLogin } from '@react-oauth/google';
 import { LoginRightContent, Logo } from '../../components';
 
-import { Button, ModeToggle } from '@keepcloud/web-core/react';
+import { Button, ModeToggle, ROUTE_PATH } from '@keepcloud/web-core/react';
 import {
   AuthHelper,
   useGetProfile,
@@ -24,7 +24,7 @@ export default function Login() {
 
   if (AuthHelper.checkIfSessionValid()) {
     refetch();
-    return <Navigate to="/app" />;
+    return <Navigate to={ROUTE_PATH.home} />;
   }
 
   return (
