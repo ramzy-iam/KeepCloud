@@ -14,4 +14,7 @@ export class User extends AppBaseEntity {
 
   @Column({ nullable: true, default: null })
   picture: string | null;
+
+  @Column({ type: 'text', default: () => 'nanoid()' })
+  slug: string;
 }
