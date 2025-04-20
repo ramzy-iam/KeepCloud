@@ -1,5 +1,6 @@
 import {
   Button,
+  ROUTE_PATH,
   Sidebar,
   SidebarContent,
   SidebarGroup,
@@ -8,11 +9,11 @@ import {
   cn,
   useSidebar,
 } from '@keepcloud/web-core/react';
-import { useState } from 'react';
 import { UserProfileIcon } from '../../user';
 import { UserProfileDto } from '@keepcloud/commons/dtos';
 import { HomeMenu } from './menus/home';
 import { FileTree } from './menus/folder';
+import { NavLink, useLocation } from 'react-router';
 
 const HomeIcon = () => {
   return (
@@ -123,10 +124,12 @@ const SidebarItems = [
   {
     label: 'Home',
     icon: <HomeIcon />,
+    url: ROUTE_PATH.home,
   },
   {
     label: 'Folder',
     icon: <FolderIcon />,
+    url: ROUTE_PATH.folder,
   },
 ];
 
@@ -137,7 +140,11 @@ interface Props {
 }
 
 export function AppSidebar({ user }: Readonly<Props>) {
-  const [selectedTab, setSelectedTab] = useState(0);
+  const location = useLocation();
+  const activeTabIndex = SidebarItems.findIndex((item) =>
+    location.pathname.startsWith(item.url),
+  );
+  const activeContent = contents[activeTabIndex] ?? null;
   const { open, openMobile } = useSidebar();
 
   return (
@@ -147,30 +154,39 @@ export function AppSidebar({ user }: Readonly<Props>) {
           <SidebarGroupContent className="flex h-full">
             <div className="flex h-full w-[88px] flex-col items-center justify-between p-6 text-foreground">
               <div className="flex h-full flex-col items-center gap-y-6">
-                <img
-                  src="/assets/svg/logomark.svg"
-                  alt="logo"
-                  width={40}
-                  height={40}
-                />
-                <div className="flex flex-col items-center justify-between gap-6">
-                  {SidebarItems.map((item, index) => (
-                    <Button
-                      className={cn(
-                        'group relative flex size-10 cursor-pointer flex-col items-center gap-1 stroke-foreground hover:stroke-primary hover:text-primary dark:hover:stroke-white-light dark:hover:text-white-light',
-                        selectedTab === index &&
-                          'stroke-primary text-primary dark:stroke-white-light dark:text-white-light',
-                      )}
-                      variant="text"
+                <NavLink to={'/'}>
+                  <img
+                    src="/assets/svg/logomark.svg"
+                    alt="logo"
+                    width={40}
+                    height={40}
+                  />
+                </NavLink>
+                <div className="relative flex flex-col items-center justify-between gap-6">
+                  {SidebarItems.map((item) => (
+                    <NavLink
                       key={item.label}
-                      onClick={() => setSelectedTab(index)}
+                      to={item.url}
+                      end
+                      className="flex size-10 cursor-pointer flex-col items-center gap-1"
                     >
-                      {item.icon}
-                      <span className="text-12-medium">{item.label}</span>
-                      {selectedTab === index && (
-                        <div className="absolute -right-[21px] z-[2] h-10 border-[1.5px] border-primary"></div>
+                      {({ isActive }) => (
+                        <Button
+                          className={cn(
+                            'group flex size-10 cursor-pointer flex-col items-center gap-1 stroke-foreground hover:stroke-primary hover:text-primary dark:hover:stroke-white-light dark:hover:text-white-light',
+                            isActive &&
+                              'stroke-primary text-primary dark:stroke-white-light dark:text-white-light',
+                          )}
+                          variant="text"
+                        >
+                          {item.icon}
+                          <span className="text-12-medium">{item.label}</span>
+                          {isActive && (
+                            <div className="absolute -right-[21px] z-[2] h-10 border-[1.5px] border-primary"></div>
+                          )}
+                        </Button>
                       )}
-                    </Button>
+                    </NavLink>
                   ))}
                 </div>
                 <div className="grid size-12 cursor-pointer place-items-center gap-1 rounded-[8px] stroke-foreground p-2 hover:bg-stroke-200 hover:text-neutral-300 dark:hover:bg-white/5 dark:hover:stroke-neutral-300">
@@ -183,9 +199,7 @@ export function AppSidebar({ user }: Readonly<Props>) {
 
             <div className="relative flex h-full w-[267px] flex-col gap-8 border-0 border-x border-section-border p-6">
               <UserProfileIcon user={user} />
-              <div className="h-full overflow-auto">
-                {contents[selectedTab]}
-              </div>
+              <div className="h-full overflow-auto">{activeContent}</div>
             </div>
           </SidebarGroupContent>
         </SidebarGroup>
