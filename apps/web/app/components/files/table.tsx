@@ -409,73 +409,73 @@ export const columns: ColumnDef<File>[] = [
               <DropdownMenuLabel className="mb-3 text-14-medium">
                 {row.getValue('name')}
               </DropdownMenuLabel>
-              <DropdownMenuItem className="flex cursor-pointer items-center py-2">
+              <DropdownMenuItem className="flex cursor-pointer items-center stroke-neutral-300 py-2 text-neutral-300! hover:bg-foreground hover:text-neutral-300 dark:stroke-200 dark:text-neutral-200 dark:hover:text-neutral-200">
                 <Info className="mr-2 h-4 w-4" />
                 <span>Info</span>
                 <ChevronRight className="ml-auto h-4 w-4" />
               </DropdownMenuItem>
 
-              <DropdownMenuItem className="flex cursor-pointer items-center py-2">
+              <DropdownMenuItem className="flex cursor-pointer items-center stroke-neutral-300 py-2 text-neutral-300! hover:bg-foreground hover:text-neutral-300 dark:stroke-200 dark:text-neutral-200 dark:hover:text-neutral-200">
                 <ExternalLink className="mr-2 h-4 w-4" />
                 <span>Open in</span>
                 <ChevronRight className="ml-auto h-4 w-4" />
               </DropdownMenuItem>
 
-              <DropdownMenuItem className="flex cursor-pointer items-center py-2">
+              <DropdownMenuItem className="flex cursor-pointer items-center stroke-neutral-300 py-2 text-neutral-300! hover:bg-foreground hover:text-neutral-300 dark:stroke-200 dark:text-neutral-200 dark:hover:text-neutral-200">
                 <Share2 className="mr-2 h-4 w-4" />
                 <span>Share</span>
               </DropdownMenuItem>
 
-              <DropdownMenuItem className="flex cursor-pointer items-center py-2">
+              <DropdownMenuItem className="flex cursor-pointer items-center stroke-neutral-300 py-2 text-neutral-300! hover:bg-foreground hover:text-neutral-300 dark:stroke-200 dark:text-neutral-200 dark:hover:text-neutral-200">
                 <Link className="mr-2 h-4 w-4" />
                 <span>Copy link</span>
               </DropdownMenuItem>
 
-              <DropdownMenuItem className="flex cursor-pointer items-center py-2">
+              <DropdownMenuItem className="flex cursor-pointer items-center stroke-neutral-300 py-2 text-neutral-300! hover:bg-foreground hover:text-neutral-300 dark:stroke-200 dark:text-neutral-200 dark:hover:text-neutral-200">
                 <UserCog className="mr-2 h-4 w-4" />
                 <span>Manage permissions</span>
               </DropdownMenuItem>
 
-              <DropdownMenuItem className="flex cursor-pointer items-center py-2">
+              <DropdownMenuItem className="flex cursor-pointer items-center stroke-neutral-300 py-2 text-neutral-300! hover:bg-foreground hover:text-neutral-300 dark:stroke-200 dark:text-neutral-200 dark:hover:text-neutral-200">
                 <Download className="mr-2 h-4 w-4" />
                 <span>Download</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator className="mt-2" />
-              <DropdownMenuItem className="flex cursor-pointer items-center py-2">
+              <DropdownMenuItem className="flex cursor-pointer items-center stroke-neutral-300 py-2 text-neutral-300! hover:bg-foreground hover:text-neutral-300 dark:stroke-200 dark:text-neutral-200 dark:hover:text-neutral-200">
                 <span className="mr-2 stroke-foreground dark:stroke-white-light">
                   <RenameIcon />
                 </span>
                 <span>Rename</span>
               </DropdownMenuItem>
-              <DropdownMenuItem className="flex cursor-pointer items-center py-2">
+              <DropdownMenuItem className="flex cursor-pointer items-center stroke-neutral-300 py-2 text-neutral-300! hover:bg-foreground hover:text-neutral-300 dark:stroke-200 dark:text-neutral-200 dark:hover:text-neutral-200">
                 <Copy className="mr-2 h-4 w-4" />
                 <span>Copy</span>
               </DropdownMenuItem>
-              <DropdownMenuItem className="flex cursor-pointer items-center py-2">
+              <DropdownMenuItem className="flex cursor-pointer items-center stroke-neutral-300 py-2 text-neutral-300! hover:bg-foreground hover:text-neutral-300 dark:stroke-200 dark:text-neutral-200 dark:hover:text-neutral-200">
                 <Move className="mr-2 h-4 w-4" />
                 <span>Move</span>
               </DropdownMenuItem>
-              <DropdownMenuItem className="flex cursor-pointer items-center py-2 text-error-500">
+              <DropdownMenuItem className="flex cursor-pointer items-center py-2 text-error-500 hover:text-error-500!">
                 <Trash2 className="mr-2 h-4 w-4 text-error-500" />
                 <span>Delete</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator className="mt-2" />
-              <DropdownMenuItem className="flex cursor-pointer items-center py-2">
+              <DropdownMenuItem className="flex cursor-pointer items-center stroke-neutral-300 py-2 text-neutral-300! hover:bg-foreground hover:text-neutral-300 dark:stroke-200 dark:text-neutral-200 dark:hover:text-neutral-200">
                 <Star className="mr-2 h-4 w-4" />
                 <span>Star</span>
               </DropdownMenuItem>
 
-              <DropdownMenuItem className="flex cursor-pointer items-center py-2">
+              <DropdownMenuItem className="flex cursor-pointer items-center stroke-neutral-300 py-2 text-neutral-300! hover:bg-foreground hover:text-neutral-300 dark:stroke-200 dark:text-neutral-200 dark:hover:text-neutral-200">
                 <Pin className="mr-2 h-4 w-4" />
                 <span>Pin to KeepCloud</span>
               </DropdownMenuItem>
 
-              <DropdownMenuItem className="flex cursor-pointer items-center py-2">
+              <DropdownMenuItem className="flex cursor-pointer items-center stroke-neutral-300 py-2 text-neutral-300! hover:bg-foreground hover:text-neutral-300 dark:stroke-200 dark:text-neutral-200 dark:hover:text-neutral-200">
                 <Eye className="mr-2 h-4 w-4" />
                 <span>Show pinned items</span>
               </DropdownMenuItem>
 
-              <DropdownMenuItem className="flex cursor-pointer items-center py-2">
+              <DropdownMenuItem className="flex cursor-pointer items-center stroke-neutral-300 py-2 text-neutral-300! hover:bg-foreground hover:text-neutral-300 dark:stroke-200 dark:text-neutral-200 dark:hover:text-neutral-200">
                 <Activity className="mr-2 h-4 w-4" />
                 <span>Activity</span>
                 <ChevronRight className="ml-auto h-4 w-4" />
