@@ -13,7 +13,7 @@ export const LoginRightContent = ({ className }: { className?: string }) => {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const [imageOpacities, setImageOpacities] = useState<number[]>(
-    new Array(images.length * 2).fill(0.6)
+    new Array(images.length * 2).fill(0.6),
   );
 
   const updateImageOpacity = () => {
@@ -50,7 +50,7 @@ export const LoginRightContent = ({ className }: { className?: string }) => {
     });
 
     const newOpacities = Array.from({ length: imageElements.length }, (_, i) =>
-      i === closestIndex ? 1 : 0.6
+      i === closestIndex ? 1 : 0.6,
     );
 
     setImageOpacities(newOpacities);
@@ -106,22 +106,22 @@ export const LoginRightContent = ({ className }: { className?: string }) => {
     <div
       ref={carouselParentRef}
       className={cn(
-        ' rounded-[12px] flex flex-col items-center h-full max-h-full relative overflow-hidden',
-        className
+        'relative flex h-full max-h-full flex-col items-center overflow-hidden rounded-[12px]',
+        className,
       )}
     >
-      <div className="absolute top-0 left-0 w-full h-full">
+      <div className="absolute top-0 left-0 h-full w-full">
         <img
           src={'/assets/images/03-Sky 2.png'}
           alt="sky"
-          className="w-full h-full rounded-[12px] object-cover"
+          className="h-full w-full rounded-[12px] object-cover"
         />
       </div>
 
       {/* Carousel with images */}
       <div
         ref={carouselRef}
-        className="absolute top-0 left-0 w-full h-full flex flex-col items-center no-scrollbar gap-10 overflow-y-scroll"
+        className="no-scrollbar absolute top-0 left-0 flex h-full w-full flex-col items-center gap-10 overflow-y-scroll"
         style={{
           scrollBehavior: 'auto',
           maxHeight: '100%',
