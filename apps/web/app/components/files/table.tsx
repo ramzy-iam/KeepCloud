@@ -341,7 +341,12 @@ export const columns: ColumnDef<File>[] = [
     header: 'Shared By',
     cell: ({ row }) => {
       const sharedBy = row.getValue('sharedBy') as File['sharedBy'];
-      if (!sharedBy) return <div className="text-secondary-foreground">-</div>;
+      if (!sharedBy)
+        return (
+          <div className="text-center text-secondary-foreground md:text-left">
+            -
+          </div>
+        );
       return (
         <div className="flex items-center gap-2 capitalize">
           <Avatar className={cn('h-[24px] w-[24px]')}>
