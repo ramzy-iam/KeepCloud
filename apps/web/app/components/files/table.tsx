@@ -531,7 +531,7 @@ export function DataTableDemo() {
               // onChange={(event) =>
               //   table.getColumn('email')?.setFilterValue(event.target.value)
               // }
-              className="h-8 w-full max-w-sm rounded-lg bg-background pl-8"
+              className="h-8 w-full max-w-sm rounded-lg bg-background pl-8 placeholder:text-12!"
             />
           </div>
         </div>
