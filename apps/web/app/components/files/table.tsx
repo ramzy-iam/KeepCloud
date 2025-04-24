@@ -472,7 +472,7 @@ export const columns: ColumnDef<File>[] = [
 
               <DropdownMenuItem className="flex cursor-pointer items-center py-2">
                 <Activity className="mr-2 h-4 w-4" />
-                <span>Folder activity</span>
+                <span>Activity</span>
                 <ChevronRight className="ml-auto h-4 w-4" />
               </DropdownMenuItem>
             </DropdownMenuContent>
