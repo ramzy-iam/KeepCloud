@@ -12,3 +12,6 @@ export * from './separator';
 export * from './avatar';
 export * from './menu-button';
 export * from './collapsible';
+export * from './table';
+export * from './checkbox';
+export * from './input';
