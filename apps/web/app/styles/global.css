@@ -183,6 +183,8 @@
   --sidebar-width: 355px;
   --heading: var(--neutral-500);
 
+  --app-accent: #ffca28;
+
   font-family: 'Inter', sans-serif;
 }
 
@@ -262,6 +264,7 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-error: var(--error-400);
+  --color-error-500: var(--error-500);
   --color-heading: var(--heading);
 
   --color-neutral-50: var(--neutral-50);
@@ -274,11 +277,13 @@
   --color-neutral-700: var(--neutral-700);
   --color-neutral-800: var(--neutral-800);
   --color-neutral-900: var(--neutral-900);
+  --color-stroke-50: var(--stroke-50);
   --color-stroke-200: var(--stroke-200);
   --color-stroke-500: var(--stroke-500);
   --color-white-light: var(--white-light);
   --color-section-border: var(--section-border);
   --color-placeholder: var(--placeholder);
+  --color-app-accent: var(--app-accent);
 
   /* Extend the default font family */
   --font-family-inter: Inter, sans-serif;
@@ -483,9 +488,6 @@
     @apply bg-background text-foreground;
   }
 }
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
 
 ::-webkit-scrollbar {
   width: 8px;
@@ -529,4 +531,11 @@
 
 .dark * {
   scrollbar-color: var(--neutral-600) var(--neutral-800);
+}
+
+.no-scrollbar {
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
 }
