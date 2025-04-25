@@ -12,7 +12,9 @@ import './styles/global.css';
 
 export const meta: MetaFunction = () => [
   {
-    title: 'New Nx React Router App',
+    title: 'KeepCloud',
+    description:
+      'KeepCloud is a cloud storage service that allows you to store and share files securely.',
   },
 ];
 
