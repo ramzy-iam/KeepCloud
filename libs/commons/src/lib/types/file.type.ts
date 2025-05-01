@@ -15,6 +15,8 @@ export type File = {
   isTrashed?: boolean;
   sharedWith?: string[];
   fileType?: 'folder' | 'file' | 'image' | 'video';
+  parent?: File;
+  children?: File[];
 };
 
 export const files: File[] = [
