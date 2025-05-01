@@ -15,3 +15,8 @@ export * from './collapsible';
 export * from './table';
 export * from './checkbox';
 export * from './input';
+export * from './select';
+export * from './dialog';
+export * from './calendar';
+export * from './form';
+export * from './label';
