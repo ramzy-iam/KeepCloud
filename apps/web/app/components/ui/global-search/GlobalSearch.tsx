@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {
+  Button,
   CommandDialog,
   CommandEmpty,
   CommandGroup,
@@ -131,9 +132,10 @@ export const GlobalSearch = () => {
 
       <CommandDialog open={open} onOpenChange={handleCommandDialogOpenChange}>
         <div className="flex items-center gap-2 border-b p-2">
-          <button
+          <Button
             onClick={() => setFilterDialogOpen(true)}
-            className="rounded-md p-1 hover:bg-gray-100 dark:hover:bg-gray-700"
+            variant="outline"
+            size={'icon'}
             aria-label={
               hasActiveFilters ? 'Clear filters' : 'Open filter options'
             }
@@ -143,7 +145,7 @@ export const GlobalSearch = () => {
             ) : (
               <Funnel className={cn('h-5 w-5 text-foreground')} />
             )}
-          </button>
+          </Button>
         </div>
         <CommandInput
           placeholder="Type to search..."
@@ -180,6 +182,7 @@ export const GlobalSearch = () => {
         open={filterDialogOpen}
         onOpenChange={setFilterDialogOpen}
         initialFilters={filters}
+        defaultFilters={filterInitialValues}
         onApplyFilters={setFilters}
       />
     </div>

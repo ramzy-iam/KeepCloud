@@ -35,6 +35,7 @@ interface FilterDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   initialFilters: FilterFormData;
+  defaultFilters: FilterFormData;
   onApplyFilters: (filters: FilterFormData) => void;
 }
 
@@ -42,6 +43,7 @@ export const FilterDialog = ({
   open,
   onOpenChange,
   initialFilters,
+  defaultFilters,
   onApplyFilters,
 }: FilterDialogProps) => {
   const form = useForm<FilterFormData>({
@@ -72,18 +74,17 @@ export const FilterDialog = ({
     onOpenChange(false);
   });
 
-  // Handle Clear button
-  const handleClear = () => {
-    form.reset({
-      location: 'anywhere',
-      inTrash: false,
-      type: 'all',
-      owner: 'any',
-      ownerId: undefined,
-      sharedWith: '',
-      name: undefined,
-      modifiedDate: undefined,
+  const handleClear = async () => {
+    form.reset();
+    onApplyFilters(defaultFilters);
+
+    // Wait for the form to fully reset before closing
+    await new Promise((resolve) => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(resolve);
+      });
     });
+
     onOpenChange(false);
   };
 
