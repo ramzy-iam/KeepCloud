@@ -11,8 +11,7 @@ import {
 } from '@keepcloud/web-core/react';
 import { useAtomValue } from 'jotai';
 import { UserProfileDto } from '@keepcloud/commons/dtos';
-import { AppSidebar, UserProfileIcon } from '../../components';
-import { Search } from 'lucide-react';
+import { AppSidebar, GlobalSearch, UserProfileIcon } from '../../components';
 
 const LocalSidebarTrigger = () => {
   const { open, openMobile, isMobile } = useSidebar();
@@ -61,10 +60,7 @@ export default function Layout() {
           <div className="flex h-[72px] items-center justify-between border-b border-section-border px-2 py-5 md:px-8">
             <div className="flex items-center gap-2.5 text-14">
               <LocalSidebarTrigger />
-              <Search className="text-foreground" size={16} />
-              <span className="text-placeholder">
-                What are you looking for?
-              </span>
+              <GlobalSearch />
             </div>
             <div className="flex items-center gap-2.5">
               <ProfileIcon user={user} />
