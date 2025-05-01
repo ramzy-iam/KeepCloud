@@ -17,6 +17,10 @@ const buttonVariants = cva(
         secondary:
           'text-secondary-foreground bg-white-light border-stroke-300 hover:bg-[#f0f0f0]/20 shadow-[0_4px_8px_rgba(0, 0, 0, 0.4)] dark:bg-neutral-800 dark:border-neutral-600 ',
         text: 'border-0',
+        outline:
+          'border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground',
+
+        ghost: 'hover:bg-accent hover:text-accent-foreground',
       },
 
       size: {
@@ -31,7 +35,7 @@ const buttonVariants = cva(
       variant: 'primary',
       size: 'default',
     },
-  }
+  },
 );
 
 function Button({
