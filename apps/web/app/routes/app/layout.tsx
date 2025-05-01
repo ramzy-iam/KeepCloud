@@ -52,7 +52,7 @@ const ProfileIcon = ({ user }: { user: UserProfileDto }) => {
 
 const ActionsButtons = () => {
   return (
-    <div className="flex flex-wrap justify-around gap-2 bg-background py-6 md:flex-row md:justify-start md:gap-4">
+    <div className="flex flex-wrap justify-start gap-4 bg-background py-6">
       {actions.map((action) => (
         <button
           key={action.label}
