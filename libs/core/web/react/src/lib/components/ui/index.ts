@@ -20,3 +20,4 @@ export * from './dialog';
 export * from './calendar';
 export * from './form';
 export * from './label';
+export * from './accordion';
