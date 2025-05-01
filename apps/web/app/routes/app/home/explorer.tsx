@@ -83,7 +83,7 @@ export default function ExplorerComponent() {
       </div>
       <div className="flex flex-col gap-3">
         <h3 className="sticky top-0 z-[1] bg-background p-1.5 text-18-medium text-heading">
-          Folders
+          Suggested Folders
         </h3>
         <div className="flex flex-col flex-wrap gap-3 sm:flex-row md:gap-8">
           {folders.map((folder) => (
@@ -113,7 +113,7 @@ export default function ExplorerComponent() {
       </div>
       <div className="flex flex-col gap-3">
         <h3 className="sticky top-0 z-[1] bg-background p-1.5 text-18-medium text-heading">
-          Files
+          Suggested Files
         </h3>
         <DataTableDemo />
       </div>
