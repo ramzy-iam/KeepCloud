@@ -1,4 +1,4 @@
-import { MenuButton } from '@keepcloud/web-core/react';
+import { MenuButton, ROUTE_PATH } from '@keepcloud/web-core/react';
 import { NavLink } from 'react-router';
 
 const Links = [
@@ -38,7 +38,7 @@ const Links = [
       </svg>
     ),
     label: 'Explorer',
-    path: '#',
+    path: ROUTE_PATH.explorer,
   },
   {
     icon: (
@@ -57,8 +57,8 @@ const Links = [
         />
       </svg>
     ),
-    label: 'Shared',
-    path: '#',
+    label: 'Shared with me',
+    path: ROUTE_PATH.sharedWithMe,
   },
   {
     icon: (
@@ -78,7 +78,7 @@ const Links = [
       </svg>
     ),
     label: 'File Requests',
-    path: '#',
+    path: ROUTE_PATH.fileRequest,
   },
   {
     icon: (
@@ -98,26 +98,29 @@ const Links = [
       </svg>
     ),
     label: 'Trash',
-    path: '#',
+    path: ROUTE_PATH.trash,
   },
 ];
 
 export const HomeMenu = () => {
   return (
-    <div>
+    <div className="flex flex-col gap-2">
       {Links.map((link) => (
-        <MenuButton
-          key={link.label}
-          asChild
-          className="stroke-foreground px-3! py-1! hover:stroke-sidebar-accent-foreground hover:text-sidebar-accent-foreground active:bg-sidebar-accent active:stroke-sidebar-accent-foreground dark:hover:stroke-white-light"
-        >
-          <NavLink to={link.path} end>
-            <div className="flex items-center gap-2">
-              {link.icon}
-              <span className="icon">{link.label}</span>
-            </div>
-          </NavLink>
-        </MenuButton>
+        <NavLink key={link.label} to={link.path} end>
+          {({ isActive }) => (
+            <MenuButton
+              isActive={isActive}
+              key={link.label}
+              asChild
+              className="stroke-foreground px-3! py-1! hover:stroke-sidebar-accent-foreground hover:text-sidebar-accent-foreground active:bg-sidebar-accent data-[active=true]:stroke-sidebar-accent-foreground! dark:hover:stroke-white-light"
+            >
+              <div>
+                {link.icon}
+                <span className="text-12-medium">{link.label}</span>
+              </div>
+            </MenuButton>
+          )}
+        </NavLink>
       ))}
     </div>
   );
