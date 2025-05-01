@@ -1,12 +1,13 @@
+export type Owner = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  picture: string;
+};
 export type File = {
   id: string;
   name: string;
-  owner: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    picture: string;
-  };
+  owner: Owner;
   isFolder?: boolean;
   size: number;
   lastModified: string;
