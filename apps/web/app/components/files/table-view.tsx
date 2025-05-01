@@ -111,8 +111,8 @@ export const columns: ColumnDef<File>[] = [
         row.original.isFolder || row.original.fileType == 'folder';
       if (isFolder)
         return (
-          <div className="flex justify-center">
-            <Minus />
+          <div className="flex justify-center md:justify-end">
+            <Minus size={16} />
           </div>
         );
       const formatted = filesize(row.getValue('size'));
