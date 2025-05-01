@@ -1,7 +1,6 @@
 'use client';
 
-import { ColumnDef } from '@tanstack/react-table';
-import { FileTextIcon, FunnelIcon, MoreVertical } from 'lucide-react';
+import { FileTextIcon, MoreVertical, SlidersHorizontal } from 'lucide-react';
 
 import { filesize } from 'filesize';
 
@@ -20,8 +19,9 @@ import {
   useFileMenu,
 } from '@keepcloud/web-core/react';
 import { DayjsHelper, NameFormatterHelper } from '@keepcloud/commons/helpers';
-import { data } from '@keepcloud/commons/types';
+import { Owner, data } from '@keepcloud/commons/types';
 import { FolderIconOutline } from '../ui';
+import { ColumnDef } from '@tanstack/react-table';
 
 export type File = {
   id: string;
@@ -50,6 +50,7 @@ export const columns: ColumnDef<File>[] = [
         aria-label="Select all"
       />
     ),
+
     cell: ({ row }) => (
       <Checkbox
         checked={row.getIsSelected()}
@@ -63,6 +64,9 @@ export const columns: ColumnDef<File>[] = [
   {
     accessorKey: 'name',
     header: 'Name',
+    meta: {
+      name: 'Name',
+    },
     cell: ({ row }) => {
       const isFolder = row.original.isFolder;
       return (
@@ -76,12 +80,16 @@ export const columns: ColumnDef<File>[] = [
         </div>
       );
     },
+    enableHiding: false,
   },
   {
     accessorKey: 'owner',
     header: 'Owner',
+    meta: {
+      name: 'Owner',
+    },
     cell: ({ row }) => {
-      const owner = row.getValue('owner') as File['owner'];
+      const owner: Owner = row.getValue('owner');
 
       return (
         <div className="flex items-center gap-2 capitalize">
@@ -104,6 +112,9 @@ export const columns: ColumnDef<File>[] = [
   {
     accessorKey: 'size',
     header: () => <div className="text-right">Size</div>,
+    meta: {
+      name: 'Size',
+    },
     cell: ({ row }) => {
       const formatted = filesize(row.getValue('size'));
       return (
@@ -116,6 +127,9 @@ export const columns: ColumnDef<File>[] = [
   {
     accessorKey: 'lastModified',
     header: () => <div className="text-right">Last Modified</div>,
+    meta: {
+      name: 'Last Modified',
+    },
     cell: ({ row }) => {
       const formatted = DayjsHelper.new(row.getValue('lastModified')).format(
         'YYYY-MM-DD HH:mm:ss',
@@ -169,8 +183,8 @@ export function DataTableDemo() {
             variant="secondary"
             className="ml-auto h-8 w-8 px-0 md:h-[32px] md:w-[85px]"
           >
-            <FunnelIcon />
-            <span className="hidden md:inline">Filters</span>
+            <SlidersHorizontal />
+            <span className="hidden md:inline">Columns</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
@@ -184,7 +198,7 @@ export function DataTableDemo() {
                 checked={column.getIsVisible()}
                 onCheckedChange={(value) => column.toggleVisibility(!!value)}
               >
-                {column.id}
+                {column?.columnDef.meta?.name}
               </DropdownMenuCheckboxItem>
             ))}
         </DropdownMenuContent>
