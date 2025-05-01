@@ -22,11 +22,12 @@ import {
   cn,
   useFileTable,
   useFileMenu,
+  useSidebar,
 } from '@keepcloud/web-core/react';
 import { DayjsHelper, NameFormatterHelper } from '@keepcloud/commons/helpers';
 import { File, Owner } from '@keepcloud/commons/types';
 import { FolderIconOutline } from '../ui';
-import { ColumnDef } from '@tanstack/react-table';
+import { ColumnDef, Table } from '@tanstack/react-table';
 
 export const columns: ColumnDef<File>[] = [
   {
@@ -173,19 +174,20 @@ interface TableViewProps {
   data: File[];
 }
 
-export function TableView({ data }: TableViewProps) {
-  const { table, TableComponent } = useFileTable({
-    data,
-    columns,
-  });
+interface BeforeTableProps {
+  table: Table<File>;
+}
 
-  const beforeTable = (
+const BeforeTable = ({ table }: BeforeTableProps) => {
+  const { isMobile } = useSidebar();
+  return (
     <div className="flex items-center gap-2 py-4">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
             variant="secondary"
-            className="ml-auto h-8 w-8 px-0 md:h-[32px] md:w-[85px]"
+            size={isMobile ? 'icon' : 'sm'}
+            className="ml-auto"
           >
             <SlidersHorizontal />
             <span className="hidden md:inline">Columns</span>
@@ -209,6 +211,13 @@ export function TableView({ data }: TableViewProps) {
       </DropdownMenu>
     </div>
   );
+};
+
+export function TableView({ data }: TableViewProps) {
+  const { table, TableComponent } = useFileTable({
+    data,
+    columns,
+  });
 
   const footer = (
     <div className="flex items-center justify-end space-x-2 py-4">
@@ -237,5 +246,10 @@ export function TableView({ data }: TableViewProps) {
     </div>
   );
 
-  return <TableComponent beforeTable={beforeTable} footer={footer} />;
+  return (
+    <TableComponent
+      beforeTable={<BeforeTable table={table} />}
+      footer={footer}
+    />
+  );
 }
