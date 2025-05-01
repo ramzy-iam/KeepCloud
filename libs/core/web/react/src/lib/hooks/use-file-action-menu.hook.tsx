@@ -15,26 +15,10 @@ import {
   Pin,
   Eye,
   Activity,
+  TextCursorInput as RenameIcon,
 } from 'lucide-react';
 import { File } from '@keepcloud/commons/types';
 import { cn } from '../helpers';
-
-const RenameIcon = () => (
-  <svg
-    width="18"
-    height="19"
-    viewBox="0 0 18 19"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      d="M9.75 5.75012H3.9C3.05992 5.75012 2.63988 5.75012 2.31901 5.91361C2.03677 6.05742 1.8073 6.28689 1.66349 6.56914C1.5 6.89 1.5 7.31004 1.5 8.15012V10.8501C1.5 11.6902 1.5 12.1102 1.66349 12.4311C1.8073 12.7134 2.03677 12.9428 2.31901 13.0866C2.63988 13.2501 3.05992 13.2501 3.9 13.2501H9.75M12.75 5.75012H14.1C14.9401 5.75012 15.3601 5.75012 15.681 5.91361C15.9632 6.05742 16.1927 6.28689 16.3365 6.56914C16.5 6.89 16.5 7.31004 16.5 8.15012V10.8501C16.5 11.6902 16.5 12.1102 16.3365 12.4311C16.1927 12.7134 15.9632 12.9428 15.681 13.0866C15.3601 13.2501 14.9401 13.2501 14.1 13.2501H12.75M12.75 16.2501L12.75 2.75012M14.625 2.75013L10.875 2.75012M14.625 16.2501L10.875 16.2501"
-      strokeWidth="1.2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
 
 interface UseFileMenuProps {
   file: File;
@@ -99,11 +83,7 @@ export function useFileMenu({ file }: UseFileMenuProps): UseFileMenuReturn {
     },
     {
       label: 'Rename',
-      icon: (
-        <span className="stroke-neutral-300! hover:stroke-neutral-300! dark:stroke-200 dark:hover:stroke-neutral-200">
-          <RenameIcon />
-        </span>
-      ),
+      icon: <RenameIcon className={iconClassName} />,
       onClick: () => console.log(`Rename ${fileName}`),
       className: itemClassName,
     },
