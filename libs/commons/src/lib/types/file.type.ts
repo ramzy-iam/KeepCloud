@@ -17,7 +17,7 @@ export type File = {
   fileType?: 'folder' | 'file' | 'image' | 'video';
 };
 
-export const data: File[] = [
+export const files: File[] = [
   {
     id: 'file_01hzyvffsdvwb4xyqz6a2cbx0g',
     name: 'Project_Plan.pdf',

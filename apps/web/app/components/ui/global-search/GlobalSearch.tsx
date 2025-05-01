@@ -9,15 +9,8 @@ import {
   CommandList,
   cn,
 } from '@keepcloud/web-core/react';
-import {
-  Search,
-  Folder,
-  FileText,
-  Funnel,
-  FunnelX,
-  FileTextIcon,
-} from 'lucide-react';
-import { data } from '@keepcloud/commons/types';
+import { Search, Funnel, FunnelX, FileTextIcon } from 'lucide-react';
+import { files as data } from '@keepcloud/commons/types';
 import { FilterDialog } from './FilterDialog';
 import { FilterFormData } from './filterSchema';
 import { FolderIconOutline } from '../folder-icon';

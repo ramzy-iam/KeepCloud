@@ -1,1 +1,2 @@
-export * from './table';
+export * from './table-view';
+export * from './grid-view';

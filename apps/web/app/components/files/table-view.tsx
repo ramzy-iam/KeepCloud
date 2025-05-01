@@ -1,6 +1,11 @@
 'use client';
 
-import { FileTextIcon, MoreVertical, SlidersHorizontal } from 'lucide-react';
+import {
+  FileTextIcon,
+  Minus,
+  MoreVertical,
+  SlidersHorizontal,
+} from 'lucide-react';
 
 import { filesize } from 'filesize';
 
@@ -19,23 +24,9 @@ import {
   useFileMenu,
 } from '@keepcloud/web-core/react';
 import { DayjsHelper, NameFormatterHelper } from '@keepcloud/commons/helpers';
-import { Owner, data } from '@keepcloud/commons/types';
+import { File, Owner } from '@keepcloud/commons/types';
 import { FolderIconOutline } from '../ui';
 import { ColumnDef } from '@tanstack/react-table';
-
-export type File = {
-  id: string;
-  name: string;
-  owner: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    picture: string;
-  };
-  isFolder?: boolean;
-  size: number;
-  lastModified: string;
-};
 
 export const columns: ColumnDef<File>[] = [
   {
@@ -116,7 +107,16 @@ export const columns: ColumnDef<File>[] = [
       name: 'Size',
     },
     cell: ({ row }) => {
+      const isFolder =
+        row.original.isFolder || row.original.fileType == 'folder';
+      if (isFolder)
+        return (
+          <div className="flex justify-center">
+            <Minus />
+          </div>
+        );
       const formatted = filesize(row.getValue('size'));
+
       return (
         <div className="truncate text-right text-14-medium text-secondary-foreground">
           {formatted}
@@ -169,9 +169,13 @@ const RenderActionMenu = (file: File) => {
   );
 };
 
-export function DataTableDemo() {
+interface TableViewProps {
+  data: File[];
+}
+
+export function TableView({ data }: TableViewProps) {
   const { table, TableComponent } = useFileTable({
-    data: data,
+    data,
     columns,
   });
 
