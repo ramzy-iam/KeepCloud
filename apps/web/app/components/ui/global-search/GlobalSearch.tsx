@@ -117,7 +117,7 @@ export const GlobalSearch = () => {
     <div>
       <button
         onClick={() => setOpen(true)}
-        className="flex cursor-pointer items-center gap-2.5 rounded-[8px] border border-transparent px-[24px] py-[13px] text-14 hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary/50 focus:outline-none md:w-[200px] lg:w-[300px] xl:w-[400px] 2xl:w-[500px] dark:hover:border-primary dark:focus:border-primary dark:focus:ring-primary/50"
+        className="flex cursor-pointer items-center gap-2.5 rounded-[8px] border border-transparent px-[24px] py-[13px] text-14 hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary/50 focus:outline-none md:w-[300px] xl:w-[400px] 2xl:w-[500px] dark:hover:border-primary dark:focus:border-primary dark:focus:ring-primary/50"
       >
         <Search className="text-foreground" size={16} />
         <span className="text-placeholder">What are you looking for?</span>
