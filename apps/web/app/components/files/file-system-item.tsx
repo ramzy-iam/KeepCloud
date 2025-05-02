@@ -33,12 +33,14 @@ export const FileSystemItem = ({ file, className }: FileSystemItemProps) => {
         </p>
       </div>
       <FileMenu>
-        <span
-          className="rounded-full p-1 hover:bg-stroke-200 dark:hover:bg-white/5"
+        <Button
+          variant={'text'}
+          size={'icon'}
+          className="size-[30px] rounded-full hover:bg-stroke-200 dark:hover:bg-white/5"
           aria-label={`More options for ${file.name}`}
         >
           <EllipsisVerticalIcon className="h-4 w-4" />
-        </span>
+        </Button>
       </FileMenu>
     </Button>
   );
