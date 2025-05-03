@@ -171,7 +171,7 @@ export function useFileTable<TData>({
     };
 
     return (
-      <div className="mb-4 w-full">
+      <div className="w-full">
         {header}
         <div className="rounded-md border">
           <Table>
