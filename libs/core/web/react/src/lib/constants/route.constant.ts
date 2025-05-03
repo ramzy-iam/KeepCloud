@@ -6,4 +6,7 @@ export const ROUTE_PATH = {
   sharedWithMe: '/home/shared-with-me',
   fileRequest: '/home/file-request',
   trash: '/home/trash',
+  folderDetails(folderId: string) {
+    return `/folders/${folderId}`;
+  },
 };

@@ -43,7 +43,6 @@ export default function FolderComponent() {
               <span
                 onClick={(event) => {
                   event.stopPropagation();
-                  console.log('Clicked on ellipsis icon!');
                 }}
                 className="rounded-full p-1 hover:bg-stroke-200 dark:hover:bg-white/5"
               >
