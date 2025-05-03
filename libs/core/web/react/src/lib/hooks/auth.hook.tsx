@@ -2,10 +2,12 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { AuthService } from '../services';
 import { AuthHelper } from '../helpers';
 import { AxiosError } from 'axios';
-import { AuthGoogleResponseDto } from '@keepcloud/commons/dtos';
+import { AuthGoogleResponseDto, UserProfileDto } from '@keepcloud/commons/dtos';
 import { authState } from '../store';
-import { useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router';
+import { useEffect, useRef, useState } from 'react';
+import { ROUTE_PATH } from '../constants';
 
 export const useGoogleAuth = () => {
   return useMutation<
@@ -49,6 +51,50 @@ export const useRefreshAccessToken = () => {
     },
     retry: false,
   });
+};
+
+export const useAuth = () => {
+  const user = useAtomValue(authState)?.user as UserProfileDto;
+  const [authChecked, setAuthChecked] = useState(false);
+  const [redirect, setRedirect] = useState<string | null>(null);
+  const { mutateAsync: refreshAccessToken } = useRefreshAccessToken();
+  const hasRefreshed = useRef(false);
+
+  const { isLoading } = useGetProfile({
+    enabled: AuthHelper.checkIfSessionValid(),
+  });
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      if (hasRefreshed.current) return;
+      hasRefreshed.current = true;
+
+      if (!AuthHelper.checkIfSessionValid()) {
+        if (AuthHelper.canRefreshToken()) {
+          try {
+            await refreshAccessToken();
+          } catch {
+            AuthHelper.clearCookies();
+            setRedirect(ROUTE_PATH.login);
+          }
+        } else {
+          AuthHelper.clearCookies();
+          setRedirect(ROUTE_PATH.login);
+        }
+      }
+      setAuthChecked(true);
+    };
+
+    checkAuth();
+  }, [refreshAccessToken]);
+
+  return {
+    user,
+    authChecked,
+    redirect,
+    isLoading,
+    isAuthenticated: AuthHelper.checkIfSessionValid() && !!user,
+  };
 };
 
 export const useLogout = () => {

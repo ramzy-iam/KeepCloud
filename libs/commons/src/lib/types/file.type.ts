@@ -365,3 +365,71 @@ export const folders: File[] = [
     fileType: 'folder',
   },
 ];
+
+export const fileTreeFolders: File[] = [
+  {
+    id: '1',
+    name: 'My Storage',
+    owner: { id: 'user1', firstName: 'John', lastName: 'Doe', picture: '' },
+    isFolder: true,
+    fileType: 'folder',
+    size: 0,
+    lastModified: '2025-05-03T10:00:00Z',
+    children: [
+      {
+        id: '1.1',
+        name: 'Documents',
+        owner: { id: 'user1', firstName: 'John', lastName: 'Doe', picture: '' },
+        isFolder: true,
+        fileType: 'folder',
+        size: 0,
+        lastModified: '2025-05-03T10:00:00Z',
+        children: [
+          {
+            id: '1.1.1',
+            name: 'Reports',
+            owner: {
+              id: 'user1',
+              firstName: 'John',
+              lastName: 'Doe',
+              picture: '',
+            },
+            isFolder: true,
+            fileType: 'folder',
+            size: 0,
+            lastModified: '2025-05-03T10:00:00Z',
+          },
+        ],
+      },
+      {
+        id: '1.2',
+        name: 'Projects',
+        owner: { id: 'user1', firstName: 'John', lastName: 'Doe', picture: '' },
+        isFolder: true,
+        fileType: 'folder',
+        size: 0,
+        lastModified: '2025-05-03T10:00:00Z',
+      },
+    ],
+  },
+  {
+    id: '2',
+    name: 'Shared with me',
+    owner: { id: 'user1', firstName: 'John', lastName: 'Doe', picture: '' },
+    isFolder: true,
+    fileType: 'folder',
+    size: 0,
+    lastModified: '2025-05-03T10:00:00Z',
+    children: [
+      {
+        id: '2.1',
+        name: 'Team',
+        owner: { id: 'user1', firstName: 'John', lastName: 'Doe', picture: '' },
+        isFolder: true,
+        fileType: 'folder',
+        size: 0,
+        lastModified: '2025-05-03T10:00:00Z',
+      },
+    ],
+  },
+];
