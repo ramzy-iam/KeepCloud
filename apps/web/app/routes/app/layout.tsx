@@ -8,13 +8,12 @@ import {
   useAuth,
 } from '@keepcloud/web-core/react';
 import { UserProfileDto } from '@keepcloud/commons/dtos';
-import { AppSidebar, GlobalSearch, UserProfileIcon } from '../../components';
-import { PlusIcon, UploadIcon } from 'lucide-react';
-
-const actions = [
-  { icon: PlusIcon, label: 'New' },
-  { icon: UploadIcon, label: 'Upload or drop' },
-];
+import {
+  AppSidebar,
+  GlobalSearch,
+  QuickActionButtons,
+  UserProfileIcon,
+} from '../../components';
 
 const LocalSidebarTrigger = () => {
   const { open, openMobile, isMobile } = useSidebar();
@@ -29,22 +28,6 @@ const ProfileIcon = ({ user }: { user: UserProfileDto }) => {
     <UserProfileIcon user={user} isIcon avatarClassName="h-[30px] w-[30px]" />
   );
 };
-
-const ActionsButtons = () => (
-  <div className="flex flex-wrap justify-start gap-4 bg-background py-6">
-    {actions.map((action) => (
-      <button
-        key={action.label}
-        className="group flex w-[100px] cursor-pointer flex-col items-center gap-2 rounded-[8px] border border-stroke-500 p-3 text-heading hover:border-primary hover:bg-primary/5 md:w-[156px] md:items-start dark:border-neutral-600 dark:hover:border-primary"
-      >
-        <action.icon className="text-primary dark:group-hover:text-white-light" />
-        <span className="text-14 group-hover:text-primary dark:group-hover:text-white-light">
-          {action.label}
-        </span>
-      </button>
-    ))}
-  </div>
-);
 
 export default function Layout() {
   const { user, authChecked, redirect, isLoading } = useAuth();
@@ -68,7 +51,7 @@ export default function Layout() {
             </div>
           </div>
           <div className="h-[calc(100%-72px)] max-h-[calc(100%-72px)] overflow-auto px-6 md:px-8">
-            <ActionsButtons />
+            <QuickActionButtons />
             <Outlet />
           </div>
         </main>
