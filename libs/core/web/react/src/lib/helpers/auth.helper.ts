@@ -42,4 +42,17 @@ export class AuthHelper {
     CookiesHelper.set(ACCESS_TOKEN, accessToken);
     CookiesHelper.set(REFRESH_TOKEN, refreshToken);
   }
+
+  static canRefreshToken(): boolean {
+    const refreshToken = CookiesHelper.get(REFRESH_TOKEN);
+    return !!refreshToken && typeof refreshToken === 'string';
+  }
+
+  static get accessToken(): string {
+    return CookiesHelper.get(ACCESS_TOKEN);
+  }
+
+  static get refreshToken(): string {
+    return CookiesHelper.get(REFRESH_TOKEN);
+  }
 }
