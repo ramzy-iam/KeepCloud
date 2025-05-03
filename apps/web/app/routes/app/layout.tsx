@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import { Navigate, Outlet } from 'react-router';
 import {
   AuthHelper,
@@ -8,81 +9,85 @@ import {
   SidebarTrigger,
   useSidebar,
   ROUTE_PATH,
+  useRefreshAccessToken,
 } from '@keepcloud/web-core/react';
 import { useAtomValue } from 'jotai';
 import { UserProfileDto } from '@keepcloud/commons/dtos';
 import { AppSidebar, GlobalSearch, UserProfileIcon } from '../../components';
-
 import { PlusIcon, UploadIcon } from 'lucide-react';
 
 const actions = [
-  {
-    icon: PlusIcon,
-    label: 'New',
-  },
-  {
-    icon: UploadIcon,
-    label: 'Upload or drop',
-  },
+  { icon: PlusIcon, label: 'New' },
+  { icon: UploadIcon, label: 'Upload or drop' },
 ];
 
 const LocalSidebarTrigger = () => {
   const { open, openMobile, isMobile } = useSidebar();
-
-  if ((open && !isMobile) || (openMobile && isMobile)) {
-    return null;
-  }
+  if ((open && !isMobile) || (openMobile && isMobile)) return null;
   return <SidebarTrigger />;
 };
 
 const ProfileIcon = ({ user }: { user: UserProfileDto }) => {
   const { isMobile } = useSidebar();
-
-  if (!isMobile) {
-    return null;
-  }
+  if (!isMobile) return null;
   return (
-    <UserProfileIcon
-      user={user}
-      isIcon={true}
-      avatarClassName="h-[30px] w-[30px]"
-    />
+    <UserProfileIcon user={user} isIcon avatarClassName="h-[30px] w-[30px]" />
   );
 };
 
-const ActionsButtons = () => {
-  return (
-    <div className="flex flex-wrap justify-start gap-4 bg-background py-6">
-      {actions.map((action) => (
-        <button
-          key={action.label}
-          className="group flex w-[100px] cursor-pointer flex-col items-center gap-2 rounded-[8px] border border-stroke-500 p-3 text-heading hover:border-primary hover:bg-primary/5 md:w-[156px] md:items-start dark:border-neutral-600 dark:hover:border-primary"
-        >
-          <action.icon className="text-primary dark:group-hover:text-white-light" />
-          <span className="text-14 group-hover:text-primary dark:group-hover:text-white-light">
-            {action.label}
-          </span>
-        </button>
-      ))}
-    </div>
-  );
-};
+const ActionsButtons = () => (
+  <div className="flex flex-wrap justify-start gap-4 bg-background py-6">
+    {actions.map((action) => (
+      <button
+        key={action.label}
+        className="group flex w-[100px] cursor-pointer flex-col items-center gap-2 rounded-[8px] border border-stroke-500 p-3 text-heading hover:border-primary hover:bg-primary/5 md:w-[156px] md:items-start dark:border-neutral-600 dark:hover:border-primary"
+      >
+        <action.icon className="text-primary dark:group-hover:text-white-light" />
+        <span className="text-14 group-hover:text-primary dark:group-hover:text-white-light">
+          {action.label}
+        </span>
+      </button>
+    ))}
+  </div>
+);
 
 export default function Layout() {
+  const user = useAtomValue(authState)?.user as UserProfileDto;
+  const [authChecked, setAuthChecked] = useState(false);
+  const [redirect, setRedirect] = useState<string | null>(null);
+  const { mutateAsync: refreshAccessToken } = useRefreshAccessToken();
+  const hasRefreshed = useRef(false);
+
   const { isLoading } = useGetProfile({
     enabled: AuthHelper.checkIfSessionValid(),
   });
 
-  const user = useAtomValue(authState)?.user as UserProfileDto;
+  useEffect(() => {
+    const checkAuth = async () => {
+      if (hasRefreshed.current) return;
+      hasRefreshed.current = true;
 
-  if (!AuthHelper.checkIfSessionValid()) {
-    AuthHelper.clearCookies();
-    return <Navigate to={ROUTE_PATH.login} />;
-  }
+      if (!AuthHelper.checkIfSessionValid()) {
+        if (AuthHelper.canRefreshToken()) {
+          try {
+            await refreshAccessToken();
+          } catch {
+            AuthHelper.clearCookies();
+            setRedirect(ROUTE_PATH.login);
+          }
+        } else {
+          AuthHelper.clearCookies();
+          setRedirect(ROUTE_PATH.login);
+        }
+      }
+      setAuthChecked(true);
+    };
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+    checkAuth();
+  }, [refreshAccessToken]);
+
+  if (redirect) return <Navigate to={ROUTE_PATH.login} />;
+  if (!authChecked || isLoading) return <div>Loading...</div>;
 
   return (
     <div className="h-svh overflow-hidden">
@@ -94,7 +99,6 @@ export default function Layout() {
               <LocalSidebarTrigger />
               <GlobalSearch />
             </div>
-
             <div className="flex items-center gap-2.5">
               <ProfileIcon user={user} />
               <ModeToggle />

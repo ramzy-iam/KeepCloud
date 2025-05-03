@@ -1,19 +1,17 @@
 import { useGoogleLogin } from '@react-oauth/google';
 import { LoginRightContent, Logo } from '../../components';
 
-import { Button, ModeToggle, ROUTE_PATH } from '@keepcloud/web-core/react';
 import {
   AuthHelper,
-  useGetProfile,
   useGoogleAuth,
+  Button,
+  ModeToggle,
+  ROUTE_PATH,
 } from '@keepcloud/web-core/react';
 import { Navigate } from 'react-router';
 
 export default function Login() {
   const { mutate: googleAuth, isPending } = useGoogleAuth();
-  const { refetch } = useGetProfile({
-    enabled: false,
-  });
 
   const login = useGoogleLogin({
     flow: 'auth-code',
@@ -23,26 +21,25 @@ export default function Login() {
   });
 
   if (AuthHelper.checkIfSessionValid()) {
-    refetch();
     return <Navigate to={ROUTE_PATH.home} />;
   }
 
   return (
-    <div className=" h-svh grid grid-cols-12 gap-4 p-2 max-h-svh ">
-      <LoginRightContent className="hidden md:block md:col-span-6" />
-      <div className="col-span-full md:col-span-6 rounded-[12px] relative flex flex-col justify-center items-center">
-        <div className="absolute top-0 right-2 flex  items-center">
+    <div className="grid h-svh max-h-svh grid-cols-12 gap-4 p-2">
+      <LoginRightContent className="hidden md:col-span-6 md:block" />
+      <div className="relative col-span-full flex flex-col items-center justify-center rounded-[12px] md:col-span-6">
+        <div className="absolute top-0 right-2 flex items-center">
           <ModeToggle />
         </div>
-        <div className="flex flex-col justify-center items-center gap-6 w-full max-w-[360px] md:w-[350px] md:max-w-full">
+        <div className="flex w-full max-w-[360px] flex-col items-center justify-center gap-6 md:w-[350px] md:max-w-full">
           <Logo />
-          <h1 className="text-neutral-500 font-semibold text-[32px] leading-[40px] dark:text-white">
+          <h1 className="text-[32px] leading-[40px] font-semibold text-neutral-500 dark:text-white">
             Welcome to{' '}
-            <span className="bg-clip-text text-transparent bg-linear-to-r from-[#4C3CC6] to-[#7E60F8]">
+            <span className="bg-linear-to-r from-[#4C3CC6] to-[#7E60F8] bg-clip-text text-transparent">
               KeepCloud
             </span>
           </h1>
-          <div className="w-full mx-auto">
+          <div className="mx-auto w-full">
             <Button
               className="w-full"
               variant="secondary"
@@ -55,7 +52,7 @@ export default function Login() {
             </Button>
           </div>
         </div>
-        <div className="absolute bottom-0 w-full text-[12px] flex justify-center gap-x-5 gap-y-2 lg:justify-between flex-wrap items-center text-foreground dark:text-300">
+        <div className="dark:text-300 absolute bottom-0 flex w-full flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[12px] text-foreground lg:justify-between">
           <span>&copy; 2025 - KeepCloud All Rights Reserved</span>
           <span>Privacy Policy &#183; Terms & Conditions</span>
         </div>
