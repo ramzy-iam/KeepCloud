@@ -14,6 +14,7 @@ import {
   FolderUp,
   LucideProps,
   PlusIcon,
+  UploadIcon,
 } from 'lucide-react';
 
 interface IActionButton {
@@ -48,7 +49,7 @@ const actions: IActionButton[] = [
     ],
   },
   {
-    icon: PlusIcon,
+    icon: UploadIcon,
     label: 'Upload',
 
     menuItems: [
