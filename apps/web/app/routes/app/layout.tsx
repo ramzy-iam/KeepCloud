@@ -1,17 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
 import { Navigate, Outlet } from 'react-router';
 import {
-  AuthHelper,
-  authState,
-  useGetProfile,
   ModeToggle,
   SidebarProvider,
   SidebarTrigger,
   useSidebar,
   ROUTE_PATH,
-  useRefreshAccessToken,
+  useAuth,
 } from '@keepcloud/web-core/react';
-import { useAtomValue } from 'jotai';
 import { UserProfileDto } from '@keepcloud/commons/dtos';
 import { AppSidebar, GlobalSearch, UserProfileIcon } from '../../components';
 import { PlusIcon, UploadIcon } from 'lucide-react';
@@ -52,39 +47,7 @@ const ActionsButtons = () => (
 );
 
 export default function Layout() {
-  const user = useAtomValue(authState)?.user as UserProfileDto;
-  const [authChecked, setAuthChecked] = useState(false);
-  const [redirect, setRedirect] = useState<string | null>(null);
-  const { mutateAsync: refreshAccessToken } = useRefreshAccessToken();
-  const hasRefreshed = useRef(false);
-
-  const { isLoading } = useGetProfile({
-    enabled: AuthHelper.checkIfSessionValid(),
-  });
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      if (hasRefreshed.current) return;
-      hasRefreshed.current = true;
-
-      if (!AuthHelper.checkIfSessionValid()) {
-        if (AuthHelper.canRefreshToken()) {
-          try {
-            await refreshAccessToken();
-          } catch {
-            AuthHelper.clearCookies();
-            setRedirect(ROUTE_PATH.login);
-          }
-        } else {
-          AuthHelper.clearCookies();
-          setRedirect(ROUTE_PATH.login);
-        }
-      }
-      setAuthChecked(true);
-    };
-
-    checkAuth();
-  }, [refreshAccessToken]);
+  const { user, authChecked, redirect, isLoading } = useAuth();
 
   if (redirect) return <Navigate to={ROUTE_PATH.login} />;
   if (!authChecked || isLoading) return <div>Loading...</div>;
