@@ -77,45 +77,7 @@ export const FileTree = () => {
         <File name="File A1" />
       </Folder>
       <Folder name="Folder B" />
-      <Folder name="Folder Very long " />
-      <Folder name="Folder C">
-        <File name="File C2" />
-        <Folder name="Folder C">
-          <Folder name="Folder C">
-            <File name="File C2" />
-            <Folder name="Folder C">
-              <File name="File C2" />
-              <Folder name="Folder C">
-                <File name="File C2" />
-                <Folder name="Folder C">
-                  <Folder name="Folder C">
-                    <File name="File C2" />
-                    <Folder name="Folder C">
-                      <Folder name="Folder C">
-                        <File name="File C2" />
-                        <Folder name="Folder C">
-                          <File name="File C2" />
-                          <Folder name="Folder C">
-                            <File name="File C2" />
-                            <Folder name="Folder C">
-                              <Folder name="Folder C">
-                                <File name="File C2" />
-                                <Folder name="Folder C">
-                                  <File name="File C2" />
-                                </Folder>
-                              </Folder>
-                            </Folder>
-                          </Folder>
-                        </Folder>
-                      </Folder>
-                    </Folder>
-                  </Folder>
-                </Folder>
-              </Folder>
-            </Folder>
-          </Folder>
-        </Folder>
-      </Folder>
+      <Folder name="Folder C" />
     </Folder>
   );
 };

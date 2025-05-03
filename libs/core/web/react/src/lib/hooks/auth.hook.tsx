@@ -40,6 +40,17 @@ export const useGetProfile = ({ enabled }: GetProfileProps = {}) => {
   });
 };
 
+export const useRefreshAccessToken = () => {
+  return useMutation<AuthGoogleResponseDto, Error | AxiosError>({
+    mutationFn: async () => {
+      const { data } = await AuthService.refreshToken(AuthHelper.refreshToken);
+      AuthHelper.storeTokens({ ...data });
+      return data;
+    },
+    retry: false,
+  });
+};
+
 export const useLogout = () => {
   const navigate = useNavigate();
   const logout = () => {

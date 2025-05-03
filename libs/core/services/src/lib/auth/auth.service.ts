@@ -19,13 +19,13 @@ export class AuthService {
 
   constructor(
     private readonly userService: UserService,
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
   ) {
     this.logger = new Logger(AuthService.name);
   }
 
   async validateOrCreateUser(
-    code: string
+    code: string,
   ): Promise<{ accessToken: string; refreshToken: string }> {
     try {
       const payload = await this.verifyGoogleCode(code);
@@ -38,14 +38,14 @@ export class AuthService {
     } catch (error: any) {
       this.logger.error(
         `Google authentication failed: ${error.message}`,
-        error.stack
+        error.stack,
       );
 
       if (error instanceof BadRequestException) {
         throw error;
       }
       throw new InternalServerErrorException(
-        'Authentication service unavailable'
+        'Authentication service unavailable',
       );
     }
   }
@@ -54,7 +54,7 @@ export class AuthService {
     const payload = await OAuthService.verifyGoogleCode(code); // Updated to call static method
     if (!payload.email || !payload.email_verified) {
       throw new BadRequestException(
-        'Google authentication failed: Email not verified'
+        'Google authentication failed: Email not verified',
       );
     }
     return payload;
@@ -91,7 +91,7 @@ export class AuthService {
       }
 
       const { accessToken } = this.generateTokens(user);
-      return { accessToken };
+      return { accessToken, refreshToken };
     } catch (error) {
       if (error instanceof BadRequestException) throw error;
       throw new BadRequestException('Invalid refresh token');
