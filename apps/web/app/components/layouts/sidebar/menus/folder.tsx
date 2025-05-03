@@ -5,27 +5,9 @@ import {
   SidebarMenuButton,
 } from '@keepcloud/web-core/react';
 import { FolderIcon } from '../../../ui';
-import { ChevronRightIcon, FileTextIcon } from 'lucide-react';
+import { ChevronRightIcon } from 'lucide-react';
 import { useState } from 'react';
-
-const File = ({
-  name,
-  icon = <FileTextIcon />,
-  noIcon = false,
-}: {
-  name: string;
-  icon?: React.ReactNode;
-  noIcon?: boolean;
-}) => {
-  return (
-    <div className="w-[200px] pl-6">
-      <SidebarMenuButton className="flex cursor-pointer items-center gap-3">
-        {!noIcon && icon}
-        {name}
-      </SidebarMenuButton>
-    </div>
-  );
-};
+import { File } from '@keepcloud/commons/types';
 
 const Folder = ({
   name,
@@ -48,7 +30,12 @@ const Folder = ({
     >
       <SidebarMenuButton className="flex w-full cursor-pointer items-center gap-3">
         <CollapsibleTrigger asChild>
-          <button onClick={() => setOpen((prev) => !prev)} tabIndex={0}>
+          <button
+            onClick={() => setOpen((prev) => !prev)}
+            tabIndex={0}
+            aria-expanded={open}
+            aria-label={`Toggle ${name} folder`}
+          >
             <ChevronRightIcon
               width={16}
               height={16}
@@ -70,14 +57,45 @@ const Folder = ({
   );
 };
 
-export const FileTree = () => {
+const FileTreeNode = ({ file }: { file: File }) => {
+  if (!file.isFolder && file.fileType !== 'folder') {
+    return null;
+  }
+
+  const sortedChildren = file.children
+    ? [...file.children]
+        .filter((child) => child.isFolder || child.fileType === 'folder')
+        .sort((a, b) => a.name.localeCompare(b.name))
+    : [];
+
   return (
-    <Folder name="My Storage" noIcon={true}>
-      <Folder name="Folder A">
-        <File name="File A1" />
-      </Folder>
-      <Folder name="Folder B" />
-      <Folder name="Folder C" />
+    <Folder name={file.name} icon={<FolderIcon />} noIcon={false}>
+      {sortedChildren.map((child) => (
+        <FileTreeNode key={child.id} file={child} />
+      ))}
     </Folder>
+  );
+};
+
+interface FileTreeProps {
+  files: File[];
+}
+
+export const FileTree = ({ files }: FileTreeProps) => {
+  const rootFolders = [...files]
+    .filter((file) => file.isFolder || file.fileType === 'folder')
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  return (
+    <div>
+      {rootFolders.map((file) => (
+        <Folder key={file.id} name={file.name} noIcon={true}>
+          {file.children
+            ?.filter((child) => child.isFolder || child.fileType === 'folder')
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .map((child) => <FileTreeNode key={child.id} file={child} />)}
+        </Folder>
+      ))}
+    </div>
   );
 };

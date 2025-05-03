@@ -19,6 +19,7 @@ import {
   SidebarFolderIcon,
   SidebarOverviewIcon,
 } from './icons';
+import { fileTreeFolders } from '@keepcloud/commons/types';
 
 const SidebarItems = [
   {
@@ -33,7 +34,7 @@ const SidebarItems = [
   },
 ];
 
-const contents = [HomeMenu, FileTree];
+const contents = [<HomeMenu />, <FileTree files={fileTreeFolders} />];
 
 interface AppSidebarProps {
   user: UserProfileDto;
@@ -98,7 +99,7 @@ export function AppSidebar({ user }: Readonly<AppSidebarProps>) {
 
             <div className="relative flex h-full w-[267px] flex-col gap-8 border-0 border-x border-section-border p-6">
               <UserProfileIcon user={user} />
-              <div className="h-full overflow-auto">{activeContent()}</div>
+              <div className="h-full overflow-auto">{activeContent}</div>
             </div>
           </SidebarGroupContent>
         </SidebarGroup>
