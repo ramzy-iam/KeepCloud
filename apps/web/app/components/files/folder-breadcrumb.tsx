@@ -14,13 +14,14 @@ import {
   useSidebar,
   ROUTE_PATH,
 } from '@keepcloud/web-core/react';
-import { Link } from 'react-router';
+import { useNavigate } from 'react-router';
 
 interface FolderBreadcrumbProps {
   folder: File;
 }
 
 export const FolderBreadcrumb = ({ folder }: FolderBreadcrumbProps) => {
+  const navigate = useNavigate();
   const ancestors = folder.ancestors ?? [];
   const { isMobile } = useSidebar();
 
@@ -51,15 +52,20 @@ export const FolderBreadcrumb = ({ folder }: FolderBreadcrumbProps) => {
           <>
             <BreadcrumbItem>
               <DropdownMenu>
-                <DropdownMenuTrigger className="flex items-center gap-1 rounded-[16px] px-1 text-20-medium text-heading hover:bg-accent">
+                <DropdownMenuTrigger className="flex cursor-pointer items-center gap-1 rounded-[16px] px-1 text-20-medium text-heading hover:bg-accent">
                   <BreadcrumbEllipsis />
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start">
+                <DropdownMenuContent align="start" className="min-w-[150px]">
                   {hiddenAncestors.map((ancestor) => (
-                    <DropdownMenuItem key={ancestor.id} asChild>
-                      <Link to={ROUTE_PATH.folderDetails(ancestor.id)}>
-                        {ancestor.name}
-                      </Link>
+                    <DropdownMenuItem
+                      key={ancestor.id}
+                      className="cursor-pointer"
+                      asChild
+                      onClick={() => {
+                        navigate(ROUTE_PATH.folderDetails(ancestor.id));
+                      }}
+                    >
+                      <span>{ancestor.name}</span>
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>
@@ -72,15 +78,18 @@ export const FolderBreadcrumb = ({ folder }: FolderBreadcrumbProps) => {
         {/* Visible ancestors */}
         {visibleAncestors.map((ancestor) => (
           <React.Fragment key={ancestor.id}>
-            <BreadcrumbItem className="rounded-[16px] px-4 py-1 hover:bg-accent">
-              <Link to={ROUTE_PATH.folderDetails(ancestor.id)}>
-                <h4
-                  className="truncate text-20-medium text-heading"
-                  title={ancestor.name}
-                >
-                  {ancestor.name}
-                </h4>
-              </Link>
+            <BreadcrumbItem
+              className="cursor-pointer rounded-[16px] px-4 py-1 hover:bg-accent"
+              onClick={() => {
+                navigate(ROUTE_PATH.folderDetails(ancestor.id));
+              }}
+            >
+              <h4
+                className="truncate text-20-medium text-heading"
+                title={ancestor.name}
+              >
+                {ancestor.name}
+              </h4>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
           </React.Fragment>
