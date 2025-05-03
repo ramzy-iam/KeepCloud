@@ -8,7 +8,6 @@ export type File = {
   id: string;
   name: string;
   owner: Owner;
-  isFolder?: boolean;
   size: number;
   lastModified: string;
   isStarred?: boolean;
@@ -16,8 +15,10 @@ export type File = {
   sharedWith?: string[];
   fileType?: 'folder' | 'file' | 'image' | 'video';
   parent?: File;
-  children?: File[];
+  children: File[];
 };
+
+export type FileMainCategory = 'folder' | 'file' | 'all';
 
 export const files: File[] = [
   {
@@ -31,6 +32,7 @@ export const files: File[] = [
     },
     size: 102400,
     lastModified: '2025-04-18T15:42:10Z',
+    children: [],
   },
   {
     id: 'file_01hzyvgg1xwff8ypr3d9ka5t2v',
@@ -43,6 +45,7 @@ export const files: File[] = [
     },
     size: 204800,
     lastModified: '2025-04-17T10:15:00Z',
+    children: [],
   },
   {
     id: 'file_01hzyvhjk88pwxz7rft5lku90g',
@@ -55,6 +58,7 @@ export const files: File[] = [
     },
     size: 51200,
     lastModified: '2025-04-15T08:30:00Z',
+    children: [],
   },
   {
     id: 'file_01hzyvhrstqubyz3kjqh8twa9c',
@@ -67,6 +71,7 @@ export const files: File[] = [
     },
     size: 153600,
     lastModified: '2025-04-14T14:25:00Z',
+    children: [],
   },
   {
     id: 'file_01hzyvjmqp2qwbw8vxytgrza5m',
@@ -77,9 +82,11 @@ export const files: File[] = [
       lastName: 'White',
       picture: 'https://picsum.photos/200/304',
     },
-    isFolder: true,
+
     size: 30720,
+    fileType: 'folder',
     lastModified: '2025-04-13T16:45:00Z',
+    children: [],
   },
   {
     id: 'file_01hzyvkp9nd5asld0yejz3ah2p',
@@ -92,6 +99,7 @@ export const files: File[] = [
     },
     size: 256000,
     lastModified: '2025-04-12T12:00:00Z',
+    children: [],
   },
   {
     id: 'file_01hzyvm5tvs8fz60n7u4mc6xqy',
@@ -104,6 +112,7 @@ export const files: File[] = [
     },
     size: 1024000,
     lastModified: '2025-04-11T09:20:00Z',
+    children: [],
   },
   {
     id: 'file_01hzyvn8szwljd6eb3zxtak2qk',
@@ -116,6 +125,7 @@ export const files: File[] = [
     },
     size: 512000,
     lastModified: '2025-04-10T13:15:00Z',
+    children: [],
   },
   {
     id: 'file_01hzyvp25jsdkfju7a0mhzz75n',
@@ -128,6 +138,7 @@ export const files: File[] = [
     },
     size: 409600,
     lastModified: '2025-04-09T07:50:00Z',
+    children: [],
   },
   {
     id: 'file_01hzyvqabc8m4kvq9mzt7tw5yw',
@@ -140,6 +151,7 @@ export const files: File[] = [
     },
     size: 10240,
     lastModified: '2025-04-08T18:35:00Z',
+    children: [],
   },
   {
     id: 'file_01hzyvrtdvq3nep8hz3ke4x56q',
@@ -152,6 +164,7 @@ export const files: File[] = [
     },
     size: 768000,
     lastModified: '2025-04-07T20:15:00Z',
+    children: [],
   },
   {
     id: 'file_01hzyvt53txxwvqp6d09gh56g2',
@@ -164,6 +177,7 @@ export const files: File[] = [
     },
     size: 153600,
     lastModified: '2025-04-06T11:10:00Z',
+    children: [],
   },
   {
     id: 'file_01hzyvv7afg82mzq2r4s3deukx',
@@ -176,6 +190,7 @@ export const files: File[] = [
     },
     size: 204800,
     lastModified: '2025-04-05T17:00:00Z',
+    children: [],
   },
   {
     id: 'file_01hzyvwgj9pnz0mx7tk4edwzxr',
@@ -188,6 +203,7 @@ export const files: File[] = [
     },
     size: 307200,
     lastModified: '2025-04-04T14:55:00Z',
+    children: [],
   },
   {
     id: 'file_01hzyvxxd7zpjrdke5t2b8g2ma',
@@ -200,6 +216,7 @@ export const files: File[] = [
     },
     size: 5120,
     lastModified: '2025-04-03T10:05:00Z',
+    children: [],
   },
 ];
 
@@ -213,12 +230,13 @@ export const folders: File[] = [
       lastName: 'Doe',
       picture: 'https://example.com/john.jpg',
     },
-    isFolder: true,
+
     size: 0,
     lastModified: '2023-10-01T09:00:00Z',
     isStarred: false,
     isTrashed: false,
     fileType: 'folder',
+    children: [],
   },
   {
     id: 'folder_2',
@@ -229,12 +247,13 @@ export const folders: File[] = [
       lastName: 'Doe',
       picture: 'https://example.com/john.jpg',
     },
-    isFolder: true,
+
     size: 0,
     lastModified: '2023-10-02T09:00:00Z',
     isStarred: true,
     isTrashed: false,
     fileType: 'folder',
+    children: [],
   },
   {
     id: 'folder_3',
@@ -245,12 +264,13 @@ export const folders: File[] = [
       lastName: 'Doe',
       picture: 'https://example.com/john.jpg',
     },
-    isFolder: true,
+
     size: 0,
     lastModified: '2023-10-03T09:00:00Z',
     isStarred: false,
     isTrashed: false,
     fileType: 'folder',
+    children: [],
   },
   {
     id: 'folder_4',
@@ -261,12 +281,13 @@ export const folders: File[] = [
       lastName: 'Doe',
       picture: 'https://example.com/john.jpg',
     },
-    isFolder: true,
+
     size: 0,
     lastModified: '2023-10-04T09:00:00Z',
     isStarred: false,
     isTrashed: false,
     fileType: 'folder',
+    children: [],
   },
   {
     id: 'folder_5',
@@ -277,12 +298,13 @@ export const folders: File[] = [
       lastName: 'Doe',
       picture: 'https://example.com/john.jpg',
     },
-    isFolder: true,
+
     size: 0,
     lastModified: '2023-10-05T09:00:00Z',
     isStarred: true,
     isTrashed: false,
     fileType: 'folder',
+    children: [],
   },
   {
     id: 'folder_6',
@@ -293,12 +315,13 @@ export const folders: File[] = [
       lastName: 'Doe',
       picture: 'https://example.com/john.jpg',
     },
-    isFolder: true,
+
     size: 0,
     lastModified: '2023-10-06T09:00:00Z',
     isStarred: false,
     isTrashed: false,
     fileType: 'folder',
+    children: [],
   },
   {
     id: 'folder_7',
@@ -309,12 +332,13 @@ export const folders: File[] = [
       lastName: 'Doe',
       picture: 'https://example.com/john.jpg',
     },
-    isFolder: true,
+
     size: 0,
     lastModified: '2023-10-07T09:00:00Z',
     isStarred: false,
     isTrashed: false,
     fileType: 'folder',
+    children: [],
   },
   {
     id: 'folder_8',
@@ -325,12 +349,13 @@ export const folders: File[] = [
       lastName: 'Doe',
       picture: 'https://example.com/john.jpg',
     },
-    isFolder: true,
+
     size: 0,
     lastModified: '2023-10-08T09:00:00Z',
     isStarred: true,
     isTrashed: false,
     fileType: 'folder',
+    children: [],
   },
   {
     id: 'folder_9',
@@ -341,12 +366,13 @@ export const folders: File[] = [
       lastName: 'Doe',
       picture: 'https://example.com/john.jpg',
     },
-    isFolder: true,
+
     size: 0,
     lastModified: '2023-10-09T09:00:00Z',
     isStarred: false,
     isTrashed: false,
     fileType: 'folder',
+    children: [],
   },
   {
     id: 'folder_10',
@@ -357,12 +383,13 @@ export const folders: File[] = [
       lastName: 'Doe',
       picture: 'https://example.com/john.jpg',
     },
-    isFolder: true,
+
     size: 0,
     lastModified: '2023-10-10T09:00:00Z',
     isStarred: false,
     isTrashed: false,
     fileType: 'folder',
+    children: [],
   },
 ];
 
@@ -371,7 +398,7 @@ export const fileTreeFolders: File[] = [
     id: '1',
     name: 'My Storage',
     owner: { id: 'user1', firstName: 'John', lastName: 'Doe', picture: '' },
-    isFolder: true,
+
     fileType: 'folder',
     size: 0,
     lastModified: '2025-05-03T10:00:00Z',
@@ -380,7 +407,7 @@ export const fileTreeFolders: File[] = [
         id: '1.1',
         name: 'Documents',
         owner: { id: 'user1', firstName: 'John', lastName: 'Doe', picture: '' },
-        isFolder: true,
+
         fileType: 'folder',
         size: 0,
         lastModified: '2025-05-03T10:00:00Z',
@@ -394,10 +421,25 @@ export const fileTreeFolders: File[] = [
               lastName: 'Doe',
               picture: '',
             },
-            isFolder: true,
             fileType: 'folder',
             size: 0,
             lastModified: '2025-05-03T10:00:00Z',
+            children: [
+              {
+                id: 'file_01hzyvgs1xwff8ypr3d9ka5t2v',
+                name: 'Reports',
+                owner: {
+                  id: 'user1',
+                  firstName: 'John',
+                  lastName: 'Doe',
+                  picture: '',
+                },
+                fileType: 'file',
+                size: 0,
+                lastModified: '2025-05-03T10:00:00Z',
+                children: [],
+              },
+            ],
           },
         ],
       },
@@ -405,10 +447,11 @@ export const fileTreeFolders: File[] = [
         id: '1.2',
         name: 'Projects',
         owner: { id: 'user1', firstName: 'John', lastName: 'Doe', picture: '' },
-        isFolder: true,
+
         fileType: 'folder',
         size: 0,
         lastModified: '2025-05-03T10:00:00Z',
+        children: [],
       },
     ],
   },
@@ -416,7 +459,7 @@ export const fileTreeFolders: File[] = [
     id: '2',
     name: 'Shared with me',
     owner: { id: 'user1', firstName: 'John', lastName: 'Doe', picture: '' },
-    isFolder: true,
+
     fileType: 'folder',
     size: 0,
     lastModified: '2025-05-03T10:00:00Z',
@@ -425,10 +468,11 @@ export const fileTreeFolders: File[] = [
         id: '2.1',
         name: 'Team',
         owner: { id: 'user1', firstName: 'John', lastName: 'Doe', picture: '' },
-        isFolder: true,
+
         fileType: 'folder',
         size: 0,
         lastModified: '2025-05-03T10:00:00Z',
+        children: [],
       },
     ],
   },

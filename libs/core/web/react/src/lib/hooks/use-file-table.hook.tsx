@@ -120,9 +120,9 @@ export function useFileTable<TData>({
   });
 
   const TableComponent: React.FC<{
-    beforeTable?: React.ReactNode;
+    header?: React.ReactNode;
     footer?: React.ReactNode;
-  }> = ({ beforeTable, footer }) => {
+  }> = ({ header, footer }) => {
     const renderTableBody = () => {
       if (isLoading) {
         return (
@@ -172,7 +172,7 @@ export function useFileTable<TData>({
 
     return (
       <div className="mb-4 w-full">
-        {beforeTable}
+        {header}
         <div className="rounded-md border">
           <Table>
             <TableHeader>

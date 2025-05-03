@@ -23,11 +23,13 @@ import {
   useFileTable,
   useFileMenu,
   useSidebar,
+  ROUTE_PATH,
 } from '@keepcloud/web-core/react';
 import { DayjsHelper, NameFormatterHelper } from '@keepcloud/commons/helpers';
 import { File, Owner } from '@keepcloud/commons/types';
 import { FolderIconOutline } from '../ui';
 import { ColumnDef, Table } from '@tanstack/react-table';
+import { useNavigate } from 'react-router';
 
 export const columns: ColumnDef<File>[] = [
   {
@@ -60,9 +62,20 @@ export const columns: ColumnDef<File>[] = [
       name: 'Name',
     },
     cell: ({ row }) => {
-      const isFolder = row.original.isFolder;
+      const isFolder = row.original.fileType == 'folder';
+      const navigate = useNavigate();
+      const url = ROUTE_PATH.folderDetails(row.original.id);
+
+      const handleClick = () => {
+        if (isFolder) {
+          navigate(url);
+        }
+      };
       return (
-        <div className="flex items-center gap-2 truncate text-14-medium text-secondary-foreground">
+        <div
+          className="flex cursor-pointer items-center gap-2 truncate text-14-medium text-secondary-foreground"
+          onClick={handleClick}
+        >
           {isFolder ? (
             <FolderIconOutline />
           ) : (
@@ -108,8 +121,7 @@ export const columns: ColumnDef<File>[] = [
       name: 'Size',
     },
     cell: ({ row }) => {
-      const isFolder =
-        row.original.isFolder || row.original.fileType == 'folder';
+      const isFolder = row.original.fileType == 'folder';
       if (isFolder)
         return (
           <div className="flex justify-center md:justify-end">
@@ -172,6 +184,9 @@ const RenderActionMenu = (file: File) => {
 
 interface TableViewProps {
   data: File[];
+  header?: React.ReactNode;
+  footer?: React.ReactNode;
+  onlyFolders?: boolean;
 }
 
 interface BeforeTableProps {
@@ -213,7 +228,12 @@ const BeforeTable = ({ table }: BeforeTableProps) => {
   );
 };
 
-export function TableView({ data }: TableViewProps) {
+export function TableView({
+  data,
+  header,
+  footer: customFooter,
+  onlyFolders = false,
+}: TableViewProps) {
   const { table, TableComponent } = useFileTable({
     data,
     columns,
@@ -248,8 +268,8 @@ export function TableView({ data }: TableViewProps) {
 
   return (
     <TableComponent
-      beforeTable={<BeforeTable table={table} />}
-      footer={footer}
+      beforeTable={header ?? <BeforeTable table={table} />}
+      footer={customFooter ?? footer}
     />
   );
 }
