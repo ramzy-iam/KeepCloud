@@ -1,4 +1,4 @@
-import { Tabs, TabsList, TabsTrigger } from '@keepcloud/web-core/react';
+import { Tabs, TabsList, TabsTrigger, cn } from '@keepcloud/web-core/react';
 import { LayoutGrid, StretchHorizontal } from 'lucide-react';
 import { useState } from 'react';
 import { File, FileMainCategory } from '@keepcloud/commons/types';
@@ -14,6 +14,7 @@ interface FolderViewProps {
   defaultViewMode?: ViewMode;
   fixedView?: ViewMode;
   group?: boolean;
+  className?: string;
 }
 
 export const FolderView = ({
@@ -23,6 +24,7 @@ export const FolderView = ({
   defaultViewMode = 'grid',
   group = false,
   fixedView,
+  className,
 }: FolderViewProps) => {
   const [viewMode, setViewMode] = useState<ViewMode>(
     fixedView ?? defaultViewMode,
@@ -46,7 +48,7 @@ export const FolderView = ({
     'data-[state=active]:bg-primary! data-[state=active]:text-white-light!';
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className={cn('mb-8 flex flex-col gap-3', className)}>
       <div className="sticky -top-[1px] z-[1] flex items-center justify-between bg-background p-1.5 pl-0">
         <h3 className="text-20-medium text-heading">{title}</h3>
         {!fixedView && (
