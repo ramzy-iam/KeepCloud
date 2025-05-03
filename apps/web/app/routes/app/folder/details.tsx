@@ -40,7 +40,7 @@ export default function FolderDetailsComponent({
 
   return (
     <div className="flex flex-col gap-6">
-      <FolderView data={folder.children} title={folder?.name} />
+      <FolderView folder={folder} title={folder?.name} />
     </div>
   );
 }
