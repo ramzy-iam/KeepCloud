@@ -2,37 +2,58 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
+  ROUTE_PATH,
   SidebarMenuButton,
 } from '@keepcloud/web-core/react';
 import { FolderIcon } from '../../../ui';
 import { ChevronRightIcon } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { File } from '@keepcloud/commons/types';
+import { useLocation, useNavigate } from 'react-router';
 
-const Folder = ({
-  name,
+interface FileNodeProps {
+  file: File;
+  icon?: React.ReactNode;
+  noIcon?: boolean;
+  children?: React.ReactNode;
+}
+
+const FileNode = ({
+  file,
   icon = <FolderIcon />,
   noIcon = false,
   children,
-}: {
-  name: string;
-  icon?: React.ReactNode;
-  children?: React.ReactNode;
-  noIcon?: boolean;
-}) => {
+}: FileNodeProps) => {
+  const { name, id } = file;
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [isActive, setIsActive] = useState(false);
+  const url = ROUTE_PATH.folderDetails(id);
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    setIsActive(pathname === url);
+  }, [pathname, url]);
 
   return (
     <Collapsible
       open={open}
       onOpenChange={setOpen}
-      className="h-full w-[200px]"
+      className="relative h-full w-[200px]"
     >
-      <SidebarMenuButton className="flex w-full cursor-pointer items-center gap-3">
+      <SidebarMenuButton
+        isActive={isActive}
+        className="flex w-full gap-0 hover:bg-sidebar-accent/30 dark:hover:bg-sidebar-accent/50"
+        onClick={() => {
+          navigate(url);
+        }}
+      >
         <CollapsibleTrigger asChild>
-          <button
-            onClick={() => setOpen((prev) => !prev)}
-            tabIndex={0}
+          <span
+            onClick={(e) => {
+              e.stopPropagation();
+              setOpen((prev) => !prev);
+            }}
             aria-expanded={open}
             aria-label={`Toggle ${name} folder`}
           >
@@ -41,15 +62,17 @@ const Folder = ({
               height={16}
               className={`transition-transform ${open ? 'rotate-90' : ''}`}
             />
-          </button>
+          </span>
         </CollapsibleTrigger>
-        <div className="flex items-center gap-3 truncate">
+
+        <div className="flex flex-1 cursor-pointer items-center gap-3 truncate pl-3">
           {!noIcon && <span>{icon}</span>}
           <span className="truncate" title={name}>
             {name}
           </span>
         </div>
       </SidebarMenuButton>
+
       <CollapsibleContent className="-pl-3 relative before:absolute before:top-0 before:bottom-0 before:left-2 before:w-px before:bg-border">
         <div className="ml-2">{children}</div>
       </CollapsibleContent>
@@ -58,22 +81,22 @@ const Folder = ({
 };
 
 const FileTreeNode = ({ file }: { file: File }) => {
-  if (!file.isFolder && file.fileType !== 'folder') {
+  if (file.fileType !== 'folder') {
     return null;
   }
 
   const sortedChildren = file.children
     ? [...file.children]
-        .filter((child) => child.isFolder || child.fileType === 'folder')
+        .filter((child) => child.fileType === 'folder')
         .sort((a, b) => a.name.localeCompare(b.name))
     : [];
 
   return (
-    <Folder name={file.name} icon={<FolderIcon />} noIcon={false}>
+    <FileNode file={file} icon={<FolderIcon />} noIcon={false}>
       {sortedChildren.map((child) => (
         <FileTreeNode key={child.id} file={child} />
       ))}
-    </Folder>
+    </FileNode>
   );
 };
 
@@ -83,18 +106,18 @@ interface FileTreeProps {
 
 export const FileTree = ({ files }: FileTreeProps) => {
   const rootFolders = [...files]
-    .filter((file) => file.isFolder || file.fileType === 'folder')
+    .filter((file) => file.fileType === 'folder')
     .sort((a, b) => a.name.localeCompare(b.name));
 
   return (
     <div>
       {rootFolders.map((file) => (
-        <Folder key={file.id} name={file.name} noIcon={true}>
+        <FileNode key={file.id} file={file} noIcon={true}>
           {file.children
-            ?.filter((child) => child.isFolder || child.fileType === 'folder')
+            ?.filter((child) => child.fileType === 'folder')
             .sort((a, b) => a.name.localeCompare(b.name))
             .map((child) => <FileTreeNode key={child.id} file={child} />)}
-        </Folder>
+        </FileNode>
       ))}
     </div>
   );
