@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import {
   MenuItem,
@@ -70,19 +70,21 @@ const actions: IActionButton[] = [
 
 const ActionButton = ({ action }: ActionButtonProps) => {
   const { menuItems, label } = action;
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <div className="flex flex-wrap justify-start gap-16 bg-background py-6">
-      <DropdownMenu>
+      <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
         <DropdownMenuTrigger>
           <span
+            data-active={isMenuOpen}
             onClick={(event) => {
               event.stopPropagation();
             }}
-            className="group flex w-[100px] cursor-pointer flex-col items-center gap-2 rounded-[8px] border border-stroke-500 p-3 text-heading hover:border-primary hover:bg-primary/5 md:w-[156px] md:items-start dark:border-neutral-600 dark:hover:border-primary"
+            className="group flex w-[100px] cursor-pointer flex-col items-center gap-2 rounded-[8px] border border-stroke-500 p-3 text-heading hover:border-primary hover:bg-primary/5 data-[active=true]:border-primary! md:w-[156px] md:items-start dark:border-neutral-600 dark:hover:border-primary"
           >
-            <action.icon className="text-primary dark:group-hover:text-white-light" />
-            <span className="text-14 group-hover:text-primary dark:group-hover:text-white-light">
+            <action.icon className="text-primary dark:group-hover:text-white-light dark:group-data-[active=true]:text-white-light" />
+            <span className="text-14 group-hover:text-primary group-data-[active=true]:text-primary dark:group-hover:text-white-light dark:group-data-[active=true]:text-white-light">
               {label}
             </span>
           </span>
@@ -97,7 +99,7 @@ const ActionButton = ({ action }: ActionButtonProps) => {
 
 export const QuickActionButtons = () => {
   return (
-    <div className="flex flex-wrap justify-start gap-16 bg-background py-6">
+    <div className="flex flex-wrap justify-start gap-8 bg-background py-6 md:gap-16">
       {actions.map((action) => (
         <ActionButton key={action.label} action={action} />
       ))}
