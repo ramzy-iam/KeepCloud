@@ -31,12 +31,58 @@ interface UseContextMenuProps {
   enableRightClick?: boolean;
 }
 
+interface ContextMenuProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
 interface UseContextMenuReturn {
-  ContextMenu: React.FC<{ children: React.ReactNode }>;
+  ContextMenu: React.FC<ContextMenuProps>;
   openMenu: (event?: React.MouseEvent) => void;
   closeMenu: () => void;
   isMenuOpen: boolean;
 }
+
+export const renderMenuItem = (item: MenuItem, index: number) => {
+  if (item.subItems && item.subItems.length > 0) {
+    return (
+      <DropdownMenuSub key={index}>
+        <DropdownMenuSubTrigger
+          className={cn(
+            'flex cursor-pointer items-center py-2',
+            item.className,
+          )}
+        >
+          {item.icon && <span className="mr-2">{item.icon}</span>}
+          <span>{item.label}</span>
+        </DropdownMenuSubTrigger>
+        <DropdownMenuSubContent>
+          {item.subItems.map((subItem, subIndex) =>
+            renderMenuItem(subItem, subIndex),
+          )}
+        </DropdownMenuSubContent>
+      </DropdownMenuSub>
+    );
+  }
+
+  return (
+    <>
+      {item.separatorBefore && <DropdownMenuSeparator />}
+      <DropdownMenuItem
+        className={cn('flex cursor-pointer items-center py-2', item.className)}
+        onClick={(e) => {
+          e.stopPropagation();
+          item.onClick?.();
+        }}
+        disabled={item.disabled}
+      >
+        {item.icon && <span className="mr-2">{item.icon}</span>}
+        <span>{item.label}</span>
+      </DropdownMenuItem>
+      {item.separatorAfter && <DropdownMenuSeparator />}
+    </>
+  );
+};
 
 export function useContextMenu({
   menuItems,
@@ -73,56 +119,10 @@ export function useContextMenu({
     };
   }, [enableRightClick]);
 
-  const renderMenuItem = (item: MenuItem, index: number) => {
-    if (item.subItems && item.subItems.length > 0) {
-      return (
-        <DropdownMenuSub key={index}>
-          <DropdownMenuSubTrigger
-            className={cn(
-              'flex cursor-pointer items-center py-2',
-              item.className,
-            )}
-          >
-            {item.icon && <span className="mr-2">{item.icon}</span>}
-            <span>{item.label}</span>
-          </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent>
-            {item.subItems.map((subItem, subIndex) =>
-              renderMenuItem(subItem, subIndex),
-            )}
-          </DropdownMenuSubContent>
-        </DropdownMenuSub>
-      );
-    }
-
-    return (
-      <>
-        {item.separatorBefore && <DropdownMenuSeparator />}
-        <DropdownMenuItem
-          className={cn(
-            'flex cursor-pointer items-center py-2',
-            item.className,
-          )}
-          onClick={(e) => {
-            e.stopPropagation();
-            item.onClick?.();
-          }}
-          disabled={item.disabled}
-        >
-          {item.icon && <span className="mr-2">{item.icon}</span>}
-          <span>{item.label}</span>
-        </DropdownMenuItem>
-        {item.separatorAfter && <DropdownMenuSeparator />}
-      </>
-    );
-  };
-
-  const ContextMenu: React.FC<{ children: React.ReactNode }> = ({
-    children,
-  }) => (
-    <div role="button" tabIndex={0} ref={triggerRef}>
+  const ContextMenu: React.FC<ContextMenuProps> = ({ children, className }) => (
+    <div ref={triggerRef} className={cn(className)}>
       <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-        <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
+        <DropdownMenuTrigger>{children}</DropdownMenuTrigger>
         <DropdownMenuContent
           align={align}
           className={cn('w-[285px] p-2', contentClassName)}
