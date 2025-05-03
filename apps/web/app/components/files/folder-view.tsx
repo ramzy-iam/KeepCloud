@@ -4,11 +4,13 @@ import { useState } from 'react';
 import { File, FileMainCategory } from '@keepcloud/commons/types';
 import { GridView } from './grid-view';
 import { TableView } from './table-view';
+import { FolderBreadcrumb } from './folder-breadcrumb';
 
 type ViewMode = 'grid' | 'table';
 
 interface FolderViewProps {
-  data: File[];
+  folder?: File;
+  items?: File[];
   categoryToDisplay?: FileMainCategory;
   title: string;
   defaultViewMode?: ViewMode;
@@ -18,7 +20,8 @@ interface FolderViewProps {
 }
 
 export const FolderView = ({
-  data,
+  folder,
+  items = [],
   categoryToDisplay = 'all',
   title,
   defaultViewMode = 'grid',
@@ -29,6 +32,8 @@ export const FolderView = ({
   const [viewMode, setViewMode] = useState<ViewMode>(
     fixedView ?? defaultViewMode,
   );
+  const data = folder?.children ?? items;
+
   const displayOnlyFolders = categoryToDisplay === 'folder';
 
   const filteredItems = data.filter((item) => {
@@ -50,7 +55,10 @@ export const FolderView = ({
   return (
     <div className={cn('mb-8 flex flex-col gap-3', className)}>
       <div className="sticky -top-[1px] z-[1] flex items-center justify-between bg-background p-1.5 pl-0">
-        <h3 className="text-20-medium text-heading">{title}</h3>
+        {title && !folder && (
+          <h3 className="text-20-medium text-heading">{title}</h3>
+        )}
+        {folder && <FolderBreadcrumb folder={folder} />}
         {!fixedView && (
           <div className="flex gap-2">
             <Tabs

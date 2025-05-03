@@ -22,3 +22,4 @@ export * from './form';
 export * from './label';
 export * from './accordion';
 export * from './tabs';
+export * from './breadcrumb';
