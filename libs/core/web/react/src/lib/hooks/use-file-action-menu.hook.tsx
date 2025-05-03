@@ -1,7 +1,6 @@
 import * as React from 'react';
-import { useContextMenu } from './use-context-menu.hook';
+import { MenuItem, useContextMenu } from './use-context-menu.hook';
 import {
-  ChevronRight,
   Info,
   ExternalLink,
   Share2,
@@ -37,24 +36,18 @@ export function useFileMenu({ file }: UseFileMenuProps): UseFileMenuReturn {
     'mr-2 h-4 w-4 text-neutral-300 hover:text-neutral-300 dark:hover:text-neutral-200';
   const itemClassName =
     'flex cursor-pointer items-center stroke-neutral-300 py-2 text-neutral-300! hover:bg-foreground hover:text-neutral-300 dark:stroke-200 dark:text-neutral-200 dark:hover:text-neutral-200';
-  const menuItems = [
+  const menuItems: MenuItem[] = [
     {
       label: 'Info',
       icon: <Info className={iconClassName} />,
       onClick: () => console.log(`View info for ${fileName}`),
       className: itemClassName,
-      suffix: (
-        <ChevronRight className="ml-auto h-4 w-4 text-neutral-300 hover:text-neutral-300 dark:hover:text-neutral-200" />
-      ),
     },
     {
       label: 'Open in',
       icon: <ExternalLink className={iconClassName} />,
       onClick: () => console.log(`Open ${fileName} in...`),
       className: itemClassName,
-      suffix: (
-        <ChevronRight className="ml-auto h-4 w-4 text-neutral-300 hover:text-neutral-300 dark:hover:text-neutral-200" />
-      ),
     },
     {
       label: 'Share',
@@ -135,9 +128,6 @@ export function useFileMenu({ file }: UseFileMenuProps): UseFileMenuReturn {
       icon: <Activity className={iconClassName} />,
       onClick: () => console.log(`View activity for ${fileName}`),
       className: itemClassName,
-      suffix: (
-        <ChevronRight className="ml-auto h-4 w-4 text-neutral-300 hover:text-neutral-300 dark:hover:text-neutral-200" />
-      ),
     },
   ];
 

@@ -17,6 +17,7 @@ export interface MenuItem {
   icon?: React.ReactNode;
   onClick?: () => void;
   className?: string;
+  separatorBefore?: boolean;
   separatorAfter?: boolean;
   disabled?: boolean;
   subItems?: MenuItem[];
@@ -95,20 +96,24 @@ export function useContextMenu({
     }
 
     return (
-      <React.Fragment key={index}>
+      <>
+        {item.separatorBefore && <DropdownMenuSeparator />}
         <DropdownMenuItem
           className={cn(
             'flex cursor-pointer items-center py-2',
             item.className,
           )}
-          onClick={item.onClick}
+          onClick={(e) => {
+            e.stopPropagation();
+            item.onClick?.();
+          }}
           disabled={item.disabled}
         >
           {item.icon && <span className="mr-2">{item.icon}</span>}
           <span>{item.label}</span>
         </DropdownMenuItem>
         {item.separatorAfter && <DropdownMenuSeparator />}
-      </React.Fragment>
+      </>
     );
   };
 

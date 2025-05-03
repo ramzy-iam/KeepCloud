@@ -21,10 +21,13 @@ export const FileSystemItem = ({ file, className }: FileSystemItemProps) => {
     }
   };
 
+  const buttonSecondaryClassName =
+    'inline-flex items-center cursor-pointer px-[24px] py-[13px] justify-center gap-2 whitespace-nowrap shadow-[0px_4px_8px_rgba(0, 0, 0, 0.16)] rounded-[8px] border border-1 text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-non shrink-0 [&_svg]:shrink-0 outline-none  text-secondary-foreground bg-white-light border-stroke-300 hover:bg-[#f0f0f0]/20 shadow-[0_4px_8px_rgba(0, 0, 0, 0.4)] dark:bg-neutral-800 dark:border-neutral-600 ';
+
   return (
-    <Button
-      variant="secondary"
+    <div
       className={cn(
+        buttonSecondaryClassName,
         'flex h-[38px] w-full items-center justify-between gap-2 px-3 py-1 sm:w-[150px] md:w-[194px]',
         className,
       )}
@@ -45,7 +48,6 @@ export const FileSystemItem = ({ file, className }: FileSystemItemProps) => {
       </div>
       <FileMenu>
         <Button
-          asChild
           variant={'text'}
           size={'icon'}
           className="size-[24px] rounded-full p-1 hover:bg-stroke-200 dark:hover:bg-white/5"
@@ -54,6 +56,6 @@ export const FileSystemItem = ({ file, className }: FileSystemItemProps) => {
           <EllipsisVerticalIcon className="h-4 w-4" />
         </Button>
       </FileMenu>
-    </Button>
+    </div>
   );
 };
