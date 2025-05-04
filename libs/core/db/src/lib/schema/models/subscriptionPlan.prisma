@@ -1,0 +1,10 @@
+model SubscriptionPlan {
+  id          String   @id @default(dbgenerated("nanoid()"))
+  nameKey        String   @unique
+  descriptionKey String   @unique
+  maxStorage  BigInt      // in bytes 
+  price       Int      // in cents, e.g., 999 = $9.99
+  isDefault   Boolean  @default(false)
+
+  users       User[]
+}
