@@ -18,9 +18,7 @@ import {
 } from 'lucide-react';
 
 interface IActionButton {
-  icon: React.ForwardRefExoticComponent<
-    Omit<LucideProps, 'ref'> & React.RefAttributes<SVGSVGElement>
-  >;
+  icon: React.ComponentType<LucideProps>;
   label: string;
   menuItems: MenuItem[];
 }
@@ -91,7 +89,11 @@ const ActionButton = ({ action }: ActionButtonProps) => {
           </span>
         </DropdownMenuTrigger>
         <DropdownMenuContent className={cn('max-w-[285px] min-w-[200px] p-2')}>
-          {menuItems.map(renderMenuItem)}
+          {menuItems.map((item, index) => (
+            <React.Fragment key={item.label}>
+              {renderMenuItem(item, index)}
+            </React.Fragment>
+          ))}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
