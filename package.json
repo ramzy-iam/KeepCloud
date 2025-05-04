@@ -5,7 +5,8 @@
   "scripts": {},
   "private": true,
   "prisma": {
-    "schema": "libs/core/db/src/lib/schema"
+    "schema": "libs/core/db/src/lib/schema",
+    "seed": "ts-node --project libs/core/db/tsconfig.json libs/core/db/src/lib/schema/seed.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",

@@ -1,8 +1,0 @@
-model Author {
-  id        String   @id @default(dbgenerated("nanoid()"))
-  firstName String
-  lastName  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  posts     Post[]
-}
