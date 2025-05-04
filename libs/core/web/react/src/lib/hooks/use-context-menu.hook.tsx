@@ -122,7 +122,7 @@ export function useContextMenu({
   const ContextMenu: React.FC<ContextMenuProps> = ({ children, className }) => (
     <div ref={triggerRef} className={cn(className)}>
       <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-        <DropdownMenuTrigger>{children}</DropdownMenuTrigger>
+        <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
         <DropdownMenuContent
           align={align}
           className={cn('w-[285px] p-2', contentClassName)}
@@ -132,7 +132,11 @@ export function useContextMenu({
               {label}
             </DropdownMenuLabel>
           )}
-          {menuItems.map(renderMenuItem)}
+          {menuItems.map((item, index) => (
+            <React.Fragment key={item.label}>
+              {renderMenuItem(item, index)}
+            </React.Fragment>
+          ))}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

@@ -40,7 +40,7 @@ export function Layout({ children }: { readonly children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         {/* <AppNav /> */}
         {children}
         <ScrollRestoration />
