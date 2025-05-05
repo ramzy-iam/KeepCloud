@@ -52,7 +52,7 @@ export const FolderBreadcrumb = ({ folder }: FolderBreadcrumbProps) => {
           <>
             <BreadcrumbItem>
               <DropdownMenu>
-                <DropdownMenuTrigger className="flex cursor-pointer items-center gap-1 rounded-[16px] px-1 text-20-medium text-heading hover:bg-accent">
+                <DropdownMenuTrigger className="flex cursor-pointer items-center gap-1 rounded-[16px] px-1 text-20-medium text-heading hover:bg-stroke-200 dark:hover:bg-white/5">
                   <BreadcrumbEllipsis />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" className="min-w-[150px]">
@@ -79,15 +79,12 @@ export const FolderBreadcrumb = ({ folder }: FolderBreadcrumbProps) => {
         {visibleAncestors.map((ancestor) => (
           <React.Fragment key={ancestor.id}>
             <BreadcrumbItem
-              className="cursor-pointer rounded-[16px] px-4 py-1 hover:bg-accent"
+              className="cursor-pointer rounded-[16px] px-4 py-1 text-heading hover:bg-stroke-200 dark:hover:bg-white/5"
               onClick={() => {
                 navigate(ROUTE_PATH.folderDetails(ancestor.id));
               }}
             >
-              <h4
-                className="truncate text-20-medium text-heading"
-                title={ancestor.name}
-              >
+              <h4 className="truncate text-20-medium" title={ancestor.name}>
                 {ancestor.name}
               </h4>
             </BreadcrumbItem>
