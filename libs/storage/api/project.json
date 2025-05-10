@@ -1,0 +1,20 @@
+{
+  "name": "storage-api",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/storage/api/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/storage/api",
+        "tsConfig": "libs/storage/api/tsconfig.lib.json",
+        "packageJson": "libs/storage/api/package.json",
+        "main": "libs/storage/api/src/index.ts",
+        "assets": ["libs/storage/api/*.md"]
+      }
+    }
+  }
+}

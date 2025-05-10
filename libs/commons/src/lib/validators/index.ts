@@ -7,3 +7,5 @@ export * from './is-array.validator';
 export * from './is-not-empty-array.validator';
 export * from './is-string.validator';
 export * from './is-boolean.validator';
+export * from './max.validator';
+export * from './min.validator';

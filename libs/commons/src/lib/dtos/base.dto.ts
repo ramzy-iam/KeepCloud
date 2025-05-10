@@ -1,16 +1,8 @@
-import { Expose, Transform, Type } from 'class-transformer';
-import {
-  IsNotEmpty,
-  IsOptional,
-  IsPositive,
-  IsString,
-  IsUUID,
-  Max,
-  Min,
-} from 'class-validator';
+import { Expose, Transform } from 'class-transformer';
 import CastHelper from '../helpers/shared/cast.helper';
-import { PAGINATION } from '../constants';
+import { ErrorCode, PAGINATION } from '../constants';
 import { SortOrder } from '../types';
+import { IsNotEmpty, IsOptional, IsString, Max, Min } from '../validators';
 
 export class BaseDto {
   @Expose()
@@ -36,23 +28,24 @@ export class BaseFilterDto {
   @Transform(({ value }) =>
     CastHelper.toNumber(value, {
       default: PAGINATION.DEFAULT_PAGE,
+      min: PAGINATION.DEFAULT_PAGE,
     }),
   )
   @IsOptional()
-  @IsPositive()
-  @Min(PAGINATION.DEFAULT_PAGE)
-  page?: number = PAGINATION.DEFAULT_PAGE;
+  @Min(PAGINATION.DEFAULT_PAGE, ErrorCode.PAGE_INVALID)
+  page?: number;
 
   @Transform(({ value }) =>
     CastHelper.toNumber(value, {
-      default: PAGINATION.DEFAULT_LIMIT,
+      default: PAGINATION.DEFAULT_PAGE_SIZE,
+      min: 1,
+      max: PAGINATION.DEFAULT_MAX_PAGE_SIZE,
     }),
   )
   @IsOptional()
-  @IsPositive()
-  @Min(1)
-  @Max(PAGINATION.MAX_LIMIT + 1)
-  limit?: number;
+  @Min(1, ErrorCode.PAGE_SIZE_INVALID)
+  @Max(PAGINATION.DEFAULT_MAX_PAGE_SIZE + 1, ErrorCode.PAGE_SIZE_INVALID)
+  pageSize?: number;
 
   @Transform(({ value }) => CastHelper.toOrder(value))
   @IsOptional()

@@ -13,7 +13,7 @@ export class BaseScope<
     findFirstOrThrow: (args: { where: WhereInput }) => Promise<T>;
   },
 > {
-  protected where: WhereInput = {} as WhereInput;
+  protected _where: WhereInput = {} as WhereInput;
   protected include: Include = {} as Include;
 
   constructor(
@@ -22,27 +22,31 @@ export class BaseScope<
   ) {}
 
   filterById(id: string) {
-    (this.where as { id: string }).id = id;
+    (this._where as { id: string }).id = id;
     return this;
   }
 
   async findMany(): Promise<T[]> {
     return this.model.findMany({
-      where: this.where,
+      where: this._where,
       include: this.include,
     });
   }
 
   async findOne(): Promise<T | null> {
     return this.model.findFirst({
-      where: this.where,
+      where: this._where,
       include: this.include,
     });
   }
 
   async findOneOrFail(): Promise<T> {
     return this.model.findFirstOrThrow({
-      where: this.where,
+      where: this._where,
     });
+  }
+
+  get where() {
+    return this._where;
   }
 }

@@ -9,7 +9,7 @@ import {
 } from 'class-validator';
 import { ErrorCode } from '../constants';
 
-@ValidatorConstraint({ name: 'isNotEmpty', async: false })
+@ValidatorConstraint({ name: '_isNotEmpty', async: false })
 export class IsNotEmptyConstraint implements ValidatorConstraintInterface {
   validate(value: unknown, args: ValidationArguments) {
     return isNotEmpty(value) && isString(value);
@@ -32,7 +32,7 @@ export function IsNotEmpty(
 ) {
   return function (object: Object, propertyName: string) {
     registerDecorator({
-      name: 'isNotEmpty',
+      name: '_isNotEmpty',
       target: object.constructor,
       propertyName: propertyName,
       options: validationOptions,

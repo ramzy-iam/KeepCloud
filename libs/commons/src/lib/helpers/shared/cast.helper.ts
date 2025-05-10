@@ -34,22 +34,29 @@ const toBoolean = (value?: BOOLEAN_ENUM): boolean | undefined => {
 };
 
 const toNumber = (
-  value?: string,
-  opts: ToNumberOptions = {}
+  value?: string | number,
+  opts: ToNumberOptions = {},
 ): number | undefined => {
   let newValue: number | undefined = undefined;
 
   if (!value) {
-    if (typeof opts.default === 'number') newValue = opts.default;
-    else return;
+    if (typeof opts.default === 'number') {
+      newValue = opts.default;
+    } else {
+      return undefined;
+    }
   }
 
-  if (typeof newValue === 'undefined') newValue = Number(value);
+  if (typeof value === 'string') {
+    newValue = Number(value);
+  } else {
+    newValue = value;
+  }
 
-  if (opts.min && newValue < opts.min) newValue = opts.min;
+  if (newValue === undefined) return undefined;
 
-  if (opts.max && newValue > opts.max) newValue = opts.max;
-
+  if (opts.min !== undefined && newValue < opts.min) newValue = opts.min;
+  if (opts.max !== undefined && newValue > opts.max) newValue = opts.max;
   return newValue;
 };
 

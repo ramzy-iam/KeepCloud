@@ -7,7 +7,7 @@ import {
 } from 'class-validator';
 import { ErrorCode } from '../constants';
 
-@ValidatorConstraint({ name: 'IsArray', async: false })
+@ValidatorConstraint({ name: '_isArray', async: false })
 export class IsArrayConstraint implements ValidatorConstraintInterface {
   validate(value: unknown) {
     return Array.isArray(value);
@@ -29,7 +29,7 @@ export function IsArray(
 ) {
   return function (object: Object, propertyName: string) {
     registerDecorator({
-      name: 'IsArray',
+      name: '_isArray',
       target: object.constructor,
       propertyName: propertyName,
       options: validationOptions,

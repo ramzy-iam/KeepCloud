@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import {
   CurrentUser,
@@ -17,7 +18,8 @@ import {
   CreateFolderDto,
   FileDetailsDto,
   FileMinViewDto,
-  GetChildrenResponseDto,
+  FolderFilterDto,
+  PaginationDto,
   RenameFolderDto,
 } from '@keepcloud/commons/dtos';
 import { User } from '@keepcloud/core/db';
@@ -36,14 +38,14 @@ export class FolderController {
   }
 
   @Get(':id/children')
-  @Serialize(GetChildrenResponseDto)
-  getFolderChildren(@Param('id') id: string) {
-    return this.folderService.getChildren(id);
+  @Serialize(new PaginationDto(FileMinViewDto))
+  getChildren(@Param('id') id: string, @Query() filters: FolderFilterDto) {
+    return this.folderService.getChildren(id, filters);
   }
 
   @Get(':id')
   @Serialize(FileDetailsDto)
-  getFolder(@Param('id') id: string) {
+  getOne(@Param('id') id: string) {
     return this.folderService.getOne(id);
   }
 

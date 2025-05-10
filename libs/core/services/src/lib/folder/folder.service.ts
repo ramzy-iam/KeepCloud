@@ -1,7 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { File, FileType } from '@keepcloud/core/db';
-import { CreateFolderDto } from '@keepcloud/commons/dtos';
-import { BadRequestException } from '@keepcloud/commons/backend';
+import {
+  CreateFolderDto,
+  FolderFilterDto,
+  PaginationDto,
+} from '@keepcloud/commons/dtos';
+import {
+  BadRequestException,
+  NotFoundException,
+} from '@keepcloud/commons/backend';
 import { ErrorCode } from '@keepcloud/commons/constants';
 import { Prisma } from '@prisma/client';
 import { BaseFileService } from '../file/base-file-service';
@@ -47,8 +54,30 @@ export class FolderService extends BaseFileService {
     return this.fileRepository.create(folderData);
   }
 
-  async getChildren(id: string): Promise<{ children: File[] }> {
-    const children = await this.fileRepository.findMany({ parentId: id });
-    return { children };
+  async getChildren(
+    parentId: string,
+    filters: FolderFilterDto,
+  ): Promise<PaginationDto<File>> {
+    const scope = this.fileRepository.scoped.filterByParentId(parentId);
+
+    if (filters.type) scope.filterByType(filters.type);
+    if (filters.name) scope.filterByName(filters.name);
+    if (filters.format) scope.filterByFormat(filters.format);
+
+    return this.fileRepository.findManyPaginated(
+      scope.where,
+      filters.page,
+      filters.pageSize,
+    );
+  }
+
+  override async getOne(id: string): Promise<File> {
+    const file = await this.fileRepository.findOne({
+      id,
+      type: FileType.FOLDER,
+    });
+    if (!file)
+      throw new NotFoundException(ErrorCode.NOT_FOUND, 'Resource not found');
+    return file;
   }
 }
