@@ -12,7 +12,7 @@ import {
   PrismaClientValidationError,
 } from '@prisma/client/runtime/library';
 import { AppException } from '../exceptions/base.exception';
-import { PrismaExceptionFactory } from '../exceptions/prisma-exception.factory';
+import { DatabaseExceptionFactory } from '../exceptions';
 import { ErrorCode } from '@keepcloud/commons/constants';
 
 @Catch()
@@ -24,8 +24,8 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     this.logger.error('Unhandled exception:', { exception });
 
-    if (this.isPrismaException(exception)) {
-      const appException = PrismaExceptionFactory.fromPrismaError(exception);
+    if (DatabaseExceptionFactory.isDatabaseException(exception)) {
+      const appException = DatabaseExceptionFactory.fromError(exception);
       response
         .status(appException.getStatus())
         .json(appException.getResponse());
@@ -84,14 +84,6 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         },
       ],
     });
-  }
-
-  private isPrismaException(error: any): boolean {
-    return (
-      error instanceof PrismaClientKnownRequestError ||
-      error instanceof PrismaClientValidationError ||
-      (error?.name && error.name.startsWith('Prisma'))
-    );
   }
 
   private httpStatusToErrorCode(status: number): string {
