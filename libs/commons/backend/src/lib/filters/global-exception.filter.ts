@@ -7,10 +7,6 @@ import {
   Logger,
 } from '@nestjs/common';
 import { Response } from 'express';
-import {
-  PrismaClientKnownRequestError,
-  PrismaClientValidationError,
-} from '@prisma/client/runtime/library';
 import { AppException } from '../exceptions/base.exception';
 import { DatabaseExceptionFactory } from '../exceptions';
 import { ErrorCode } from '@keepcloud/commons/constants';
