@@ -3,7 +3,7 @@ import { AppException } from './base.exception';
 import { ErrorCode } from '@keepcloud/commons/constants';
 
 export class NotFoundException extends AppException {
-  constructor(errorCode: string, message: string) {
+  constructor(errorCode: string, message = 'Resource not found') {
     super(
       ErrorCode.NOT_FOUND,
       [{ code: errorCode, message }],
