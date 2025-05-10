@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 import { FileScope } from './file.scope';
 import { File } from '../../entities';
 import { BaseRepository } from '../base';
@@ -12,7 +12,7 @@ export class FileRepository extends BaseRepository<
   Prisma.FileUpdateInput,
   Prisma.FileWhereUniqueInput,
   Prisma.FileWhereInput,
-  PrismaService['file'],
+  PrismaClient['file'],
   FileScope
 > {
   constructor(protected readonly prisma: PrismaService) {

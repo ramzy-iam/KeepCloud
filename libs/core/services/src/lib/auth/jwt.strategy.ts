@@ -1,4 +1,7 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { UnauthorizedException } from '@keepcloud/commons/backend';
+import { ErrorCode } from '@keepcloud/commons/constants';
+import { AccessTokenPayload } from '@keepcloud/commons/dtos';
+import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
@@ -12,10 +15,10 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
   }
 
-  async validate(payload: any) {
+  async validate(payload: AccessTokenPayload) {
     if (!payload) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException(ErrorCode.UNAUTHORIZED, 'Invalid token');
     }
-    return { userId: payload.sub, email: payload.email };
+    return payload;
   }
 }

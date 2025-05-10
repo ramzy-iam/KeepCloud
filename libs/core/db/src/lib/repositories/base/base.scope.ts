@@ -1,4 +1,4 @@
-import { PrismaService } from '../../prisma';
+import { PrismaClient } from '@prisma/client';
 
 export class BaseScope<
   T extends object,
@@ -17,7 +17,7 @@ export class BaseScope<
   protected include: Include = {} as Include;
 
   constructor(
-    protected readonly prisma: PrismaService,
+    protected readonly prisma: PrismaClient,
     protected readonly model: PrismaModel,
   ) {}
 

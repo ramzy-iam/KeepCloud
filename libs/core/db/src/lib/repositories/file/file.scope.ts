@@ -1,6 +1,6 @@
 import { File } from '../../entities';
 import { FileFormat } from '@keepcloud/commons/constants';
-import { Prisma } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 import { PrismaService } from '../../prisma';
 import { BaseScope } from '../base';
 
@@ -8,7 +8,7 @@ export class FileScope extends BaseScope<
   File,
   Prisma.FileWhereInput,
   Prisma.FileInclude,
-  PrismaService['file']
+  PrismaClient['file']
 > {
   constructor(protected readonly prisma: PrismaService) {
     super(prisma, prisma.file);
