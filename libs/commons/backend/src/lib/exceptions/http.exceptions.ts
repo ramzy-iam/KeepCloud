@@ -61,3 +61,13 @@ export class InternalServerErrorException extends AppException {
     );
   }
 }
+
+export class ServiceUnavailableException extends AppException {
+  constructor(errorCode: string, message: string, field?: string) {
+    super(
+      ErrorCode.SERVICE_UNAVAILABLE,
+      [{ code: errorCode, message, field }],
+      HttpStatus.SERVICE_UNAVAILABLE,
+    );
+  }
+}

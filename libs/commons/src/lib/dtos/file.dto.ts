@@ -32,5 +32,6 @@ export class CreateFolderDto {
 
   @IsNotEmpty(ErrorCode.PARENT_ID_REQUIRED)
   @IsString(ErrorCode.PARENT_ID_REQUIRED)
-  parentId: string;
+  @IsOptional()
+  parentId?: string;
 }
