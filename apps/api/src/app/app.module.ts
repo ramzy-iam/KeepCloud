@@ -3,9 +3,10 @@ import { DatabaseModule } from '@keepcloud/core/db';
 import { IamApiModule } from '@keepcloud/iam/api';
 import { FileApiModule } from '@keepcloud/files/api';
 import { GlobalExceptionFilter } from '@keepcloud/commons/backend';
+import { ServicesModule } from './services.module';
 
 @Module({
-  imports: [DatabaseModule, IamApiModule, FileApiModule],
+  imports: [DatabaseModule, ServicesModule, IamApiModule, FileApiModule],
   providers: [
     {
       provide: 'APP_FILTER',

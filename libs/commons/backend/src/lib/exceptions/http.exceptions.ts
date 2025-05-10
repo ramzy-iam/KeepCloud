@@ -33,7 +33,7 @@ export class BadRequestException extends AppException {
 }
 
 export class UnauthorizedException extends AppException {
-  constructor(errorCode: string, message: string) {
+  constructor(errorCode: string, message: string = 'Unauthorized') {
     super(
       ErrorCode.UNAUTHORIZED,
       [{ code: errorCode, message }],
