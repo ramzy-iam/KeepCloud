@@ -1,3 +1,7 @@
-export * from './user.entity';
-export * from './file.entity';
-export * from './file-share.entity';
+export {
+  User,
+  SubscriptionPlan,
+  File,
+  SharedFile,
+  FileAccessLog,
+} from '@prisma/client';

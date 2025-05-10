@@ -14,21 +14,19 @@ import { SortOrder } from '../types';
 
 export class BaseDto {
   @Expose()
-  id: number;
+  id: string;
 
   @Expose()
   createdAt: string | Date;
 
   @Expose()
   updatedAt: string | Date;
-
-  @Expose()
-  deletedAt: string | Date | null;
 }
 
 export class BaseFilterDto {
   @IsOptional()
-  @IsUUID()
+  @IsNotEmpty()
+  @IsString()
   id?: string;
 
   @IsOptional()
@@ -38,7 +36,7 @@ export class BaseFilterDto {
   @Transform(({ value }) =>
     CastHelper.toNumber(value, {
       default: PAGINATION.DEFAULT_PAGE,
-    })
+    }),
   )
   @IsOptional()
   @IsPositive()
@@ -48,7 +46,7 @@ export class BaseFilterDto {
   @Transform(({ value }) =>
     CastHelper.toNumber(value, {
       default: PAGINATION.DEFAULT_LIMIT,
-    })
+    }),
   )
   @IsOptional()
   @IsPositive()

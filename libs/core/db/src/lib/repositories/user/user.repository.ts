@@ -1,19 +1,21 @@
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
 import { UserScope } from './user.scope';
+import { PrismaService } from '../../prisma';
 import { User } from '../../entities';
+import { Prisma, PrismaClient } from '@prisma/client';
+import { BaseRepository } from '../base';
 
 @Injectable()
-export class UserRepository extends Repository<User> {
-  constructor(
-    @InjectRepository(User)
-    private readonly repository: Repository<User>
-  ) {
-    super(repository.target, repository.manager, repository.queryRunner);
-  }
-
-  get scoped() {
-    return new UserScope(this.repository.createQueryBuilder('User'));
+export class UserRepository extends BaseRepository<
+  User,
+  Prisma.UserCreateInput,
+  Prisma.UserUpdateInput,
+  Prisma.UserWhereUniqueInput,
+  Prisma.UserWhereInput,
+  PrismaClient['user'],
+  UserScope
+> {
+  constructor(protected readonly prisma: PrismaService) {
+    super(prisma, prisma.user, new UserScope(prisma));
   }
 }

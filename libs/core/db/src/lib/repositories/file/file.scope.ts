@@ -1,68 +1,50 @@
-import { SelectQueryBuilder } from 'typeorm';
 import { File } from '../../entities';
-import { FileFormat, FileSortField } from '@keepcloud/commons/constants';
-import { SortOrder } from '@keepcloud/commons/types';
+import { FileFormat } from '@keepcloud/commons/constants';
+import { Prisma } from '@prisma/client';
+import { PrismaService } from '../../prisma';
+import { BaseScope } from '../base';
 
-export class FileScope extends SelectQueryBuilder<File> {
-  filterById(id: number) {
-    return this.andWhere('File.id = :id', {
-      id,
-    });
+export class FileScope extends BaseScope<
+  File,
+  Prisma.FileWhereInput,
+  Prisma.FileInclude,
+  PrismaService['file']
+> {
+  constructor(protected readonly prisma: PrismaService) {
+    super(prisma, prisma.file);
   }
 
-  filterByOwnerId(id: number) {
-    return this.andWhere('File.ownerId = :id', {
-      id,
-    });
+  filterByOwnerId(id: string) {
+    this.where.ownerId = id;
   }
 
-  filterByParentId(id: number | null) {
-    if (id === null) return this.andWhere('File.parentId IS NULL');
-    return this.andWhere('File.parentId = :id', {
-      id,
-    });
+  filterByParentId(id: string | null) {
+    this.where.parentId = id;
   }
 
-  filerByIsFolder(isFolder: boolean) {
-    if (isFolder === undefined) return this;
-    return this.andWhere('File.isFolder = :isFolder', {
-      isFolder,
-    });
+  filerByIsFolder() {
+    this.where.type = 'FOLDER';
   }
 
   filterByName(name: string) {
-    return this.andWhere(`File.name ILIKE %:name%`, {
-      name,
-    });
+    return (this.where.name = { contains: name, mode: 'insensitive' });
   }
 
   filterByFormat(format: FileFormat) {
-    return this.andWhere('File.format = :format', {
-      format,
-    });
+    this.where.format = format;
   }
 
   filterByTemporaryDeletedAt(date: Date) {
-    return this.andWhere('DATE (File.temporaryDeletedAt) = DATE(:date)', {
-      date,
-    });
+    this.where.trashedAt = date;
   }
 
-  filterByIsTemporaryDeleted(isDeleted: boolean) {
-    if (isDeleted === undefined) return this;
-    if (isDeleted === true)
-      return this.andWhere('File.temporaryDeletedAt IS NOT NULL');
-
-    return this.andWhere('File.temporaryDeletedAt IS NULL');
+  filterByTrashed(): this {
+    this.where.trashedAt = { not: null };
+    return this;
   }
 
-  filterByPath(path: string) {
-    return this.andWhere('File.path = :path', {
-      path,
-    });
-  }
-
-  order(field: string = FileSortField.CREATED_AT, order: SortOrder = 'DESC') {
-    return this.addOrderBy(`File.${field}`, order);
+  filterByNotTrashed(): this {
+    this.where.trashedAt = null;
+    return this;
   }
 }
