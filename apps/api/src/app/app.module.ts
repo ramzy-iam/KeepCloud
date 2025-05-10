@@ -2,11 +2,18 @@ import { Module } from '@nestjs/common';
 import { DatabaseModule } from '@keepcloud/core/db';
 import { IamApiModule } from '@keepcloud/iam/api';
 import { FileApiModule } from '@keepcloud/files/api';
+import { StorageApiModule } from '@keepcloud/storage/api';
 import { GlobalExceptionFilter } from '@keepcloud/commons/backend';
 import { ServicesModule } from './services.module';
 
 @Module({
-  imports: [DatabaseModule, ServicesModule, IamApiModule, FileApiModule],
+  imports: [
+    DatabaseModule,
+    ServicesModule,
+    IamApiModule,
+    FileApiModule,
+    StorageApiModule,
+  ],
   providers: [
     {
       provide: 'APP_FILTER',

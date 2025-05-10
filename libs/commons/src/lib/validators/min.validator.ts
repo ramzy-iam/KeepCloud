@@ -7,34 +7,37 @@ import {
 } from 'class-validator';
 import { ErrorCode } from '../constants';
 
-@ValidatorConstraint({ name: '_ArrayNotEmpty', async: false })
-export class ArrayNotEmptyConstraint implements ValidatorConstraintInterface {
-  validate(value: unknown) {
-    return Array.isArray(value) && value.length > 0;
+@ValidatorConstraint({ name: '_min', async: false })
+export class MinConstraint implements ValidatorConstraintInterface {
+  validate(value: any, args: ValidationArguments) {
+    const minValue = args.constraints[0] as number;
+    return typeof value === 'number' && !isNaN(value) && value >= minValue;
   }
 
   defaultMessage(args: ValidationArguments) {
-    const [errorCode] = args.constraints;
+    const [minValue, errorCode] = args.constraints as [number, ErrorCode];
+
     return JSON.stringify({
       code: errorCode,
-      message: `${args.property} must be a non-empty array`,
+      message: `${args.property} must not be less than ${minValue}`,
       path: args.property,
     });
   }
 }
 
-export function ArrayNotEmpty(
+export function Min(
+  minValue: number,
   errorCode: ErrorCode = ErrorCode.INVALID_INPUT,
   validationOptions?: ValidationOptions,
 ) {
   return function (object: Object, propertyName: string) {
     registerDecorator({
-      name: '_arrayNotEmpty',
+      name: '_min',
       target: object.constructor,
-      propertyName: propertyName,
+      propertyName,
       options: validationOptions,
-      constraints: [errorCode],
-      validator: ArrayNotEmptyConstraint,
+      constraints: [minValue, errorCode],
+      validator: MinConstraint,
     });
   };
 }

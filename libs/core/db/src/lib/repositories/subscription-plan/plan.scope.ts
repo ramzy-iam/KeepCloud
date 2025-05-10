@@ -13,12 +13,12 @@ export class SubscriptionPlanScope extends BaseScope<
   }
 
   filterById(id: string) {
-    this.where.id = id;
+    this._where.id = id;
     return this;
   }
 
   filterByDefault() {
-    this.where.isDefault = true;
+    this._where.isDefault = true;
     return this;
   }
 }

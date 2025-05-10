@@ -7,7 +7,7 @@ import {
 } from 'class-validator';
 import { ErrorCode } from '../constants';
 
-@ValidatorConstraint({ name: 'isString', async: false })
+@ValidatorConstraint({ name: '_isString', async: false })
 export class IsStringConstraint implements ValidatorConstraintInterface {
   validate(value: unknown, args: ValidationArguments) {
     return typeof value === 'string';
@@ -29,7 +29,7 @@ export function IsString(
 ) {
   return function (object: Object, propertyName: string) {
     registerDecorator({
-      name: 'isString',
+      name: '_isString',
       target: object.constructor,
       propertyName: propertyName,
       options: validationOptions,

@@ -6,7 +6,10 @@ import {
   PrismaService,
 } from '@keepcloud/core/db';
 import { CreateFolderDto } from '@keepcloud/commons/dtos';
-import { BadRequestException } from '@keepcloud/commons/backend';
+import {
+  BadRequestException,
+  NotFoundException,
+} from '@keepcloud/commons/backend';
 import { ErrorCode } from '@keepcloud/commons/constants';
 import { Prisma } from '@prisma/client';
 import { BaseFileService } from './base-file-service';
@@ -50,5 +53,12 @@ export class FileService extends BaseFileService {
     };
 
     return this.fileRepository.create(folderData);
+  }
+
+  async getOne(id: string): Promise<File> {
+    const file = await this.fileRepository.findOne({ id });
+    if (!file)
+      throw new NotFoundException(ErrorCode.NOT_FOUND, 'Resource not found');
+    return file;
   }
 }

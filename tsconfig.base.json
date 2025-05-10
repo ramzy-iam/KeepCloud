@@ -30,6 +30,7 @@
       "@keepcloud/core/services": ["libs/core/services/src/index.ts"],
       "@keepcloud/files/api": ["libs/files/api/src/index.ts"],
       "@keepcloud/iam/api": ["libs/iam/api/src/index.ts"],
+      "@keepcloud/storage/api": ["libs/storage/api/src/index.ts"],
       "@keepcloud/users/api": ["libs/users/api/src/index.ts"],
       "@keepcloud/web-core/react": ["libs/core/web/react/src/index.ts"]
     }

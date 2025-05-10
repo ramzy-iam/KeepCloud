@@ -9,7 +9,7 @@ import {
 } from 'class-validator';
 import { ErrorCode } from '../constants';
 
-@ValidatorConstraint({ name: 'isNumber', async: false })
+@ValidatorConstraint({ name: '_isNumber', async: false })
 export class IsNumberConstraint implements ValidatorConstraintInterface {
   validate(value: unknown, args: ValidationArguments) {
     return isNumber(value, { allowNaN: false, allowInfinity: false });
@@ -31,7 +31,7 @@ export function IsNumber(
 ) {
   return function (object: Object, propertyName: string) {
     registerDecorator({
-      name: 'isNumber',
+      name: '_isNumber',
       target: object.constructor,
       propertyName: propertyName,
       options: validationOptions,
