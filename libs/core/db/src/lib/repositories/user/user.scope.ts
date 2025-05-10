@@ -1,21 +1,24 @@
-import { SelectQueryBuilder } from 'typeorm';
-import { User } from '../../entities';
+import { Prisma, PrismaClient, User } from '@prisma/client';
+import { PrismaService } from '../../prisma';
+import { BaseScope } from '../base';
 
-export class UserScope extends SelectQueryBuilder<User> {
-  filterById(id: number) {
-    return this.andWhere('User.id = :id', {
-      id,
-    });
+export class UserScope extends BaseScope<
+  User,
+  Prisma.UserWhereInput,
+  Prisma.UserInclude,
+  PrismaClient['user']
+> {
+  constructor(protected readonly prisma: PrismaService) {
+    super(prisma, prisma.user);
+  }
+
+  filterById(id: string) {
+    this.where.id = id;
+    return this;
   }
 
   filterByEmail(email: string) {
-    return this.andWhere('User.email = :email', {
-      email,
-    });
-  }
-  filterByAuthProviderId(authProviderId: string) {
-    return this.andWhere('User.authProviderId = :authProviderId', {
-      authProviderId,
-    });
+    this.where.email = email;
+    return this;
   }
 }

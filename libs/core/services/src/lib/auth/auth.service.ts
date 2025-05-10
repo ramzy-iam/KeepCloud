@@ -80,7 +80,7 @@ export class AuthService {
         throw new BadRequestException('Refresh token missing');
       }
 
-      const { email, sub }: { sub: number; email: string } =
+      const { email, sub }: { sub: string; email: string } =
         this.jwtService.verify(refreshToken, {
           secret: JWT_REFRESH_SECRET,
         });
@@ -98,7 +98,7 @@ export class AuthService {
     }
   }
 
-  async getUserProfile({ email, id }: { email: string; id: number }) {
+  async getUserProfile({ email, id }: { email: string; id: string }) {
     const user = await this.userService.findOne({ email, id });
     if (!user) {
       throw new UnauthorizedException('User not found');

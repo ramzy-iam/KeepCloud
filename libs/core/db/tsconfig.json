@@ -5,7 +5,7 @@
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "importHelpers": true,
-    "noImplicitOverride": true,
+    "noImplicitOverride": false,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "noPropertyAccessFromIndexSignature": false
