@@ -17,23 +17,23 @@ async function bootstrap() {
       transform: true,
       whitelist: true,
       stopAtFirstError: true,
-      exceptionFactory: (errors) => {
-        const errorsMessages: { [key: string]: string } = {};
-        errors.forEach((error) => {
-          let message = error.constraints
-            ? error.constraints[Object.keys(error.constraints)[0]]
-            : '';
+      // exceptionFactory: (errors) => {
+      //   const errorsMessages: { [key: string]: string } = {};
+      //   errors.forEach((error) => {
+      //     let message = error.constraints
+      //       ? error.constraints[Object.keys(error.constraints)[0]]
+      //       : '';
 
-          errorsMessages[error.property] = message;
-        });
-        return new BadRequestException(errorsMessages);
-      },
-    })
+      //     errorsMessages[error.property] = message;
+      //   });
+      //   return new BadRequestException(errorsMessages);
+      // },
+    }),
   );
   const port = process.env.PORT || 3000;
   await app.listen(port);
   Logger.log(
-    `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`
+    `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`,
   );
 }
 

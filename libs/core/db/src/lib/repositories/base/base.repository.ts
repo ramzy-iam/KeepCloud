@@ -1,4 +1,3 @@
-import { PrismaClient } from '@prisma/client';
 import { PrismaService } from '../../prisma';
 
 export class BaseRepository<
@@ -8,6 +7,7 @@ export class BaseRepository<
   WhereUniqueInput extends object,
   WhereInput extends object,
   PrismaModel extends {
+    findFirst: (args: { where: WhereInput }) => Promise<T | null>;
     findUnique: (args: { where: WhereUniqueInput }) => Promise<T | null>;
     findMany: (args: { where?: WhereInput }) => Promise<T[]>;
     create: (args: { data: CreateInput }) => Promise<T>;
@@ -29,8 +29,8 @@ export class BaseRepository<
     return this.scope;
   }
 
-  async findOne(where: WhereUniqueInput): Promise<T | null> {
-    return this.model.findUnique({ where });
+  async findOne(where: WhereInput): Promise<T | null> {
+    return this.model.findFirst({ where });
   }
 
   async findMany(where?: WhereInput): Promise<T[]> {

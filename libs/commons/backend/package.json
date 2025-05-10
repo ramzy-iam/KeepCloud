@@ -1,5 +1,5 @@
 {
-  "name": "@keepcloud/commons/helpers/backend",
+  "name": "@keepcloud/commons/backend",
   "version": "0.0.1",
   "private": true,
   "type": "commonjs",
