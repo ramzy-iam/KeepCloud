@@ -1,4 +1,10 @@
-import { IsNotEmpty, IsString, IsPositive, IsEnum } from '../validators';
+import {
+  IsNotEmpty,
+  IsString,
+  IsPositive,
+  IsEnum,
+  IsOptional,
+} from '../validators';
 import { ErrorCode, FileFormat } from '@keepcloud/commons/constants';
 
 export class CreateFileDto {
@@ -15,7 +21,8 @@ export class CreateFileDto {
 
   @IsNotEmpty(ErrorCode.PARENT_ID_REQUIRED)
   @IsString(ErrorCode.PARENT_ID_REQUIRED)
-  parentId: string;
+  @IsOptional()
+  parentId?: string;
 }
 
 export class CreateFolderDto {
