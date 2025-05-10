@@ -15,36 +15,46 @@ export class FileScope extends BaseScope<
   }
 
   filterByOwnerId(id: string) {
-    this.where.ownerId = id;
+    this._where.ownerId = id;
+    return this;
   }
 
   filterByParentId(id: string | null) {
-    this.where.parentId = id;
+    this._where.parentId = id;
+    return this;
   }
 
   filerByIsFolder() {
-    this.where.type = 'FOLDER';
+    this._where.type = 'FOLDER';
+    return this;
+  }
+
+  filterByType(type: File['type']) {
+    this._where.type = type;
+    return this;
   }
 
   filterByName(name: string) {
-    return (this.where.name = { contains: name, mode: 'insensitive' });
+    this._where.name = { contains: name, mode: 'insensitive' };
+    return this;
   }
 
   filterByFormat(format: FileFormat) {
-    this.where.format = format;
+    this._where.format = format;
+    return this;
   }
 
   filterByTemporaryDeletedAt(date: Date) {
-    this.where.trashedAt = date;
+    this._where.trashedAt = date;
   }
 
   filterByTrashed(): this {
-    this.where.trashedAt = { not: null };
+    this._where.trashedAt = { not: null };
     return this;
   }
 
   filterByNotTrashed(): this {
-    this.where.trashedAt = null;
+    this._where.trashedAt = null;
     return this;
   }
 }

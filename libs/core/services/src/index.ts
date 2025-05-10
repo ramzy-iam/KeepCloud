@@ -7,3 +7,4 @@ export * from './lib/user';
 export * from './lib/auth';
 export * from './lib/folder';
 export * from './lib/file';
+export * from './lib/storage';

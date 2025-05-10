@@ -9,6 +9,8 @@ import { ErrorCode, FileFormat } from '@keepcloud/commons/constants';
 
 import { Expose, Transform, Type } from 'class-transformer';
 import { FileType } from '@prisma/client';
+import { BaseFilterDto } from './base.dto';
+import castHelper from '../helpers/shared/cast.helper';
 
 export class CreateFileDto {
   @IsNotEmpty(ErrorCode.FILE_NAME_REQUIRED)
@@ -46,7 +48,7 @@ export class CreateFolderDto {
 
 export class RenameFolderDto {
   @IsNotEmpty(ErrorCode.FILE_NAME_REQUIRED)
-  @IsString()
+  @IsString(ErrorCode.FILE_NAME_REQUIRED)
   name: string;
 }
 
@@ -95,8 +97,25 @@ export class FilePreviewDto extends FileMinViewDto {
 
 export class FileDetailsDto extends FilePreviewDto {}
 
-export class GetChildrenResponseDto {
-  @Type(() => FileMinViewDto)
-  @Expose()
-  children: FileMinViewDto[];
+export class FolderFilterDto extends BaseFilterDto {
+  @Transform(({ value }) => castHelper.trim(value))
+  @IsOptional()
+  @IsString()
+  parentId: string | null = null;
+
+  @IsOptional()
+  @IsString()
+  ownerId?: string;
+
+  @IsOptional()
+  @IsString()
+  name?: string;
+
+  @IsEnum(FileFormat, ErrorCode.FILE_FORMAT_INVALID)
+  @IsOptional()
+  format?: FileFormat;
+
+  @IsEnum(FileType, ErrorCode.FILE_TYPE_INVALID)
+  @IsOptional()
+  type?: FileType;
 }

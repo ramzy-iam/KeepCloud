@@ -7,7 +7,7 @@ import {
 } from 'class-validator';
 import { ErrorCode } from '../constants';
 
-@ValidatorConstraint({ name: 'isBoolean', async: false })
+@ValidatorConstraint({ name: '_isBoolean', async: false })
 export class IsBooleanConstraint implements ValidatorConstraintInterface {
   validate(value: unknown, args: ValidationArguments) {
     return typeof value === 'boolean';
@@ -29,7 +29,7 @@ export function IsBoolean(
 ) {
   return function (object: Object, propertyName: string) {
     registerDecorator({
-      name: 'isBoolean',
+      name: '_isBoolean',
       target: object.constructor,
       propertyName: propertyName,
       options: validationOptions,

@@ -8,7 +8,7 @@ import {
 } from 'class-validator';
 import { ErrorCode } from '../constants';
 
-@ValidatorConstraint({ name: 'isPositive', async: false })
+@ValidatorConstraint({ name: '_isPositive', async: false })
 export class IsPositiveConstraint implements ValidatorConstraintInterface {
   validate(value: unknown, args: ValidationArguments) {
     return (
@@ -33,7 +33,7 @@ export function IsPositive(
 ) {
   return function (object: Object, propertyName: string) {
     registerDecorator({
-      name: 'isPositive',
+      name: '_isPositive',
       target: object.constructor,
       propertyName: propertyName,
       options: validationOptions,

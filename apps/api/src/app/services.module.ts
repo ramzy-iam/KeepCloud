@@ -1,4 +1,8 @@
-import { SubscriptionPlanRepository, UserRepository } from '@keepcloud/core/db';
+import {
+  FileRepository,
+  SubscriptionPlanRepository,
+  UserRepository,
+} from '@keepcloud/core/db';
 import {
   AuthService,
   CurrentUserPipe,
@@ -16,6 +20,7 @@ const services = [
   // Repositories
   UserRepository,
   SubscriptionPlanRepository,
+  FileRepository,
 
   // Miscellaneous
   CurrentUserPipe,

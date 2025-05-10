@@ -13,12 +13,12 @@ export class UserScope extends BaseScope<
   }
 
   filterById(id: string) {
-    this.where.id = id;
+    this._where.id = id;
     return this;
   }
 
   filterByEmail(email: string) {
-    this.where.email = email;
+    this._where.email = email;
     return this;
   }
 }
