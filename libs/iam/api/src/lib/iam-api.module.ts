@@ -1,9 +1,8 @@
 import { APP_GUARD } from '@nestjs/core';
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { User, UserRepository } from '@keepcloud/core/db';
+import { SubscriptionPlanRepository, UserRepository } from '@keepcloud/core/db';
 import {
   UserService,
   AuthService,
@@ -14,13 +13,11 @@ import { AuthController } from './auth.controller';
 import { UserController } from './user.controller';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([User]),
-    PassportModule.register({ defaultStrategy: 'jwt' }),
-  ],
+  imports: [PassportModule.register({ defaultStrategy: 'jwt' })],
   controllers: [AuthController, UserController],
   providers: [
     UserRepository,
+    SubscriptionPlanRepository,
     UserService,
     AuthService,
     AuthGuard,

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { User, UserRepository } from '@keepcloud/core/db';
+import { SubscriptionPlanRepository, UserRepository } from '@keepcloud/core/db';
 import { TokenPayload } from 'google-auth-library';
+import { User } from '@prisma/client';
 
 interface Profile {
   email: string;
@@ -10,29 +11,40 @@ interface Profile {
 
 @Injectable()
 export class UserService {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly subscriptionPlanRepository: SubscriptionPlanRepository,
+  ) {}
 
   async createOrUpdateGoogleUser(profile: TokenPayload): Promise<User> {
-    let user = await this.userRepository.scoped
-      .filterByEmail(profile.email as string)
-      .getOne();
+    const email = profile.email as string;
+
+    let user = await this.userRepository.scoped.filterByEmail(email).findOne();
+
+    const plan = await this.subscriptionPlanRepository.scoped
+      .filterByDefault()
+      .findOneOrFail();
 
     if (!user) {
-      user = this.userRepository.create({
-        email: profile.email as string,
+      user = await this.userRepository.create({
+        email,
         firstName: profile.given_name,
         lastName: profile.family_name,
         picture: profile.picture,
+        plan: {
+          connect: {
+            id: plan.id,
+          },
+        },
       });
-      await this.userRepository.save(user);
     }
     return user;
   }
 
-  findOne({ email, id }: { email?: string; id?: number }) {
+  findOne({ email, id }: { email?: string; id?: string }) {
     const scope = this.userRepository.scoped;
     if (email) scope.filterByEmail(email);
     if (id) scope.filterById(id);
-    return scope.getOne();
+    return scope.findOne();
   }
 }
