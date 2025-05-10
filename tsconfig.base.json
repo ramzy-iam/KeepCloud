@@ -24,9 +24,7 @@
       "@keepcloud/commons/helpers": [
         "libs/commons/src/lib/helpers/shared/index.ts"
       ],
-      "@keepcloud/commons/helpers/backend": [
-        "libs/commons/helpers/backend/src/index.ts"
-      ],
+      "@keepcloud/commons/backend": ["libs/commons/backend/src/index.ts"],
       "@keepcloud/commons/types": ["libs/commons/src/lib/types/index.ts"],
       "@keepcloud/core/db": ["libs/core/db/src/index.ts"],
       "@keepcloud/core/services": ["libs/core/services/src/index.ts"],

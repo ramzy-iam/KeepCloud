@@ -4,4 +4,5 @@ export {
   File,
   SharedFile,
   FileAccessLog,
+  FileType,
 } from '@prisma/client';

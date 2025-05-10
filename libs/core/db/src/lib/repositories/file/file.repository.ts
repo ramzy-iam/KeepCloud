@@ -6,7 +6,7 @@ import { BaseRepository } from '../base';
 import { PrismaService } from '../../prisma';
 
 @Injectable()
-export class SubscriptionPlanRepository extends BaseRepository<
+export class FileRepository extends BaseRepository<
   File,
   Prisma.FileCreateInput,
   Prisma.FileUpdateInput,

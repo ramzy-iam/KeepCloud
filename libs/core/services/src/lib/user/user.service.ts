@@ -3,12 +3,6 @@ import { SubscriptionPlanRepository, UserRepository } from '@keepcloud/core/db';
 import { TokenPayload } from 'google-auth-library';
 import { User } from '@prisma/client';
 
-interface Profile {
-  email: string;
-  family_name?: string;
-  given_name?: string;
-}
-
 @Injectable()
 export class UserService {
   constructor(

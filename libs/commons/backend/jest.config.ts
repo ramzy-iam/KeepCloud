@@ -1,10 +1,10 @@
 export default {
-  displayName: 'helpers-backend',
+  displayName: 'commons-backend',
   preset: '../../../../jest.preset.js',
   testEnvironment: 'node',
   transform: {
     '^.+\\.[tj]s$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.spec.json' }],
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
-  coverageDirectory: '../../../../coverage/libs/commons/helpers/backend',
+  coverageDirectory: '../../../../coverage/libs/commons/backend',
 };

@@ -4,3 +4,4 @@ export * from './lib/interceptors';
 
 export * from './lib/user';
 export * from './lib/auth';
+export * from './lib/file';
