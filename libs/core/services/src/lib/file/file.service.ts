@@ -11,7 +11,7 @@ export class FileService {
   async createFolder(dto: CreateFolderDto): Promise<File> {
     if (dto.parentId) {
       const parent = await this.fileRepository.findOne({ id: dto.parentId });
-      if (!parent || parent.type !== FileType.FOLDER) {
+      if (dto.parentId && (!parent || parent.type !== FileType.FOLDER)) {
         throw new BadRequestException(
           ErrorCode.INVALID_PARENT_FOLDER,
           'Parent must be a valid folder',
