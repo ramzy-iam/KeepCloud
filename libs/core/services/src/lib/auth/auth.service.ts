@@ -1,15 +1,20 @@
 import {
-  BadRequestException,
   Injectable,
-  InternalServerErrorException,
-  UnauthorizedException,
   Logger,
+  ServiceUnavailableException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import { User } from '@keepcloud/core/db';
 import { TokenPayload } from 'google-auth-library';
 import { OAuthService } from './oauth.service';
+import { AccessTokenPayload } from '@keepcloud/commons/dtos';
+import {
+  BadRequestException,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@keepcloud/commons/backend';
+import { ErrorCode } from '@keepcloud/commons/constants';
 
 const { JWT_REFRESH_SECRET, JWT_SECRET } = process.env;
 
@@ -31,7 +36,10 @@ export class AuthService {
       const payload = await this.verifyGoogleCode(code);
       const user = await this.userService.createOrUpdateGoogleUser(payload);
       if (!user) {
-        throw new InternalServerErrorException('Failed to create/update user');
+        throw new InternalServerErrorException(
+          ErrorCode.INTERNAL_SERVER_ERROR,
+          'Failed to create user',
+        );
       }
 
       return this.generateTokens(user);
@@ -44,7 +52,7 @@ export class AuthService {
       if (error instanceof BadRequestException) {
         throw error;
       }
-      throw new InternalServerErrorException(
+      throw new ServiceUnavailableException(
         'Authentication service unavailable',
       );
     }
@@ -54,6 +62,7 @@ export class AuthService {
     const payload = await OAuthService.verifyGoogleCode(code); // Updated to call static method
     if (!payload.email || !payload.email_verified) {
       throw new BadRequestException(
+        ErrorCode.EMAIL_NOT_VERIFIED,
         'Google authentication failed: Email not verified',
       );
     }
@@ -62,7 +71,7 @@ export class AuthService {
 
   private generateTokens(user: User) {
     const { id: sub, email, picture } = user;
-    const payload = { sub, email, picture };
+    const payload: AccessTokenPayload = { sub, email, picture };
     const accessToken = this.jwtService.sign(payload, {
       secret: JWT_SECRET,
       expiresIn: '1h',
@@ -77,7 +86,10 @@ export class AuthService {
   async refreshAccessToken(refreshToken: string) {
     try {
       if (!refreshToken) {
-        throw new BadRequestException('Refresh token missing');
+        throw new BadRequestException(
+          ErrorCode.INVALID_INPUT,
+          'Invalid refresh token',
+        );
       }
 
       const { email, sub }: { sub: string; email: string } =
@@ -87,21 +99,27 @@ export class AuthService {
 
       const user = await this.userService.findOne({ id: sub, email });
       if (!user) {
-        throw new BadRequestException('Invalid refresh token');
+        throw new BadRequestException(
+          ErrorCode.INVALID_INPUT,
+          'Invalid refresh token',
+        );
       }
 
       const { accessToken } = this.generateTokens(user);
       return { accessToken, refreshToken };
     } catch (error) {
       if (error instanceof BadRequestException) throw error;
-      throw new BadRequestException('Invalid refresh token');
+      throw new BadRequestException(
+        ErrorCode.INVALID_INPUT,
+        'Invalid refresh token',
+      );
     }
   }
 
   async getUserProfile({ email, id }: { email: string; id: string }) {
     const user = await this.userService.findOne({ email, id });
     if (!user) {
-      throw new UnauthorizedException('User not found');
+      throw new UnauthorizedException(ErrorCode.UNAUTHORIZED, 'Invalid token');
     }
     return user;
   }

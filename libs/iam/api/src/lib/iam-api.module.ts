@@ -2,7 +2,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { Module } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { SubscriptionPlanRepository, UserRepository } from '@keepcloud/core/db';
+import { UserRepository } from '@keepcloud/core/db';
 import {
   UserService,
   AuthService,
@@ -17,7 +17,6 @@ import { UserController } from './user.controller';
   controllers: [AuthController, UserController],
   providers: [
     UserRepository,
-    SubscriptionPlanRepository,
     UserService,
     AuthService,
     AuthGuard,
