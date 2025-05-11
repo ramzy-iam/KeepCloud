@@ -1,26 +1,25 @@
-import { APP_API } from './axios';
 import { AuthGoogleResponseDto, UserProfileDto } from '@keepcloud/commons/dtos';
+import { BaseHttpService } from './base.service';
 
-export class AuthService {
-  static async authGoogle(code: string) {
-    const { data } = await APP_API.post<AuthGoogleResponseDto>('auth/google', {
+export class AuthService extends BaseHttpService {
+  protected baseUrl: string = 'auth';
+
+  async authGoogle(code: string) {
+    return this.post<AuthGoogleResponseDto, { code: string }>('/google', {
       code,
     });
-    return data;
   }
 
-  static async refreshToken(refreshToken: string) {
-    const { data } = await APP_API.post<AuthGoogleResponseDto>(
-      'auth/refresh-token',
-      {
-        refreshToken,
-      },
+  async refreshToken(refreshToken: string) {
+    return this.post<AuthGoogleResponseDto, { refreshToken: string }>(
+      '/refresh-token',
+      { refreshToken },
     );
-    return data;
   }
 
-  static async getProfile() {
-    const { data } = await APP_API.get<UserProfileDto>('auth/me');
-    return data;
+  async getProfile() {
+    return this.get<UserProfileDto>('/me');
   }
 }
+
+export default new AuthService();

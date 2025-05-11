@@ -1,4 +1,4 @@
 export * from './axios/type';
-export * from './auth.service';
-export * from './folder.service';
-export * from './storage.service';
+export { default as AuthService } from './auth.service';
+export { default as FolderService } from './folder.service';
+export { default as StorageService } from './storage.service';
