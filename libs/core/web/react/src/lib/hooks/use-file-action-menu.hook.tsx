@@ -16,11 +16,11 @@ import {
   Activity,
   TextCursorInput as RenameIcon,
 } from 'lucide-react';
-import { File } from '@keepcloud/commons/types';
 import { cn } from '../helpers';
+import { FileMinViewDto } from '@keepcloud/commons/dtos';
 
 interface UseFileMenuProps {
-  file: File;
+  file: FileMinViewDto;
 }
 
 interface UseFileMenuReturn {

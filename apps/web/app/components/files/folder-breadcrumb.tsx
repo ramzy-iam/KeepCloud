@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { File, FileAncestor } from '@keepcloud/commons/types';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -15,9 +14,10 @@ import {
   ROUTE_PATH,
 } from '@keepcloud/web-core/react';
 import { useNavigate } from 'react-router';
+import { FileAncestor, FileMinViewDto } from '@keepcloud/commons/dtos';
 
 interface FolderBreadcrumbProps {
-  folder: File;
+  folder: FileMinViewDto;
 }
 
 export const FolderBreadcrumb = ({ folder }: FolderBreadcrumbProps) => {

@@ -1,16 +1,17 @@
 import { Tabs, TabsList, TabsTrigger, cn } from '@keepcloud/web-core/react';
 import { LayoutGrid, StretchHorizontal } from 'lucide-react';
 import { useState } from 'react';
-import { File, FileMainCategory } from '@keepcloud/commons/types';
+import { FileMainCategory } from '@keepcloud/commons/types';
 import { GridView } from './grid-view';
 import { TableView } from './table-view';
 import { FolderBreadcrumb } from './folder-breadcrumb';
+import { FileMinViewDto } from '@keepcloud/commons/dtos';
 
 type ViewMode = 'grid' | 'table';
 
 interface FolderViewProps {
-  folder?: File;
-  items?: File[];
+  folder?: FileMinViewDto;
+  items?: FileMinViewDto[];
   categoryToDisplay?: FileMainCategory;
   title: string;
   defaultViewMode?: ViewMode;
@@ -37,16 +38,16 @@ export const FolderView = ({
   const displayOnlyFolders = categoryToDisplay === 'folder';
 
   const filteredItems = data.filter((item) => {
-    if (categoryToDisplay === 'folder') return item.fileType === 'folder';
-    if (categoryToDisplay === 'file') return item.fileType !== 'folder';
+    if (categoryToDisplay === 'folder') return item.contentType == 'folder';
+    if (categoryToDisplay === 'file') return item.contentType != 'folder';
     return true;
   });
 
   const sortedItems = [...filteredItems].sort((a, b) => {
-    if (a.fileType === 'folder' && b.fileType === 'folder') {
+    if (a.contentType === 'folder' && b.contentType === 'folder') {
       return a.name.localeCompare(b.name);
     }
-    return a.fileType === 'folder' ? -1 : 1;
+    return a.contentType === 'folder' ? -1 : 1;
   });
 
   const tabClassName =

@@ -17,7 +17,7 @@ export const useGoogleAuth = () => {
     }
   >({
     mutationFn: async (params) => {
-      const { data } = await AuthService.authGoogle(params.code);
+      const data = await AuthService.authGoogle(params.code);
       AuthHelper.storeTokens({ ...data });
       return data;
     },
@@ -32,7 +32,7 @@ export const useGetProfile = ({ enabled }: GetProfileProps = {}) => {
   return useQuery({
     queryKey: ['profile'],
     queryFn: async () => {
-      const { data } = await AuthService.getProfile();
+      const data = await AuthService.getProfile();
       setAuthAtom((prev) => ({ ...prev, user: data }));
       return data;
     },
@@ -44,7 +44,7 @@ export const useGetProfile = ({ enabled }: GetProfileProps = {}) => {
 export const useRefreshAccessToken = () => {
   return useMutation<AuthGoogleResponseDto, ApiError>({
     mutationFn: async () => {
-      const { data } = await AuthService.refreshToken(AuthHelper.refreshToken);
+      const data = await AuthService.refreshToken(AuthHelper.refreshToken);
       AuthHelper.storeTokens({ ...data });
       return data;
     },

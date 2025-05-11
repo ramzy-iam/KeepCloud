@@ -1,29 +1,28 @@
+import { useGetFolder, useGetFolderChildren } from '@keepcloud/web-core/react';
 import { FolderView } from '../../../components';
 import type { Route } from './+types/details';
-import { File, fileTreeFolders } from '@keepcloud/commons/types';
-
-export function findFileById(id: string, files: File[]): File | undefined {
-  for (const file of files) {
-    if (file.id === id) return file;
-    if (file.children) {
-      const found = findFileById(id, file.children);
-      if (found) return found;
-    }
-  }
-  return undefined;
-}
-
-export async function clientLoader({ params }: Route.ClientLoaderArgs) {
-  const folder = findFileById(params.folderId, fileTreeFolders);
-  return folder ?? null;
-}
 
 export default function FolderDetailsComponent({
-  loaderData,
+  params,
 }: Route.ComponentProps) {
-  const folder = loaderData;
+  const {
+    data: folder,
+    isLoading,
+    error,
+  } = useGetFolder({
+    id: params.folderId,
+    query: { withAncestors: true },
+  });
 
-  if (!folder) {
+  const { data: folderChildren = [], isLoading: isLoadingChildren } =
+    useGetFolderChildren({
+      id: params.folderId,
+      enabled: !!folder,
+    });
+
+  if (isLoading || isLoadingChildren) return <div>Loading...</div>;
+
+  if (error || !folder) {
     return (
       <div>
         <h3 className="sticky top-0 z-[1] bg-background p-1.5 text-18-medium text-heading">
@@ -40,7 +39,10 @@ export default function FolderDetailsComponent({
 
   return (
     <div className="flex flex-col gap-6">
-      <FolderView folder={folder} title={folder?.name} />
+      <FolderView
+        folder={{ ...folder, children: folderChildren ?? [] }}
+        title={folder?.name}
+      />
     </div>
   );
 }

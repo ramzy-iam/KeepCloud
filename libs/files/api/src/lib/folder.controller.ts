@@ -40,8 +40,14 @@ export class FolderController {
 
   @Get(':id/children')
   @Serialize(new PaginationDto(FileMinViewDto))
-  getChildren(@Param('id') id: string, @Query() filters: FolderFilterDto) {
+  async getChildren(
+    @Param('id') id: string,
+    @Query() filters: FolderFilterDto,
+  ) {
     return this.folderService.getChildren(id, filters);
+    // const { items, meta } = await this.folderService.getChildren(id, filters);
+    // console.log({ items, meta });
+    // return { items, meta };
   }
 
   @Get(':id')
