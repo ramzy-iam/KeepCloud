@@ -4,6 +4,7 @@ import {
   IsPositive,
   IsEnum,
   IsOptional,
+  IsBoolean,
 } from '../validators';
 import { ErrorCode, FileFormat } from '@keepcloud/commons/constants';
 
@@ -92,7 +93,26 @@ export class FilePreviewDto extends FileMinViewDto {
   storagePath: string | null;
 }
 
-export class FileDetailsDto extends FilePreviewDto {}
+export class FileDetailsDto extends FilePreviewDto {
+  @Expose()
+  @Type(() => FileAncestor)
+  ancestors: FileAncestor[];
+}
+
+export class FileAncestor {
+  @Expose()
+  id: string;
+
+  @Expose()
+  name: string;
+}
+
+export class GetOneFolderQueryDto {
+  @Transform(({ value }) => castHelper.toBoolean(value))
+  @IsOptional()
+  @IsBoolean()
+  withAncestors?: boolean;
+}
 
 export class FolderFilterDto extends BaseFilterDto {
   @Transform(({ value }) => castHelper.trim(value))

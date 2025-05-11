@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { File, FileType } from '@keepcloud/core/db';
 import {
   CreateFolderDto,
+  FileAncestor,
   FolderFilterDto,
   PaginationDto,
 } from '@keepcloud/commons/dtos';
@@ -71,13 +72,22 @@ export class FolderService extends BaseFileService {
     );
   }
 
-  override async getOne(id: string): Promise<File> {
+  override async getOne(
+    id: string,
+    withAncestors = false,
+  ): Promise<{ file: File; ancestors: FileAncestor[] }> {
     const file = await this.fileRepository.findOne({
       id,
       type: FileType.FOLDER,
     });
+
     if (!file)
       throw new NotFoundException(ErrorCode.NOT_FOUND, 'Resource not found');
-    return file;
+
+    let ancestors: FileAncestor[] = [];
+    if (typeof withAncestors === 'boolean' && withAncestors) {
+      ancestors = await this.fileRepository.getAncestors(id);
+    }
+    return { file, ancestors };
   }
 }
