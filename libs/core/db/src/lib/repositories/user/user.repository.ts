@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { UserScope } from './user.scope';
 import { PrismaService } from '../../prisma';
 import { User } from '../../entities';
 import { Prisma, PrismaClient } from '@prisma/client';
@@ -12,10 +11,20 @@ export class UserRepository extends BaseRepository<
   Prisma.UserUpdateInput,
   Prisma.UserWhereUniqueInput,
   Prisma.UserWhereInput,
-  PrismaClient['user'],
-  UserScope
+  Prisma.UserInclude,
+  PrismaClient['user']
 > {
   constructor(protected readonly prisma: PrismaService) {
-    super(prisma, prisma.user, new UserScope(prisma));
+    super(prisma, prisma.user);
+  }
+
+  filterById(id: string) {
+    this._where.id = id;
+    return this;
+  }
+
+  filterByEmail(email: string) {
+    this._where.email = email;
+    return this;
   }
 }

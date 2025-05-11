@@ -10,6 +10,8 @@ import type { Route } from './+types/details';
 import { FileAncestor } from '@keepcloud/commons/dtos';
 import { SYSTEM_FILE } from '@keepcloud/commons/constants';
 import { useNavigate } from 'react-router';
+import { useEffect } from 'react';
+import { columns } from './columns';
 
 export default function FolderDetailsComponent({
   params,
@@ -31,6 +33,14 @@ export default function FolderDetailsComponent({
       id: params.folderId,
       enabled: !!folder,
     });
+
+  useEffect(() => {
+    if (!folder) return;
+    setActiveFolder({
+      id: params.folderId,
+      name: folder.name,
+    });
+  }, [folder]);
 
   if (isLoading || isLoadingChildren) return <div>Loading...</div>;
 
@@ -76,6 +86,7 @@ export default function FolderDetailsComponent({
           ancestors: enhancedAncestors,
           children: folderChildren,
         }}
+        columns={columns}
         title={folder.name}
         onBreadcrumbClick={handleBreadcrumbClick}
       />
