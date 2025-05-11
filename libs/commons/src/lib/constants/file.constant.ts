@@ -59,3 +59,9 @@ export enum FileSortField {
   UPDATED_AT = 'updatedAt',
   IS_FOLDER = 'isFolder',
 }
+
+export enum SystemFolder {
+  MY_STORAGE = 'My Storage',
+  SHARED_WITH_ME = 'shared-with-me',
+  TRASH = 'trash',
+}
