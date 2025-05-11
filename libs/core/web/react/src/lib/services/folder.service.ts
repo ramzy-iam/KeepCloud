@@ -7,30 +7,27 @@ import {
   FileDetailsDto,
   GetOneFolderQueryDto,
 } from '@keepcloud/commons/dtos';
+import { BaseHttpService } from './base.service';
 
-export class FolderService {
-  static async create(dto: CreateFolderDto) {
-    const { data } = await APP_API.post<FileMinViewDto>('folders', dto);
-    return data;
+class FolderService extends BaseHttpService {
+  protected baseUrl: string = 'folders';
+
+  async create(dto: CreateFolderDto) {
+    return this.post<FileMinViewDto, CreateFolderDto>('', dto);
   }
 
-  static async getChildren(id: string, filters: FolderFilterDto) {
-    const { data } = await APP_API.get<PaginationDto<FileMinViewDto>>(
-      `folders/${id}/children`,
-      {
-        params: filters,
-      },
-    );
-    return data;
+  async getChildren(id: string, filters: FolderFilterDto) {
+    return this.get<PaginationDto<FileMinViewDto>>(`/${id}/children`, {
+      params: filters,
+    });
   }
 
-  static async getOne(
+  async getOne(
     id: string,
     query: GetOneFolderQueryDto = { withAncestors: true },
   ) {
-    const { data } = await APP_API.get<FileDetailsDto>(`folders/${id}`, {
-      params: query,
-    });
-    return data;
+    return this.get<FileDetailsDto>(`/${id}`, { params: query });
   }
 }
+
+export default new FolderService();

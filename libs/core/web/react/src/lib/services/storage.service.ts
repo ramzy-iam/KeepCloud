@@ -1,38 +1,30 @@
-import { APP_API } from './axios';
 import {
   PaginationDto,
   FolderFilterDto,
   FileMinViewDto,
 } from '@keepcloud/commons/dtos';
+import { BaseHttpService } from './base.service';
 
-export class StorageService {
-  static async getRootItems(filters?: FolderFilterDto) {
-    const { data } = await APP_API.get<PaginationDto<FileMinViewDto>>(
-      'storage/my-storage',
-      {
-        params: filters,
-      },
-    );
-    return data;
+class StorageService extends BaseHttpService {
+  protected baseUrl: string = 'storage';
+
+  async getRootItems(filters?: FolderFilterDto) {
+    return this.get<PaginationDto<FileMinViewDto>>('/my-storage', {
+      params: filters,
+    });
   }
 
-  static async getSharedWithMe(filters: FolderFilterDto) {
-    const { data } = await APP_API.get<PaginationDto<FileMinViewDto>>(
-      'storage/shared-with-me',
-      {
-        params: filters,
-      },
-    );
-    return data;
+  async getSharedWithMe(filters: FolderFilterDto) {
+    return this.get<PaginationDto<FileMinViewDto>>('/shared-with-me', {
+      params: filters,
+    });
   }
 
-  static async getTrashedItems(filters: FolderFilterDto) {
-    const { data } = await APP_API.get<PaginationDto<FileMinViewDto>>(
-      'storage/trash',
-      {
-        params: filters,
-      },
-    );
-    return data;
+  async getTrashedItems(filters: FolderFilterDto) {
+    return this.get<PaginationDto<FileMinViewDto>>('/trash', {
+      params: filters,
+    });
   }
 }
+
+export default new StorageService();
