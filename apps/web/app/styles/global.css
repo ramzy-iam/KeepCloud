@@ -226,6 +226,7 @@
 
 @theme inline {
   --font-inter: 'Inter', sans-serif;
+  --breakpoint-xs: 30rem;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);

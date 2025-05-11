@@ -18,9 +18,13 @@ import { FileAncestor, FileMinViewDto } from '@keepcloud/commons/dtos';
 
 interface FolderBreadcrumbProps {
   folder: FileMinViewDto;
+  onBreadcrumbClick?: (ancestor: FileAncestor) => void;
 }
 
-export const FolderBreadcrumb = ({ folder }: FolderBreadcrumbProps) => {
+export const FolderBreadcrumb = ({
+  folder,
+  onBreadcrumbClick,
+}: FolderBreadcrumbProps) => {
   const navigate = useNavigate();
   const ancestors = folder.ancestors ?? [];
   const { isMobile } = useSidebar();
@@ -62,7 +66,7 @@ export const FolderBreadcrumb = ({ folder }: FolderBreadcrumbProps) => {
                       className="cursor-pointer"
                       asChild
                       onClick={() => {
-                        navigate(ROUTE_PATH.folderDetails(ancestor.id));
+                        onBreadcrumbClick && onBreadcrumbClick(ancestor);
                       }}
                     >
                       <span>{ancestor.name}</span>
@@ -81,7 +85,7 @@ export const FolderBreadcrumb = ({ folder }: FolderBreadcrumbProps) => {
             <BreadcrumbItem
               className="cursor-pointer rounded-[16px] px-4 py-1 text-heading hover:bg-stroke-200 dark:hover:bg-white/5"
               onClick={() => {
-                navigate(ROUTE_PATH.folderDetails(ancestor.id));
+                onBreadcrumbClick && onBreadcrumbClick(ancestor);
               }}
             >
               <h4 className="truncate text-20-medium" title={ancestor.name}>

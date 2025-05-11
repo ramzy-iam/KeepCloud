@@ -1,10 +1,22 @@
-import { useGetFolder, useGetFolderChildren } from '@keepcloud/web-core/react';
+import {
+  useGetFolder,
+  useGetFolderChildren,
+  useGetActiveFolder,
+  DEFAULT_ACTIVE_FOLDER,
+  ROUTE_PATH,
+} from '@keepcloud/web-core/react';
 import { FolderView } from '../../../components';
 import type { Route } from './+types/details';
+import { FileAncestor } from '@keepcloud/commons/dtos';
+import { SYSTEM_FILE } from '@keepcloud/commons/constants';
+import { useNavigate } from 'react-router';
 
 export default function FolderDetailsComponent({
   params,
 }: Route.ComponentProps) {
+  const navigate = useNavigate();
+  const { setActiveFolder } = useGetActiveFolder();
+
   const {
     data: folder,
     isLoading,
@@ -37,11 +49,35 @@ export default function FolderDetailsComponent({
     );
   }
 
+  const enhancedAncestors: FileAncestor[] = [
+    { id: 'null', name: SYSTEM_FILE.MY_STORAGE.name },
+    ...(folder.ancestors || []),
+  ];
+
+  const handleBreadcrumbClick = (ancestor: FileAncestor) => {
+    if (ancestor.id == 'null') {
+      setActiveFolder(DEFAULT_ACTIVE_FOLDER);
+      navigate(ROUTE_PATH.folder);
+    } else {
+      setActiveFolder({
+        id: ancestor.id,
+        name: ancestor.name,
+      });
+
+      navigate(ROUTE_PATH.folderDetails(ancestor.id));
+    }
+  };
+
   return (
     <div className="flex flex-col gap-6">
       <FolderView
-        folder={{ ...folder, children: folderChildren ?? [] }}
-        title={folder?.name}
+        folder={{
+          ...folder,
+          ancestors: enhancedAncestors,
+          children: folderChildren,
+        }}
+        title={folder.name}
+        onBreadcrumbClick={handleBreadcrumbClick}
       />
     </div>
   );
