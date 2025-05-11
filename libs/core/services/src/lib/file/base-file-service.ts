@@ -19,5 +19,5 @@ export abstract class BaseFileService {
     return this.fileRepository.update({ id }, { trashedAt: null });
   }
 
-  abstract getOne(id: string): Promise<unknown>;
+  abstract getOne(...args: unknown[]): Promise<unknown>;
 }
