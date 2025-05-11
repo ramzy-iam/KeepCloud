@@ -63,19 +63,19 @@ export enum FileSortField {
 
 export const SYSTEM_FILE = {
   MY_STORAGE: {
-    id: 'my-storage',
+    id: 'null',
     name: 'My Storage',
     code: 'MY_STORAGE',
     isSystem: true,
   },
   SHARED_WITH_ME: {
-    id: 'shared-with-me',
+    id: 'null',
     name: 'shared-with-me',
     code: 'SHARED_WITH_ME',
     isSystem: true,
   },
   TRASH: {
-    id: 'trash',
+    id: 'null',
     name: 'trash',
     code: 'TRASH',
     system: true,

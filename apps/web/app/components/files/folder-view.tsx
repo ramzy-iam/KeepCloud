@@ -5,7 +5,7 @@ import { FileMainCategory } from '@keepcloud/commons/types';
 import { GridView } from './grid-view';
 import { TableView } from './table-view';
 import { FolderBreadcrumb } from './folder-breadcrumb';
-import { FileMinViewDto } from '@keepcloud/commons/dtos';
+import { FileAncestor, FileMinViewDto } from '@keepcloud/commons/dtos';
 
 type ViewMode = 'grid' | 'table';
 
@@ -18,6 +18,7 @@ interface FolderViewProps {
   fixedView?: ViewMode;
   group?: boolean;
   className?: string;
+  onBreadcrumbClick?: (ancestor: FileAncestor) => void;
 }
 
 export const FolderView = ({
@@ -29,6 +30,7 @@ export const FolderView = ({
   group = false,
   fixedView,
   className,
+  onBreadcrumbClick,
 }: FolderViewProps) => {
   const [viewMode, setViewMode] = useState<ViewMode>(
     fixedView ?? defaultViewMode,
@@ -59,7 +61,12 @@ export const FolderView = ({
         {title && !folder && (
           <h3 className="text-20-medium text-heading">{title}</h3>
         )}
-        {folder && <FolderBreadcrumb folder={folder} />}
+        {folder && (
+          <FolderBreadcrumb
+            folder={folder}
+            onBreadcrumbClick={onBreadcrumbClick}
+          />
+        )}
         {!fixedView && (
           <div className="flex gap-2">
             <Tabs
