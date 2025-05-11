@@ -3,13 +3,10 @@ import {
   PaginationDto,
   FolderFilterDto,
   FileMinViewDto,
-  UserProfileDto,
 } from '@keepcloud/commons/dtos';
 import { StorageService, ApiError } from '../services';
 import { SYSTEM_FILE } from '@keepcloud/commons/constants';
-import { ActiveFolder, authAtom } from '../store';
 import { useGetActiveFolder } from './folder.hook';
-import { useAtomValue } from 'jotai';
 
 interface StorageQueryProps {
   filters?: FolderFilterDto;
@@ -57,6 +54,11 @@ export const useGetTrashedItems = ({
     retry: false,
   });
 };
+
+// export const useGetSuggestedRessource({
+
+//   GetSuggestedResourceProps
+// })
 
 export const useGetKeyToInvalidateBasedOnActiveFolder = () => {
   const { activeFolder } = useGetActiveFolder();

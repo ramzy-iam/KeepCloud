@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { File, FileRepository } from '@keepcloud/core/db';
+import { File, FileRepository, FileType } from '@keepcloud/core/db';
 import { PaginationDto, FolderFilterDto } from '@keepcloud/commons/dtos';
+import { PAGINATION } from '@keepcloud/commons/constants';
 
 @Injectable()
 export class StorageService {
@@ -29,5 +30,21 @@ export class StorageService {
     return this.fileRepository
       .filterByNotTrashed()
       .findManyPaginated(filters.page, filters.pageSize);
+  }
+
+  getSuggestedFolders(): Promise<PaginationDto<File>> {
+    return this.fileRepository
+      .filterByParentId(null)
+      .filterByType(FileType.FOLDER)
+      .filterByNotTrashed()
+      .findManyPaginated(1, 15);
+  }
+
+  getSuggestedFiles(): Promise<PaginationDto<File>> {
+    return this.fileRepository
+      .filterByParentId(null)
+      .filterByType(FileType.FILE)
+      .filterByNotTrashed()
+      .findManyPaginated(1, 15);
   }
 }

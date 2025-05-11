@@ -27,4 +27,16 @@ export class StorageController {
   getTrashedItems(filters: FolderFilterDto) {
     return this.storageService.getTrashedItems(filters);
   }
+
+  @Get('suggested-folders')
+  @Serialize(new PaginationDto(FileMinViewDto))
+  getSuggestedFolders() {
+    return this.storageService.getSuggestedFolders();
+  }
+
+  @Get('suggested-files')
+  @Serialize(new PaginationDto(FileMinViewDto))
+  getSuggestedFiles() {
+    return this.storageService.getSuggestedFiles();
+  }
 }
