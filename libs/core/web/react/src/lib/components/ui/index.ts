@@ -23,3 +23,4 @@ export * from './label';
 export * from './accordion';
 export * from './tabs';
 export * from './breadcrumb';
+export * from './sonner';

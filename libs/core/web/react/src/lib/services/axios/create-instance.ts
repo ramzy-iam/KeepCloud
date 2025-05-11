@@ -1,5 +1,4 @@
 import axios, {
-  AxiosError,
   AxiosResponse,
   AxiosInstance,
   InternalAxiosRequestConfig,
@@ -7,6 +6,7 @@ import axios, {
 import { CookiesHelper } from '../../helpers';
 import { renewAccessToken } from './token.helper';
 import { ACCESS_TOKEN } from '@keepcloud/commons/constants';
+import { ApiError } from './type';
 
 const axiosOptions = {
   headers: {
@@ -34,12 +34,12 @@ export const createAxiosInstance = (baseURL: string): AxiosInstance => {
       }
       return config;
     },
-    (error: AxiosError) => Promise.reject(error)
+    (error: ApiError) => Promise.reject(error),
   );
 
   axiosInstance.interceptors.response.use(
     (response: AxiosResponse) => response,
-    async (error: AxiosError) => {
+    async (error: ApiError) => {
       const { response, config } = error;
 
       if (axios.isCancel(error)) return handleCancelRequest();
@@ -52,7 +52,7 @@ export const createAxiosInstance = (baseURL: string): AxiosInstance => {
         }
       }
       return Promise.reject(response?.data || error);
-    }
+    },
   );
 
   return axiosInstance;
