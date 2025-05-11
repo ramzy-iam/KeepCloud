@@ -1,4 +1,5 @@
 export enum ContentType {
+  FOLDER = 'folder',
   PDF = 'application/pdf',
   JPEG = 'image/jpeg',
   JPG = 'image/jpg',
@@ -60,8 +61,23 @@ export enum FileSortField {
   IS_FOLDER = 'isFolder',
 }
 
-export enum SystemFolder {
-  MY_STORAGE = 'My Storage',
-  SHARED_WITH_ME = 'shared-with-me',
-  TRASH = 'trash',
-}
+export const SYSTEM_FILE = {
+  MY_STORAGE: {
+    id: 'my-storage',
+    name: 'My Storage',
+    code: 'MY_STORAGE',
+    isSystem: true,
+  },
+  SHARED_WITH_ME: {
+    id: 'shared-with-me',
+    name: 'shared-with-me',
+    code: 'SHARED_WITH_ME',
+    isSystem: true,
+  },
+  TRASH: {
+    id: 'trash',
+    name: 'trash',
+    code: 'TRASH',
+    system: true,
+  },
+} as const;

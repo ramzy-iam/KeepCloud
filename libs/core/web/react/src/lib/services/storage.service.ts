@@ -6,24 +6,33 @@ import {
 } from '@keepcloud/commons/dtos';
 
 export class StorageService {
-  static getRootItems(filters: FolderFilterDto) {
-    return APP_API.get<PaginationDto<FileMinViewDto>>('storage/my-storage', {
-      params: filters,
-    });
+  static async getRootItems(filters?: FolderFilterDto) {
+    const { data } = await APP_API.get<PaginationDto<FileMinViewDto>>(
+      'storage/my-storage',
+      {
+        params: filters,
+      },
+    );
+    return data;
   }
 
-  static getSharedWithMe(filters: FolderFilterDto) {
-    return APP_API.get<PaginationDto<FileMinViewDto>>(
+  static async getSharedWithMe(filters: FolderFilterDto) {
+    const { data } = await APP_API.get<PaginationDto<FileMinViewDto>>(
       'storage/shared-with-me',
       {
         params: filters,
       },
     );
+    return data;
   }
 
-  static getTrashedItems(filters: FolderFilterDto) {
-    return APP_API.get<PaginationDto<FileMinViewDto>>('storage/trash', {
-      params: filters,
-    });
+  static async getTrashedItems(filters: FolderFilterDto) {
+    const { data } = await APP_API.get<PaginationDto<FileMinViewDto>>(
+      'storage/trash',
+      {
+        params: filters,
+      },
+    );
+    return data;
   }
 }

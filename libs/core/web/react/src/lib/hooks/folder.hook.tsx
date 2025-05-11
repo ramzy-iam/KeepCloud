@@ -45,8 +45,7 @@ export const useGetActiveFolder = () => {
 export const useCreateFolder = () => {
   return useMutation<FileMinViewDto, ApiError, CreateFolderDto>({
     mutationFn: async (dto) => {
-      const { data } = await FolderService.create(dto);
-      return data;
+      return FolderService.create(dto);
     },
     onSuccess: () => {
       toast.success('Folder created successfully');
@@ -59,11 +58,11 @@ export const useGetFolderChildren = ({
   filters = {},
   enabled = true,
 }: GetChildrenProps) => {
-  return useQuery<PaginationDto<FileMinViewDto>, AxiosError>({
+  return useQuery<FileMinViewDto[], AxiosError>({
     queryKey: ['folder', id, 'children', filters],
     queryFn: async () => {
-      const { data } = await FolderService.getChildren(id, filters);
-      return data;
+      const { items } = await FolderService.getChildren(id, filters);
+      return items;
     },
     enabled: enabled && !!id,
     retry: false,
@@ -77,9 +76,8 @@ export const useGetFolder = ({
 }: GetFolderProps) => {
   return useQuery<FileDetailsDto, ApiError>({
     queryKey: ['folder', id, query.withAncestors],
-    queryFn: async () => {
-      const { data } = await FolderService.getOne(id, query);
-      return data;
+    queryFn: () => {
+      return FolderService.getOne(id, query);
     },
     enabled: enabled && !!id,
     retry: false,

@@ -6,12 +6,17 @@ import {
   IsOptional,
   IsBoolean,
 } from '../validators';
-import { ErrorCode, FileFormat } from '@keepcloud/commons/constants';
+import {
+  ContentType,
+  ErrorCode,
+  FileFormat,
+} from '@keepcloud/commons/constants';
 
 import { Expose, Transform, Type } from 'class-transformer';
 import { FileType } from '@prisma/client';
 import { BaseFilterDto } from './base.dto';
 import castHelper from '../helpers/shared/cast.helper';
+import { ValueOf } from '../types';
 
 export class CreateFileDto {
   @IsNotEmpty(ErrorCode.FILE_NAME_REQUIRED)
@@ -66,6 +71,17 @@ export class FileMinViewDto {
 
   @Expose()
   format: FileFormat;
+
+  @Expose()
+  contentType: string;
+
+  @Expose()
+  @Type(() => FileAncestor)
+  ancestors: FileAncestor[];
+
+  @Expose()
+  @Type(() => FileMinViewDto)
+  children: FileMinViewDto[];
 }
 
 export class FilePreviewDto extends FileMinViewDto {
@@ -80,10 +96,6 @@ export class FilePreviewDto extends FileMinViewDto {
 
   @Expose()
   @Type(() => FileMinViewDto)
-  children: FileMinViewDto[];
-
-  @Expose()
-  @Type(() => FileMinViewDto)
   parents: FileMinViewDto[];
 
   @Expose()
@@ -93,11 +105,7 @@ export class FilePreviewDto extends FileMinViewDto {
   storagePath: string | null;
 }
 
-export class FileDetailsDto extends FilePreviewDto {
-  @Expose()
-  @Type(() => FileAncestor)
-  ancestors: FileAncestor[];
-}
+export class FileDetailsDto extends FilePreviewDto {}
 
 export class FileAncestor {
   @Expose()
