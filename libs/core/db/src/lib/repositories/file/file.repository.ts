@@ -20,6 +20,10 @@ export class FileRepository extends BaseRepository<
     super(prisma, prisma.file);
   }
 
+  get scoped(): FileRepository {
+    return new FileRepository(this.prisma);
+  }
+
   async getAncestors(id: string): Promise<FileAncestor[]> {
     const file = await this.prisma.file.findFirstOrThrow({
       where: { id },

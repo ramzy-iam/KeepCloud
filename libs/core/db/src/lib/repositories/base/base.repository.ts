@@ -2,7 +2,11 @@ import { PAGINATION } from '@keepcloud/commons/constants';
 import { PrismaService } from '../../prisma';
 import { PaginationDto, MetaDto } from '@keepcloud/commons/dtos';
 
-export class BaseRepository<
+export interface Scoped<T> {
+  readonly scoped: T;
+}
+
+export abstract class BaseRepository<
   T extends object,
   CreateInput extends object,
   UpdateInput extends object,
@@ -32,7 +36,8 @@ export class BaseRepository<
       include?: Include;
     }) => Promise<T>;
   },
-> {
+> implements Scoped<unknown>
+{
   protected _where: WhereInput = {} as WhereInput;
   protected _include: Include = {} as Include;
   constructor(
@@ -40,9 +45,7 @@ export class BaseRepository<
     protected readonly model: PrismaModel,
   ) {}
 
-  get scoped() {
-    return this;
-  }
+  abstract get scoped(): unknown;
 
   reset() {
     this._where = {} as WhereInput;
