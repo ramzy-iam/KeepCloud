@@ -18,6 +18,10 @@ export class UserRepository extends BaseRepository<
     super(prisma, prisma.user);
   }
 
+  get scoped() {
+    return new UserRepository(this.prisma);
+  }
+
   filterById(id: string) {
     this._where.id = id;
     return this;

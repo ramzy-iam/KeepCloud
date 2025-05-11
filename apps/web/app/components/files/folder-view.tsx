@@ -6,7 +6,7 @@ import {
   useFolderViewMode,
 } from '@keepcloud/web-core/react';
 import { LayoutGrid, StretchHorizontal } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FileMainCategory, FolderViewMode } from '@keepcloud/commons/types';
 import { GridView } from './grid-view';
 import { TableView } from './table-view';
@@ -14,16 +14,14 @@ import { FolderBreadcrumb } from './folder-breadcrumb';
 import { FileAncestor, FileMinViewDto } from '@keepcloud/commons/dtos';
 import { ColumnDef } from '@tanstack/react-table';
 
-type ViewMode = 'grid' | 'table';
-
 interface FolderViewProps {
   folder?: FileMinViewDto;
   items?: FileMinViewDto[];
   columns: ColumnDef<FileMinViewDto>[];
   categoryToDisplay?: FileMainCategory;
   title: string;
-  defaultViewMode?: ViewMode;
-  fixedView?: ViewMode;
+  defaultViewMode?: FolderViewMode;
+  fixedView?: FolderViewMode;
   group?: boolean;
   className?: string;
   onBreadcrumbClick?: (ancestor: FileAncestor) => void;
@@ -41,7 +39,9 @@ export const FolderView = ({
   columns,
 }: FolderViewProps) => {
   const { view: preferredViewMode, setFolderViewMode } = useFolderViewMode();
-  const [viewMode, _] = useState<ViewMode>(fixedView ?? preferredViewMode);
+  const [viewMode, setViewMode] = useState<FolderViewMode>(
+    fixedView ?? preferredViewMode,
+  );
   const data = folder?.children ?? items;
 
   const displayOnlyFolders = categoryToDisplay === 'folder';
@@ -62,6 +62,11 @@ export const FolderView = ({
   const tabClassName =
     'data-[state=active]:bg-primary! data-[state=active]:text-white-light!';
 
+  useEffect(() => {
+    if (preferredViewMode !== viewMode && !fixedView)
+      setFolderViewMode(preferredViewMode);
+  }, [preferredViewMode]);
+
   return (
     <div className={cn('mb-8 flex flex-col gap-3', className)}>
       <div className="sticky -top-[1px] z-[1] flex items-center justify-between bg-background p-1.5 pl-0">
@@ -78,9 +83,10 @@ export const FolderView = ({
           <div className="flex gap-2">
             <Tabs
               defaultValue={viewMode}
-              onValueChange={(value) =>
-                setFolderViewMode(value as FolderViewMode)
-              }
+              onValueChange={(value) => {
+                setFolderViewMode(value as FolderViewMode);
+                setViewMode(value as FolderViewMode);
+              }}
             >
               <TabsList>
                 <TabsTrigger value="table" className={tabClassName}>
