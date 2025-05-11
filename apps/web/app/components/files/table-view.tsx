@@ -26,12 +26,13 @@ import {
   ROUTE_PATH,
 } from '@keepcloud/web-core/react';
 import { DayjsHelper, NameFormatterHelper } from '@keepcloud/commons/helpers';
-import { File, Owner } from '@keepcloud/commons/types';
+import { Owner } from '@keepcloud/commons/types';
 import { FolderIconOutline } from '../ui';
 import { ColumnDef, Table } from '@tanstack/react-table';
 import { useNavigate } from 'react-router';
+import { FileMinViewDto } from '@keepcloud/commons/dtos';
 
-export const columns: ColumnDef<File>[] = [
+export const columns: ColumnDef<FileMinViewDto>[] = [
   {
     id: 'select',
     header: ({ table }) => (
@@ -62,7 +63,7 @@ export const columns: ColumnDef<File>[] = [
       name: 'Name',
     },
     cell: ({ row }) => {
-      const isFolder = row.original.fileType == 'folder';
+      const isFolder = row.original.contentType == 'folder';
       const navigate = useNavigate();
       const url = ROUTE_PATH.folderDetails(row.original.id);
 
@@ -121,7 +122,7 @@ export const columns: ColumnDef<File>[] = [
       name: 'Size',
     },
     cell: ({ row }) => {
-      const isFolder = row.original.fileType == 'folder';
+      const isFolder = row.original.contentType === 'folder';
       if (isFolder)
         return (
           <div className="flex justify-center md:justify-end">
@@ -168,7 +169,7 @@ export const columns: ColumnDef<File>[] = [
   },
 ];
 
-const RenderActionMenu = (file: File) => {
+const RenderActionMenu = (file: FileMinViewDto) => {
   const { FileMenu } = useFileMenu({ file });
   return (
     <div className="flex items-center justify-center">
@@ -183,14 +184,14 @@ const RenderActionMenu = (file: File) => {
 };
 
 interface TableViewProps {
-  data: File[];
+  data: FileMinViewDto[];
   header?: React.ReactNode;
   footer?: React.ReactNode;
   onlyFolders?: boolean;
 }
 
 interface BeforeTableProps {
-  table: Table<File>;
+  table: Table<FileMinViewDto>;
 }
 
 const BeforeTable = ({ table }: BeforeTableProps) => {

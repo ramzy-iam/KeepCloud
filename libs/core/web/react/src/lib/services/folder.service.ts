@@ -9,25 +9,28 @@ import {
 } from '@keepcloud/commons/dtos';
 
 export class FolderService {
-  static create(dto: CreateFolderDto) {
-    return APP_API.post<FileMinViewDto>('folders', dto);
+  static async create(dto: CreateFolderDto) {
+    const { data } = await APP_API.post<FileMinViewDto>('folders', dto);
+    return data;
   }
 
-  static getChildren(id: string, filters: FolderFilterDto) {
-    return APP_API.get<PaginationDto<FileMinViewDto>>(
+  static async getChildren(id: string, filters: FolderFilterDto) {
+    const { data } = await APP_API.get<PaginationDto<FileMinViewDto>>(
       `folders/${id}/children`,
       {
         params: filters,
       },
     );
+    return data;
   }
 
-  static getOne(
+  static async getOne(
     id: string,
     query: GetOneFolderQueryDto = { withAncestors: true },
   ) {
-    return APP_API.get<FileDetailsDto>(`folders/${id}`, {
+    const { data } = await APP_API.get<FileDetailsDto>(`folders/${id}`, {
       params: query,
     });
+    return data;
   }
 }

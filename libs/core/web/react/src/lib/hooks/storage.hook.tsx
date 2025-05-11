@@ -17,9 +17,8 @@ export const useGetRootItems = ({
 }: StorageQueryProps = {}) => {
   return useQuery<PaginationDto<FileMinViewDto>, ApiError>({
     queryKey: ['storage', 'root', filters],
-    queryFn: async () => {
-      const { data } = await StorageService.getRootItems(filters);
-      return data;
+    queryFn: () => {
+      return StorageService.getRootItems(filters);
     },
     enabled,
     retry: false,
@@ -32,9 +31,8 @@ export const useGetSharedWithMe = ({
 }: StorageQueryProps = {}) => {
   return useQuery<PaginationDto<FileMinViewDto>, ApiError>({
     queryKey: ['storage', 'shared', filters],
-    queryFn: async () => {
-      const { data } = await StorageService.getSharedWithMe(filters);
-      return data;
+    queryFn: () => {
+      return StorageService.getSharedWithMe(filters);
     },
     enabled,
     retry: false,
@@ -47,9 +45,8 @@ export const useGetTrashedItems = ({
 }: StorageQueryProps = {}) => {
   return useQuery<PaginationDto<FileMinViewDto>, ApiError>({
     queryKey: ['storage', 'trash', filters],
-    queryFn: async () => {
-      const { data } = await StorageService.getTrashedItems(filters);
-      return data;
+    queryFn: () => {
+      return StorageService.getTrashedItems(filters);
     },
     enabled,
     retry: false,

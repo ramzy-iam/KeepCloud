@@ -1,8 +1,8 @@
-import { File } from '@keepcloud/commons/types';
 import { FileSystemItem } from './file-system-item';
+import { FileMinViewDto } from '@keepcloud/commons/dtos';
 
 interface GridViewProps {
-  data: File[];
+  data: FileMinViewDto[];
   onlyFolders?: boolean;
   group?: boolean;
 }
@@ -11,11 +11,11 @@ export const GridView = ({
   onlyFolders = true,
   group = false,
 }: GridViewProps) => {
-  let itemsToDisplay: File[] = [];
+  let itemsToDisplay: FileMinViewDto[] = [];
 
   if (group) {
-    const files = data.filter((item) => item.fileType !== 'folder');
-    const folders = data.filter((item) => item.fileType === 'folder');
+    const files = data.filter((item) => item.format);
+    const folders = data.filter((item) => !item.format);
 
     return (
       <div className="flex flex-col gap-3">
@@ -43,9 +43,7 @@ export const GridView = ({
     );
   }
 
-  itemsToDisplay = onlyFolders
-    ? data.filter((item) => item.fileType === 'folder')
-    : data;
+  itemsToDisplay = onlyFolders ? data.filter((item) => !item.format) : data;
 
   return (
     <div className="flex flex-col flex-wrap gap-3 sm:flex-row md:gap-8">

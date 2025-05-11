@@ -1,17 +1,17 @@
 import { Button, ROUTE_PATH, cn, useFileMenu } from '@keepcloud/web-core/react';
 import { FileTextIcon, EllipsisVerticalIcon } from 'lucide-react';
-import { File } from '@keepcloud/commons/types';
 import { FolderIconOutline } from '../ui';
 import { useNavigate } from 'react-router';
+import { FileMinViewDto } from '@keepcloud/commons/dtos';
 
 interface FileSystemItemProps {
-  file: File;
+  file: FileMinViewDto;
   className?: string;
 }
 
 export const FileSystemItem = ({ file, className }: FileSystemItemProps) => {
   const { FileMenu } = useFileMenu({ file });
-  const isFolder = file.fileType === 'folder';
+  const isFolder = file.contentType === 'folder';
   const navigate = useNavigate();
   const url = ROUTE_PATH.folderDetails(file.id);
 
