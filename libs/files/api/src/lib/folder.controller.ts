@@ -19,6 +19,7 @@ import {
   FileDetailsDto,
   FileMinViewDto,
   FolderFilterDto,
+  GetOneFolderQueryDto,
   PaginationDto,
   RenameFolderDto,
 } from '@keepcloud/commons/dtos';
@@ -45,8 +46,12 @@ export class FolderController {
 
   @Get(':id')
   @Serialize(FileDetailsDto)
-  getOne(@Param('id') id: string) {
-    return this.folderService.getOne(id);
+  async getOne(@Param('id') id: string, @Query() query: GetOneFolderQueryDto) {
+    const { file, ancestors } = await this.folderService.getOne(
+      id,
+      query.withAncestors,
+    );
+    return { ...file, ancestors };
   }
 
   @Patch(':id/rename')
