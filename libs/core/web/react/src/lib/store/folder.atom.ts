@@ -1,11 +1,15 @@
-import { SYSTEM_FILE } from '@keepcloud/commons/constants';
 import { atom } from 'jotai';
+import { SYSTEM_FILE } from '@keepcloud/commons/constants';
+import { FolderViewMode } from '@keepcloud/commons/types';
 
 export interface ActiveFolder {
-  id: string | null;
+  id: string;
   name: string;
   system?: boolean;
+  invalidationKey?: string;
 }
+
+export const folderViewAtom = atom<FolderViewMode>('grid');
 
 export const DEFAULT_ACTIVE_FOLDER: ActiveFolder = SYSTEM_FILE.MY_STORAGE;
 

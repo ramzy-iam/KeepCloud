@@ -17,6 +17,7 @@ import { FileType } from '@prisma/client';
 import { BaseFilterDto } from './base.dto';
 import castHelper from '../helpers/shared/cast.helper';
 import { ValueOf } from '../types';
+import { UserProfileDto } from './user.dto';
 
 export class CreateFileDto {
   @IsNotEmpty(ErrorCode.FILE_NAME_REQUIRED)
@@ -82,6 +83,10 @@ export class FileMinViewDto {
   @Expose()
   @Type(() => FileMinViewDto)
   children: FileMinViewDto[];
+
+  @Expose()
+  @Type(() => UserProfileDto)
+  owner: UserProfileDto;
 }
 
 export class FilePreviewDto extends FileMinViewDto {

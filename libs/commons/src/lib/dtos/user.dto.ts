@@ -1,7 +1,7 @@
 import { Expose } from 'class-transformer';
-import { BaseDto } from './base.dto';
+import { MinimalDto } from './base.dto';
 
-export class UserProfileDto extends BaseDto {
+export class UserProfileDto extends MinimalDto {
   @Expose()
   firstName: string | null;
 

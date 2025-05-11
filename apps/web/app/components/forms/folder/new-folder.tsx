@@ -20,9 +20,9 @@ import {
   FormControl,
   FormMessage,
   useCreateFolder,
+  useGetKeyToInvalidateBasedOnActiveFolder,
 } from '@keepcloud/web-core/react';
 
-// 1. Define Zod Schema for validation
 const createFolderSchema = z.object({
   name: z.string().min(1, 'Folder name is required'),
 });
@@ -39,6 +39,7 @@ export function AddFolderFormDialog({
   onOpenChange,
 }: AddFolderFormDialogProps) {
   const { activeFolder } = useGetActiveFolder();
+  const keyToInvalidate = useGetKeyToInvalidateBasedOnActiveFolder();
   const form = useForm<CreateFolderInput>({
     resolver: zodResolver(createFolderSchema),
     defaultValues: {
@@ -46,7 +47,9 @@ export function AddFolderFormDialog({
     },
   });
 
-  const createFolder = useCreateFolder();
+  const createFolder = useCreateFolder({
+    keyToInvalidate,
+  });
 
   const onSubmit = (data: CreateFolderInput) => {
     const parentId =

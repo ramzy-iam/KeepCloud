@@ -55,6 +55,8 @@ export enum FilePermission {
   COMMENT = 'comment',
 }
 
+export const FOLDER_VIEW_KEY = 'folderView';
+
 export enum FileSortField {
   CREATED_AT = 'createdAt',
   UPDATED_AT = 'updatedAt',
@@ -67,17 +69,20 @@ export const SYSTEM_FILE = {
     name: 'My Storage',
     code: 'MY_STORAGE',
     isSystem: true,
+    invalidationKey: 'MY_STORAGE',
   },
   SHARED_WITH_ME: {
     id: 'null',
     name: 'shared-with-me',
     code: 'SHARED_WITH_ME',
     isSystem: true,
+    invalidationKey: 'SHARED_WITH_ME',
   },
   TRASH: {
     id: 'null',
     name: 'trash',
     code: 'TRASH',
     system: true,
+    invalidationKey: 'TRASH',
   },
 } as const;

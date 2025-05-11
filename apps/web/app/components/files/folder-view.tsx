@@ -1,17 +1,25 @@
-import { Tabs, TabsList, TabsTrigger, cn } from '@keepcloud/web-core/react';
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  cn,
+  useFolderViewMode,
+} from '@keepcloud/web-core/react';
 import { LayoutGrid, StretchHorizontal } from 'lucide-react';
 import { useState } from 'react';
-import { FileMainCategory } from '@keepcloud/commons/types';
+import { FileMainCategory, FolderViewMode } from '@keepcloud/commons/types';
 import { GridView } from './grid-view';
 import { TableView } from './table-view';
 import { FolderBreadcrumb } from './folder-breadcrumb';
 import { FileAncestor, FileMinViewDto } from '@keepcloud/commons/dtos';
+import { ColumnDef } from '@tanstack/react-table';
 
 type ViewMode = 'grid' | 'table';
 
 interface FolderViewProps {
   folder?: FileMinViewDto;
   items?: FileMinViewDto[];
+  columns: ColumnDef<FileMinViewDto>[];
   categoryToDisplay?: FileMainCategory;
   title: string;
   defaultViewMode?: ViewMode;
@@ -26,15 +34,14 @@ export const FolderView = ({
   items = [],
   categoryToDisplay = 'all',
   title,
-  defaultViewMode = 'grid',
   group = false,
   fixedView,
   className,
   onBreadcrumbClick,
+  columns,
 }: FolderViewProps) => {
-  const [viewMode, setViewMode] = useState<ViewMode>(
-    fixedView ?? defaultViewMode,
-  );
+  const { view: preferredViewMode, setFolderViewMode } = useFolderViewMode();
+  const [viewMode, _] = useState<ViewMode>(fixedView ?? preferredViewMode);
   const data = folder?.children ?? items;
 
   const displayOnlyFolders = categoryToDisplay === 'folder';
@@ -71,7 +78,9 @@ export const FolderView = ({
           <div className="flex gap-2">
             <Tabs
               defaultValue={viewMode}
-              onValueChange={(value) => setViewMode(value as ViewMode)}
+              onValueChange={(value) =>
+                setFolderViewMode(value as FolderViewMode)
+              }
             >
               <TabsList>
                 <TabsTrigger value="table" className={tabClassName}>
@@ -92,7 +101,11 @@ export const FolderView = ({
           group={group}
         />
       ) : (
-        <TableView data={sortedItems} onlyFolders={displayOnlyFolders} />
+        <TableView
+          data={sortedItems}
+          onlyFolders={displayOnlyFolders}
+          columns={columns}
+        />
       )}
     </div>
   );

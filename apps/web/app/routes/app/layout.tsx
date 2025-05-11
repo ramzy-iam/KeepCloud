@@ -6,6 +6,7 @@ import {
   useSidebar,
   ROUTE_PATH,
   useAuth,
+  useInitializeFolderViewMode,
 } from '@keepcloud/web-core/react';
 import { UserProfileDto } from '@keepcloud/commons/dtos';
 import {
@@ -31,6 +32,7 @@ const ProfileIcon = ({ user }: { user: UserProfileDto }) => {
 
 export default function Layout() {
   const { user, authChecked, redirect, isLoading } = useAuth();
+  useInitializeFolderViewMode();
 
   if (redirect) return <Navigate to={ROUTE_PATH.login} />;
   if (!authChecked || isLoading) return <div>Loading...</div>;
