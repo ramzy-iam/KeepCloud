@@ -9,6 +9,7 @@ import {
 } from 'react-router';
 
 import './styles/global.css';
+import { Toaster } from '@keepcloud/web-core/react';
 
 export const meta: MetaFunction = () => [
   {
@@ -43,6 +44,7 @@ export function Layout({ children }: { readonly children: React.ReactNode }) {
       <body suppressHydrationWarning>
         {/* <AppNav /> */}
         {children}
+        <Toaster />
         <ScrollRestoration />
         <Scripts />
       </body>

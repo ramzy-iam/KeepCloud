@@ -118,7 +118,7 @@ export class FolderFilterDto extends BaseFilterDto {
   @Transform(({ value }) => castHelper.trim(value))
   @IsOptional()
   @IsString()
-  parentId: string | null = null;
+  parentId?: string | null = null;
 
   @IsOptional()
   @IsString()
