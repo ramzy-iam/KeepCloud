@@ -18,6 +18,10 @@ export class SubscriptionPlanRepository extends BaseRepository<
     super(prisma, prisma.subscriptionPlan);
   }
 
+  get scoped() {
+    return new SubscriptionPlanRepository(this.prisma);
+  }
+
   filterById(id: string) {
     this._where.id = id;
     return this;
