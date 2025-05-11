@@ -1,4 +1,10 @@
-import { Button, ROUTE_PATH, cn, useFileMenu } from '@keepcloud/web-core/react';
+import {
+  Button,
+  ROUTE_PATH,
+  cn,
+  useFileMenu,
+  useGetActiveFolder,
+} from '@keepcloud/web-core/react';
 import { FileTextIcon, EllipsisVerticalIcon } from 'lucide-react';
 import { FolderIconOutline } from '../ui';
 import { useNavigate } from 'react-router';
@@ -14,9 +20,11 @@ export const FileSystemItem = ({ file, className }: FileSystemItemProps) => {
   const isFolder = file.contentType === 'folder';
   const navigate = useNavigate();
   const url = ROUTE_PATH.folderDetails(file.id);
+  const { setActiveFolder } = useGetActiveFolder();
 
   const handleClick = () => {
     if (isFolder) {
+      setActiveFolder(file);
       navigate(url);
     }
   };

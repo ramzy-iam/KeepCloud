@@ -16,6 +16,7 @@ import {
   PlusIcon,
   UploadIcon,
 } from 'lucide-react';
+import { AddFolderFormDialog } from '../forms';
 
 interface IActionButton {
   icon: React.ComponentType<LucideProps>;
@@ -67,36 +68,62 @@ const actions: IActionButton[] = [
   },
 ];
 
+const dialogRegistry: Record<
+  string,
+  React.FC<{ open: boolean; onOpenChange: (v: boolean) => void }>
+> = {
+  Folder: AddFolderFormDialog,
+};
+
 const ActionButton = ({ action }: ActionButtonProps) => {
   const { menuItems, label } = action;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [activeDialogKey, setActiveDialogKey] = useState<string | null>(null);
+
+  const handleDialogClose = () => setActiveDialogKey(null);
+  const ActiveDialogComponent = activeDialogKey
+    ? dialogRegistry[activeDialogKey]
+    : null;
 
   return (
-    <div className="flex flex-wrap justify-start gap-16 bg-background py-6">
-      <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-        <DropdownMenuTrigger>
-          <span
-            data-active={isMenuOpen}
-            onClick={(event) => {
-              event.stopPropagation();
-            }}
-            className="group flex w-[100px] cursor-pointer flex-col items-center gap-2 rounded-[8px] border border-stroke-500 p-3 text-heading hover:border-primary hover:bg-primary/5 data-[active=true]:border-primary! md:w-[156px] md:items-start dark:border-neutral-600 dark:hover:border-primary"
-          >
-            <action.icon className="text-primary dark:group-hover:text-white-light dark:group-data-[active=true]:text-white-light" />
-            <span className="text-14 group-hover:text-primary group-data-[active=true]:text-primary dark:group-hover:text-white-light dark:group-data-[active=true]:text-white-light">
-              {label}
+    <>
+      <div className="flex flex-wrap justify-start gap-16 bg-background py-6">
+        <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+          <DropdownMenuTrigger>
+            <span
+              data-active={isMenuOpen}
+              onClick={(e) => e.stopPropagation()}
+              className="group flex w-[100px] cursor-pointer flex-col items-center gap-2 rounded-[8px] border border-stroke-500 p-3 text-heading hover:border-primary hover:bg-primary/5 data-[active=true]:border-primary! md:w-[156px] md:items-start dark:border-neutral-600 dark:hover:border-primary"
+            >
+              <action.icon className="text-primary" />
+              <span className="text-14">{label}</span>
             </span>
-          </span>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className={cn('max-w-[285px] min-w-[200px] p-2')}>
-          {menuItems.map((item, index) => (
-            <React.Fragment key={item.label}>
-              {renderMenuItem(item, index)}
-            </React.Fragment>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            className={cn('max-w-[285px] min-w-[200px] p-2')}
+          >
+            {menuItems.map((item, index) => (
+              <React.Fragment key={item.label}>
+                {renderMenuItem(
+                  {
+                    ...item,
+                    onClick: () => {
+                      setIsMenuOpen(false);
+                      setActiveDialogKey(item.label);
+                    },
+                  },
+                  index,
+                )}
+              </React.Fragment>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      {ActiveDialogComponent && (
+        <ActiveDialogComponent open={true} onOpenChange={handleDialogClose} />
+      )}
+    </>
   );
 };
 
