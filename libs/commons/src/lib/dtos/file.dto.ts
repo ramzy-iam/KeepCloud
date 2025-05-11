@@ -59,9 +59,6 @@ export class FileMinViewDto {
   @Expose()
   name: string;
 
-  @Expose()
-  type: FileType;
-
   @Transform(({ obj }) => obj.size.toString())
   @Expose()
   size: string;
