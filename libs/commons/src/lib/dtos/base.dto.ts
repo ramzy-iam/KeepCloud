@@ -4,6 +4,11 @@ import { ErrorCode, PAGINATION } from '../constants';
 import { SortOrder } from '../types';
 import { IsNotEmpty, IsOptional, IsString, Max, Min } from '../validators';
 
+export class MinimalDto {
+  @Expose()
+  id: string;
+}
+
 export class BaseDto {
   @Expose()
   id: string;

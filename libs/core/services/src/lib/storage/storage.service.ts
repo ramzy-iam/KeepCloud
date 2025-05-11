@@ -7,32 +7,27 @@ export class StorageService {
   constructor(protected readonly fileRepository: FileRepository) {}
 
   getRootItems(filters: FolderFilterDto): Promise<PaginationDto<File>> {
-    const scope = this.fileRepository.scoped.filterByParentId(null);
+    const scope = this.fileRepository.scoped
+      .filterByParentId(null)
+      .filterByNotTrashed()
+      .joinOwner();
 
     if (filters.type) scope.filterByType(filters.type);
     if (filters.name) scope.filterByName(filters.name);
     if (filters.format) scope.filterByFormat(filters.format);
 
-    return this.fileRepository.findManyPaginated(
-      scope.where,
-      filters.page,
-      filters.pageSize,
-    );
+    return scope.findManyPaginated(filters.page, filters.pageSize);
   }
 
   getSharedWithMe(filters: FolderFilterDto): Promise<PaginationDto<File>> {
-    return this.fileRepository.findManyPaginated(
-      { parentId: 'null' },
-      filters.page,
-      filters.pageSize,
-    );
+    return this.fileRepository
+      .filterByParentId('null')
+      .findManyPaginated(filters.page, filters.pageSize);
   }
 
   getTrashedItems(filters: FolderFilterDto): Promise<PaginationDto<File>> {
-    return this.fileRepository.findManyPaginated(
-      { parentId: 'null' },
-      filters.page,
-      filters.pageSize,
-    );
+    return this.fileRepository
+      .filterByNotTrashed()
+      .findManyPaginated(filters.page, filters.pageSize);
   }
 }

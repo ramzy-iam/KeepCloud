@@ -1,10 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {
-  File,
-  FileRepository,
-  FileType,
-  PrismaService,
-} from '@keepcloud/core/db';
+import { File, FileType } from '@keepcloud/core/db';
 import { CreateFolderDto } from '@keepcloud/commons/dtos';
 import {
   BadRequestException,
@@ -18,7 +13,9 @@ import { BaseFileService } from './base-file-service';
 export class FileService extends BaseFileService {
   async create(dto: CreateFolderDto): Promise<File> {
     if (dto.parentId) {
-      const parent = await this.fileRepository.findOne({ id: dto.parentId });
+      const parent = await this.fileRepository
+        .filterByParentId(dto.parentId)
+        .findOne();
       if (!parent || parent.type !== FileType.FOLDER) {
         throw new BadRequestException(
           ErrorCode.INVALID_PARENT_FOLDER,
@@ -28,10 +25,10 @@ export class FileService extends BaseFileService {
       }
     }
 
-    const existingFolder = await this.fileRepository.findOne({
-      name: dto.name,
-      parentId: dto.parentId,
-    });
+    const existingFolder = await this.fileRepository
+      .filterByExactName(dto.name)
+      .filterByParentId(dto.parentId ?? null)
+      .findOne();
     if (existingFolder) {
       throw new BadRequestException(
         ErrorCode.FOLDER_ALREADY_EXISTS,
@@ -56,7 +53,7 @@ export class FileService extends BaseFileService {
   }
 
   async getOne(id: string): Promise<File> {
-    const file = await this.fileRepository.findOne({ id });
+    const file = await this.fileRepository.filterById(id).findOne();
     if (!file)
       throw new NotFoundException(ErrorCode.NOT_FOUND, 'Resource not found');
     return file;

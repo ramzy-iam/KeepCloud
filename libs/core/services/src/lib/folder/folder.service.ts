@@ -18,7 +18,9 @@ import { BaseFileService } from '../file/base-file-service';
 export class FolderService extends BaseFileService {
   async create(dto: CreateFolderDto): Promise<File> {
     if (dto.parentId) {
-      const parent = await this.fileRepository.findOne({ id: dto.parentId });
+      const parent = await this.fileRepository
+        .filterByParentId(dto.parentId)
+        .findOne();
       if (!parent || parent.type !== FileType.FOLDER) {
         throw new BadRequestException(
           ErrorCode.INVALID_PARENT_FOLDER,
@@ -28,10 +30,10 @@ export class FolderService extends BaseFileService {
       }
     }
 
-    const existingFolder = await this.fileRepository.findOne({
-      name: dto.name,
-      parentId: dto.parentId,
-    });
+    const existingFolder = await this.fileRepository
+      .filterByName(dto.name)
+      .filterByParentId(dto.parentId ?? null)
+      .findOne();
     if (existingFolder) {
       throw new BadRequestException(
         ErrorCode.FOLDER_ALREADY_EXISTS,
@@ -59,27 +61,26 @@ export class FolderService extends BaseFileService {
     parentId: string,
     filters: FolderFilterDto,
   ): Promise<PaginationDto<File>> {
-    const scope = this.fileRepository.scoped.filterByParentId(parentId);
+    const scope = this.fileRepository.scoped
+      .filterByParentId(parentId)
+      .filterByNotTrashed()
+      .joinOwner();
 
     if (filters.type) scope.filterByType(filters.type);
     if (filters.name) scope.filterByName(filters.name);
     if (filters.format) scope.filterByFormat(filters.format);
 
-    return this.fileRepository.findManyPaginated(
-      scope.where,
-      filters.page,
-      filters.pageSize,
-    );
+    return scope.findManyPaginated(filters.page, filters.pageSize);
   }
 
   override async getOne(
     id: string,
     withAncestors = false,
   ): Promise<{ file: File; ancestors: FileAncestor[] }> {
-    const file = await this.fileRepository.findOne({
-      id,
-      type: FileType.FOLDER,
-    });
+    const file = await this.fileRepository.scoped
+      .filterById(id)
+      .filterByType(FileType.FOLDER)
+      .findOne();
 
     if (!file)
       throw new NotFoundException(ErrorCode.NOT_FOUND, 'Resource not found');
