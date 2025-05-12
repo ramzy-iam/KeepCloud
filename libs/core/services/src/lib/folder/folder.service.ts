@@ -18,10 +18,12 @@ import { BaseFileService } from '../file/base-file-service';
 export class FolderService extends BaseFileService {
   async create(dto: CreateFolderDto): Promise<File> {
     if (dto.parentId) {
-      const parent = await this.fileRepository
+      const parent = await this.fileRepository.scoped
         .filterByParentId(dto.parentId)
+        .filterByType(FileType.FOLDER)
         .findOne();
-      if (!parent || parent.type !== FileType.FOLDER) {
+
+      if (!parent) {
         throw new BadRequestException(
           ErrorCode.INVALID_PARENT_FOLDER,
           'Parent must be a valid folder',
@@ -30,7 +32,7 @@ export class FolderService extends BaseFileService {
       }
     }
 
-    const existingFolder = await this.fileRepository
+    const existingFolder = await this.fileRepository.scoped
       .filterByName(dto.name)
       .filterByParentId(dto.parentId ?? null)
       .findOne();

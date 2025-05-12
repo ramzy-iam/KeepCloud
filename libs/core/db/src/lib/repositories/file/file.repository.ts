@@ -56,7 +56,7 @@ export class FileRepository extends BaseRepository<
   }
 
   filterByParentId(id?: string | null | undefined) {
-    if (typeof id === undefined) return this;
+    if (typeof id === 'undefined') return this;
     this._where.parentId = id;
     return this;
   }
