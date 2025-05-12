@@ -14,9 +14,10 @@ export class FileService extends BaseFileService {
   async create(dto: CreateFolderDto): Promise<File> {
     if (dto.parentId) {
       const parent = await this.fileRepository.scoped
-        .filterByParentId(dto.parentId)
-        .findOne();
-      if (!parent || parent.type !== FileType.FOLDER) {
+        .filterById(dto.parentId)
+        .filerByIsFolder()
+        .getOne();
+      if (!parent) {
         throw new BadRequestException(
           ErrorCode.INVALID_PARENT_FOLDER,
           'Parent must be a valid folder',
@@ -28,7 +29,7 @@ export class FileService extends BaseFileService {
     const existingFolder = await this.fileRepository.scoped
       .filterByExactName(dto.name)
       .filterByParentId(dto.parentId ?? null)
-      .findOne();
+      .getOne();
     if (existingFolder) {
       throw new BadRequestException(
         ErrorCode.FOLDER_ALREADY_EXISTS,
@@ -53,7 +54,7 @@ export class FileService extends BaseFileService {
   }
 
   async getOne(id: string): Promise<File> {
-    const file = await this.fileRepository.scoped.filterById(id).findOne();
+    const file = await this.fileRepository.scoped.filterById(id).getOne();
     if (!file)
       throw new NotFoundException(ErrorCode.NOT_FOUND, 'Resource not found');
     return file;
