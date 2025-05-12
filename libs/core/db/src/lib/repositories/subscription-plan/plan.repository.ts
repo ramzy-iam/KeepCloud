@@ -3,6 +3,7 @@ import { PrismaService } from '../../prisma';
 import { BaseRepository } from '../base';
 import { SubscriptionPlan } from '../../entities';
 import { Prisma } from '@prisma/client';
+import { SubscriptionPlanScope } from './plan.scope';
 
 @Injectable()
 export class SubscriptionPlanRepository extends BaseRepository<
@@ -19,16 +20,6 @@ export class SubscriptionPlanRepository extends BaseRepository<
   }
 
   get scoped() {
-    return new SubscriptionPlanRepository(this.prisma);
-  }
-
-  filterById(id: string) {
-    this._where.id = id;
-    return this;
-  }
-
-  filterByDefault() {
-    this._where.isDefault = true;
-    return this;
+    return new SubscriptionPlanScope(this.prisma, this);
   }
 }

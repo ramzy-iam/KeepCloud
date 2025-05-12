@@ -13,11 +13,11 @@ export class UserService {
   async createOrUpdateGoogleUser(profile: TokenPayload): Promise<User> {
     const email = profile.email as string;
 
-    let user = await this.userRepository.scoped.filterByEmail(email).findOne();
+    let user = await this.userRepository.scoped.filterByEmail(email).getOne();
 
     const plan = await this.subscriptionPlanRepository.scoped
       .filterByDefault()
-      .findOneOrFail();
+      .getOneOrFail();
 
     if (!user) {
       user = await this.userRepository.create({
@@ -39,6 +39,6 @@ export class UserService {
     const scope = this.userRepository.scoped;
     if (email) scope.filterByEmail(email);
     if (id) scope.filterById(id);
-    return scope.findOne();
+    return scope.getOne();
   }
 }

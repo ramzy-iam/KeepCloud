@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { File, FileRepository, FileType } from '@keepcloud/core/db';
 import { PaginationDto, FolderFilterDto } from '@keepcloud/commons/dtos';
-import { PAGINATION } from '@keepcloud/commons/constants';
 
 @Injectable()
 export class StorageService {
@@ -17,34 +16,34 @@ export class StorageService {
     if (filters.name) scope.filterByName(filters.name);
     if (filters.format) scope.filterByFormat(filters.format);
 
-    return scope.findManyPaginated(filters.page, filters.pageSize);
+    return scope.getManyPaginated(filters.page, filters.pageSize);
   }
 
   getSharedWithMe(filters: FolderFilterDto): Promise<PaginationDto<File>> {
-    return this.fileRepository
+    return this.fileRepository.scoped
       .filterByParentId('null')
-      .findManyPaginated(filters.page, filters.pageSize);
+      .getManyPaginated(filters.page, filters.pageSize);
   }
 
   getTrashedItems(filters: FolderFilterDto): Promise<PaginationDto<File>> {
-    return this.fileRepository
+    return this.fileRepository.scoped
       .filterByNotTrashed()
-      .findManyPaginated(filters.page, filters.pageSize);
+      .getManyPaginated(filters.page, filters.pageSize);
   }
 
   getSuggestedFolders(): Promise<PaginationDto<File>> {
-    return this.fileRepository
+    return this.fileRepository.scoped
       .filterByParentId(null)
       .filterByType(FileType.FOLDER)
       .filterByNotTrashed()
-      .findManyPaginated(1, 15);
+      .getManyPaginated(1, 15);
   }
 
   getSuggestedFiles(): Promise<PaginationDto<File>> {
-    return this.fileRepository
+    return this.fileRepository.scoped
       .filterByParentId(null)
       .filterByType(FileType.FILE)
       .filterByNotTrashed()
-      .findManyPaginated(1, 15);
+      .getManyPaginated(1, 15);
   }
 }

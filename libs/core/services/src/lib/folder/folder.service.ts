@@ -19,9 +19,9 @@ export class FolderService extends BaseFileService {
   async create(dto: CreateFolderDto): Promise<File> {
     if (dto.parentId) {
       const parent = await this.fileRepository.scoped
-        .filterByParentId(dto.parentId)
-        .filterByType(FileType.FOLDER)
-        .findOne();
+        .filterById(dto.parentId)
+        .filerByIsFolder()
+        .getOne();
 
       if (!parent) {
         throw new BadRequestException(
@@ -35,7 +35,7 @@ export class FolderService extends BaseFileService {
     const existingFolder = await this.fileRepository.scoped
       .filterByName(dto.name)
       .filterByParentId(dto.parentId ?? null)
-      .findOne();
+      .getOne();
     if (existingFolder) {
       throw new BadRequestException(
         ErrorCode.FOLDER_ALREADY_EXISTS,
@@ -72,7 +72,7 @@ export class FolderService extends BaseFileService {
     if (filters.name) scope.filterByName(filters.name);
     if (filters.format) scope.filterByFormat(filters.format);
 
-    return scope.findManyPaginated(filters.page, filters.pageSize);
+    return scope.getManyPaginated(filters.page, filters.pageSize);
   }
 
   override async getOne(
@@ -82,7 +82,7 @@ export class FolderService extends BaseFileService {
     const file = await this.fileRepository.scoped
       .filterById(id)
       .filterByType(FileType.FOLDER)
-      .findOne();
+      .getOne();
 
     if (!file)
       throw new NotFoundException(ErrorCode.NOT_FOUND, 'Resource not found');
