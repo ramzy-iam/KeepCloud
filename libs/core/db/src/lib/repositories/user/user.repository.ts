@@ -3,6 +3,7 @@ import { PrismaService } from '../../prisma';
 import { User } from '../../entities';
 import { Prisma, PrismaClient } from '@prisma/client';
 import { BaseRepository } from '../base';
+import { UserScope } from './user.scope';
 
 @Injectable()
 export class UserRepository extends BaseRepository<
@@ -19,16 +20,6 @@ export class UserRepository extends BaseRepository<
   }
 
   get scoped() {
-    return new UserRepository(this.prisma);
-  }
-
-  filterById(id: string) {
-    this._where.id = id;
-    return this;
-  }
-
-  filterByEmail(email: string) {
-    this._where.email = email;
-    return this;
+    return new UserScope(this.prisma, this);
   }
 }

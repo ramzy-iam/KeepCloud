@@ -38,8 +38,6 @@ export abstract class BaseRepository<
   },
 > implements Scoped<unknown>
 {
-  protected _where: WhereInput = {} as WhereInput;
-  protected _include: Include = {} as Include;
   constructor(
     protected readonly prisma: PrismaService,
     protected readonly model: PrismaModel,
@@ -47,24 +45,13 @@ export abstract class BaseRepository<
 
   abstract get scoped(): unknown;
 
-  reset() {
-    this._where = {} as WhereInput;
-    this._include = {} as Include;
-    return this;
-  }
-
-  filterById(id: string) {
-    (this._where as { id: string }).id = id;
-    return this;
-  }
-
   async findOne({
     where,
     include,
   }: { where?: WhereInput; include?: Include } = {}) {
     return this.model.findFirst({
-      where: where ?? this._where,
-      include: include ?? this._include,
+      where: where ?? ({} as WhereInput),
+      include: include ?? ({} as Include),
     });
   }
 
@@ -73,8 +60,8 @@ export abstract class BaseRepository<
     include,
   }: { where?: WhereInput; include?: Include } = {}) {
     return this.model.findMany({
-      where: where ?? this._where,
-      include: include ?? this._include,
+      where,
+      include,
     });
   }
 
@@ -90,17 +77,15 @@ export abstract class BaseRepository<
     );
 
     const skip = (safePage - 1) * safePageSize;
-    const finalWhere = where ?? this._where;
-    const finalInclude = include ?? this._include;
 
     const [items, totalItems] = await Promise.all([
       this.model.findMany({
-        where: finalWhere,
-        include: finalInclude,
+        where,
+        include,
         skip,
         take: safePageSize,
       }),
-      this.model.count({ where: finalWhere }),
+      this.model.count({ where }),
     ]);
     const meta: MetaDto = this.buildPaginationMeta(
       totalItems,
@@ -142,8 +127,8 @@ export abstract class BaseRepository<
     include?: Include;
   } = {}): Promise<T> {
     return this.model.findFirstOrThrow({
-      where: where ?? this._where,
-      include: include ?? this._include,
+      where,
+      include,
     });
   }
 
