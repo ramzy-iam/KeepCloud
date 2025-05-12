@@ -1,31 +1,45 @@
-import { HttpException, HttpStatus } from '@nestjs/common';
+interface ExceptionDetail {
+  code: string;
+  message: string;
+  field?: string;
+}
 
-export class AppException extends HttpException {
-  constructor(
-    code: string,
-    message: string,
-    status: HttpStatus,
-    field?: string,
-  ) {
-    super(
+export class AppException extends Error {
+  public readonly code: string;
+  public readonly status: number;
+  public readonly details: ExceptionDetail[];
+
+  constructor(code: string, message: string, status: number, field?: string) {
+    super(message);
+    this.code = code;
+    this.status = status;
+    this.details = [
       {
         code,
-        details: [
-          {
-            code,
-            message,
-            ...(field ? { field } : {}),
-          },
-        ],
+        message,
+        ...(field ? { field } : {}),
       },
-      status,
-    );
+    ];
+
+    Object.setPrototypeOf(this, new.target.prototype);
+    this.name = this.constructor.name;
+  }
+
+  getStatus(): number {
+    return this.status;
+  }
+
+  getResponse(): object {
+    return {
+      code: this.code,
+      details: this.details,
+    };
   }
 
   static create(
     code: string,
     message: string,
-    status: HttpStatus,
+    status: number,
     field?: string,
   ): AppException {
     return new AppException(code, message, status, field);
