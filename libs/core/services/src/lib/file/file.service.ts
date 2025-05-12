@@ -13,7 +13,7 @@ import { BaseFileService } from './base-file-service';
 export class FileService extends BaseFileService {
   async create(dto: CreateFolderDto): Promise<File> {
     if (dto.parentId) {
-      const parent = await this.fileRepository
+      const parent = await this.fileRepository.scoped
         .filterByParentId(dto.parentId)
         .findOne();
       if (!parent || parent.type !== FileType.FOLDER) {
@@ -25,7 +25,7 @@ export class FileService extends BaseFileService {
       }
     }
 
-    const existingFolder = await this.fileRepository
+    const existingFolder = await this.fileRepository.scoped
       .filterByExactName(dto.name)
       .filterByParentId(dto.parentId ?? null)
       .findOne();
@@ -53,7 +53,7 @@ export class FileService extends BaseFileService {
   }
 
   async getOne(id: string): Promise<File> {
-    const file = await this.fileRepository.filterById(id).findOne();
+    const file = await this.fileRepository.scoped.filterById(id).findOne();
     if (!file)
       throw new NotFoundException(ErrorCode.NOT_FOUND, 'Resource not found');
     return file;
