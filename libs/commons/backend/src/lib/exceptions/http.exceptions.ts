@@ -15,7 +15,7 @@ export class NotFoundException extends AppException {
 export class ConflictException extends AppException {
   constructor(
     code: string = ErrorCode.CONFLICT,
-    message: string = 'Request conflicts with an existing resource.',
+    message = 'Request conflicts with an existing resource.',
     field?: string,
   ) {
     super(code, message, HttpStatus.CONFLICT, field);
@@ -25,7 +25,7 @@ export class ConflictException extends AppException {
 export class BadRequestException extends AppException {
   constructor(
     code: string = ErrorCode.BAD_REQUEST,
-    message: string = 'Invalid input.',
+    message = 'Invalid input.',
     field?: string,
   ) {
     super(code, message, HttpStatus.BAD_REQUEST, field);
@@ -33,19 +33,13 @@ export class BadRequestException extends AppException {
 }
 
 export class UnauthorizedException extends AppException {
-  constructor(
-    code: string = ErrorCode.UNAUTHORIZED,
-    message: string = 'Unauthorized',
-  ) {
+  constructor(code: string = ErrorCode.UNAUTHORIZED, message = 'Unauthorized') {
     super(code, message, HttpStatus.UNAUTHORIZED);
   }
 }
 
 export class ForbiddenException extends AppException {
-  constructor(
-    code: string = ErrorCode.FORBIDDEN,
-    message: string = 'Access denied.',
-  ) {
+  constructor(code: string = ErrorCode.FORBIDDEN, message = 'Access denied.') {
     super(code, message, HttpStatus.FORBIDDEN);
   }
 }
@@ -53,7 +47,7 @@ export class ForbiddenException extends AppException {
 export class InternalServerErrorException extends AppException {
   constructor(
     code: string = ErrorCode.INTERNAL_SERVER_ERROR,
-    message: string = 'An unexpected error occurred',
+    message = 'An unexpected error occurred',
   ) {
     super(code, message, HttpStatus.INTERNAL_SERVER_ERROR);
   }
@@ -62,7 +56,7 @@ export class InternalServerErrorException extends AppException {
 export class ServiceUnavailableException extends AppException {
   constructor(
     code: string = ErrorCode.SERVICE_UNAVAILABLE,
-    message: string = 'Service unavailable',
+    message = 'Service unavailable',
     field?: string,
   ) {
     super(code, message, HttpStatus.SERVICE_UNAVAILABLE, field);
