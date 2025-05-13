@@ -23,6 +23,14 @@ const handleCancelRequest = () => {
   return Promise.reject(cancelResult);
 };
 
+const cleanQueryParams = (params: Record<string, any>): Record<string, any> => {
+  return Object.fromEntries(
+    Object.entries(params).filter(
+      ([_, value]) => value !== '' && value !== null && value !== undefined,
+    ),
+  );
+};
+
 export const createAxiosInstance = (baseURL: string): AxiosInstance => {
   const axiosInstance = axios.create({ ...axiosOptions, baseURL });
 
@@ -32,6 +40,11 @@ export const createAxiosInstance = (baseURL: string): AxiosInstance => {
       if (accessToken) {
         config.headers.Authorization = `Bearer ${accessToken}`;
       }
+
+      if (config.params && typeof config.params === 'object') {
+        config.params = cleanQueryParams(config.params);
+      }
+
       return config;
     },
     (error: ApiError) => Promise.reject(error),

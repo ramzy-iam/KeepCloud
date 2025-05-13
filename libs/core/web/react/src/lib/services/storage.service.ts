@@ -25,6 +25,18 @@ class StorageService extends BaseHttpService {
       params: filters,
     });
   }
+
+  async getSuggestedFolders() {
+    return this.get<PaginationDto<FileMinViewDto>>('/suggested-folders', {
+      params: { page: 1, pageSize: 10 },
+    });
+  }
+
+  async getSuggestedFiles() {
+    return this.get<PaginationDto<FileMinViewDto>>('/suggested-files', {
+      params: { page: 1, pageSize: 15 },
+    });
+  }
 }
 
 export default new StorageService();

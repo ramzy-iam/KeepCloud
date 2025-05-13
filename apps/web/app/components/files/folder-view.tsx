@@ -1,4 +1,6 @@
+import { useEffect, useState } from 'react';
 import {
+  Skeleton,
   Tabs,
   TabsList,
   TabsTrigger,
@@ -6,13 +8,12 @@ import {
   useFolderViewMode,
 } from '@keepcloud/web-core/react';
 import { LayoutGrid, StretchHorizontal } from 'lucide-react';
-import { useEffect, useState } from 'react';
 import { FileMainCategory, FolderViewMode } from '@keepcloud/commons/types';
+import { FileAncestor, FileMinViewDto } from '@keepcloud/commons/dtos';
+import { ColumnDef } from '@tanstack/react-table';
 import { GridView } from './grid-view';
 import { TableView } from './table-view';
 import { FolderBreadcrumb } from './folder-breadcrumb';
-import { FileAncestor, FileMinViewDto } from '@keepcloud/commons/dtos';
-import { ColumnDef } from '@tanstack/react-table';
 
 interface FolderViewProps {
   folder?: FileMinViewDto;
@@ -24,6 +25,7 @@ interface FolderViewProps {
   fixedView?: FolderViewMode;
   group?: boolean;
   className?: string;
+  isLoading?: boolean;
   onBreadcrumbClick?: (ancestor: FileAncestor) => void;
 }
 
@@ -35,6 +37,7 @@ export const FolderView = ({
   group = false,
   fixedView,
   className,
+  isLoading = false,
   onBreadcrumbClick,
   columns,
 }: FolderViewProps) => {
@@ -42,13 +45,14 @@ export const FolderView = ({
   const [viewMode, setViewMode] = useState<FolderViewMode>(
     fixedView ?? preferredViewMode,
   );
+  const [internalLoading, setInternalLoading] = useState(isLoading);
   const data = folder?.children ?? items;
 
   const displayOnlyFolders = categoryToDisplay === 'folder';
 
   const filteredItems = data.filter((item) => {
-    if (categoryToDisplay === 'folder') return item.contentType == 'folder';
-    if (categoryToDisplay === 'file') return item.contentType != 'folder';
+    if (categoryToDisplay === 'folder') return item.contentType === 'folder';
+    if (categoryToDisplay === 'file') return item.contentType !== 'folder';
     return true;
   });
 
@@ -63,23 +67,35 @@ export const FolderView = ({
     'data-[state=active]:bg-primary! data-[state=active]:text-white-light!';
 
   useEffect(() => {
-    if (preferredViewMode !== viewMode && !fixedView)
+    setInternalLoading(isLoading);
+  }, [isLoading]);
+
+  useEffect(() => {
+    if (preferredViewMode !== viewMode && !fixedView) {
       setFolderViewMode(preferredViewMode);
-  }, [preferredViewMode]);
+      setViewMode(preferredViewMode);
+    }
+  }, [preferredViewMode, fixedView, setFolderViewMode]);
 
   return (
     <div className={cn('mb-8 flex flex-col gap-3', className)}>
       <div className="sticky -top-[1px] z-[1] flex items-center justify-between bg-background p-1.5 pl-0">
-        {title && !folder && (
+        {internalLoading && (
+          <div className="flex items-center gap-2 py-4">
+            <Skeleton className="h-[30px] w-[200px]" />
+          </div>
+        )}
+        {!internalLoading && title && !folder && (
           <h3 className="text-20-medium text-heading">{title}</h3>
         )}
-        {folder && (
+
+        {folder && !internalLoading && (
           <FolderBreadcrumb
             folder={folder}
             onBreadcrumbClick={onBreadcrumbClick}
           />
         )}
-        {!fixedView && (
+        {!fixedView && !internalLoading && (
           <div className="flex gap-2">
             <Tabs
               defaultValue={viewMode}
@@ -105,12 +121,14 @@ export const FolderView = ({
           data={sortedItems}
           onlyFolders={displayOnlyFolders}
           group={group}
+          isLoading={internalLoading}
         />
       ) : (
         <TableView
           data={sortedItems}
           onlyFolders={displayOnlyFolders}
           columns={columns}
+          isLoading={internalLoading}
         />
       )}
     </div>

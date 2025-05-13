@@ -1,5 +1,4 @@
 import { SlidersHorizontal } from 'lucide-react';
-
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -8,6 +7,7 @@ import {
   Button,
   useFileTable,
   useSidebar,
+  Skeleton,
 } from '@keepcloud/web-core/react';
 import { ColumnDef, Table } from '@tanstack/react-table';
 import { FileMinViewDto } from '@keepcloud/commons/dtos';
@@ -18,6 +18,7 @@ interface TableViewProps {
   footer?: React.ReactNode;
   onlyFolders?: boolean;
   columns: ColumnDef<FileMinViewDto>[];
+  isLoading?: boolean;
 }
 
 interface BeforeTableProps {
@@ -65,9 +66,10 @@ export function TableView({
   footer: customFooter,
   columns,
   onlyFolders = false,
+  isLoading = false,
 }: TableViewProps) {
   const { table, TableComponent } = useFileTable({
-    data,
+    data: isLoading ? [] : data, // Pass empty array during loading to avoid table rendering
     columns,
   });
 
@@ -97,6 +99,37 @@ export function TableView({
       </div>
     </div>
   );
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <div className="rounded-md border">
+          <table className="w-full">
+            <thead>
+              <tr>
+                {columns.map((column, index) => (
+                  <th key={index} className="p-4">
+                    <Skeleton className="h-4 w-24" />
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {Array.from({ length: 5 }).map((_, rowIndex) => (
+                <tr key={rowIndex}>
+                  {columns.map((_, colIndex) => (
+                    <td key={colIndex} className="p-4">
+                      <Skeleton className="h-4 w-full" />
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <TableComponent
