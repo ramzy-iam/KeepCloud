@@ -23,6 +23,9 @@ export class AppException extends Error {
 
     Object.setPrototypeOf(this, new.target.prototype);
     this.name = this.constructor.name;
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, this.constructor);
+    }
   }
 
   getStatus(): number {

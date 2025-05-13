@@ -18,7 +18,8 @@ export class GlobalExceptionFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    this.logger.error('Unhandled exception:', { exception });
+
+    this.logException(exception);
 
     if (DatabaseExceptionFactory.isDatabaseException(exception)) {
       const appException = DatabaseExceptionFactory.fromError(exception);
@@ -101,6 +102,23 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     }
   }
 
+  private logException(exception: unknown) {
+    const at = new Date();
+    if (exception instanceof AppException) {
+      this.logger.error('Unhandled exception', {
+        ...exception,
+        ...{ details: exception.details },
+        at,
+        stack: exception.stack,
+      });
+    } else {
+      this.logger.error('Unhandled exception', {
+        exception,
+        at,
+        stack: exception instanceof Error ? exception.stack : undefined,
+      });
+    }
+  }
   private formatValidationErrors(
     exceptionResponse: any,
     parentPath = '',
