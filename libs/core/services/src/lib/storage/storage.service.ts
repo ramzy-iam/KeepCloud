@@ -46,4 +46,13 @@ export class StorageService {
       .filterByNotTrashed()
       .getManyPaginated(1, 15);
   }
+
+  getFoldersForTree(filters: FolderFilterDto): Promise<PaginationDto<File>> {
+    return this.fileRepository.scoped
+      .filterByParentId(filters.parentId)
+      .filterByType(FileType.FOLDER)
+      .filterByNotTrashed()
+      .orderBy({ name: 'asc' })
+      .getManyPaginated(filters.page, filters.pageSize);
+  }
 }

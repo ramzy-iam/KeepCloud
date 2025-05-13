@@ -2,41 +2,28 @@ import { PaginationDto } from '@keepcloud/commons/dtos';
 import { PrismaService } from '../../prisma';
 import { BaseRepository } from './base.repository';
 import { PAGINATION } from '@keepcloud/commons/constants';
+import { GenericPrismaModel } from './model';
 
-export class BaseScope<
+export abstract class BaseScope<
   T extends object,
   CreateInput extends object,
   UpdateInput extends object,
   WhereUniqueInput extends object,
   WhereInput extends object,
   Include extends object,
-  PrismaModel extends {
-    findFirst: (args: {
-      where: WhereInput;
-      include: Include;
-    }) => Promise<T | null>;
-    findMany: (args: {
-      where?: WhereInput;
-      include?: Include;
-      skip?: number;
-      take?: number;
-    }) => Promise<T[]>;
-    count: (args: { where?: WhereInput }) => Promise<number>;
-    create: (args: { data: CreateInput }) => Promise<T>;
-    update: (args: {
-      where: WhereUniqueInput;
-      data: UpdateInput;
-    }) => Promise<T>;
-    delete: (args: { where: WhereUniqueInput }) => Promise<T>;
-    findFirstOrThrow: (args: {
-      where?: WhereInput;
-      include?: Include;
-    }) => Promise<T>;
-  },
+  OrderByWithRelationInput extends object,
 > {
   constructor(
     protected readonly prisma: PrismaService,
-    protected readonly model: PrismaModel,
+    protected readonly model: GenericPrismaModel<
+      T,
+      CreateInput,
+      UpdateInput,
+      WhereUniqueInput,
+      WhereInput,
+      Include,
+      OrderByWithRelationInput
+    >,
     private readonly repository: BaseRepository<
       T,
       CreateInput,
@@ -44,11 +31,18 @@ export class BaseScope<
       WhereUniqueInput,
       WhereInput,
       Include,
-      PrismaModel
+      OrderByWithRelationInput
     >,
   ) {}
+
   protected _where: WhereInput = {} as WhereInput;
   protected _include: Include = {} as Include;
+  protected _orderBy: OrderByWithRelationInput = {} as OrderByWithRelationInput;
+
+  orderBy(orderBy: OrderByWithRelationInput) {
+    this._orderBy = orderBy;
+    return this;
+  }
 
   filterById(id: string) {
     (this._where as { id: string }).id = id;
@@ -76,6 +70,7 @@ export class BaseScope<
     return this.repository.findManyPaginated(page, pageSize, {
       where: this._where,
       include: this._include,
+      orderBy: this._orderBy,
     });
   }
 
