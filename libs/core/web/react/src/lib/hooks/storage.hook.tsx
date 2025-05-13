@@ -86,3 +86,17 @@ export const useGetSuggestedFiles = () => {
     retry: false,
   });
 };
+
+export const useGetFoldersForTree = ({
+  filters = {},
+  enabled = true,
+}: StorageQueryProps = {}) => {
+  return useQuery<PaginationDto<FileMinViewDto>, ApiError>({
+    queryKey: ['storage', 'tree', filters],
+    queryFn: () => {
+      return StorageService.getFoldersForTree(filters);
+    },
+    enabled,
+    retry: false,
+  });
+};

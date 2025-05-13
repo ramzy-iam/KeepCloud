@@ -530,29 +530,4 @@ export const fileTreeFolders: File[] = [
     ],
     parentId: null,
   },
-  {
-    id: '2',
-    name: 'Shared with me',
-    owner: { id: 'user1', firstName: 'John', lastName: 'Doe', picture: '' },
-
-    fileType: 'folder',
-    size: 0,
-    lastModified: '2025-05-03T10:00:00Z',
-    ancestors: [],
-    children: [
-      {
-        id: '2.1',
-        name: 'Team',
-        owner: { id: 'user1', firstName: 'John', lastName: 'Doe', picture: '' },
-
-        fileType: 'folder',
-        size: 0,
-        lastModified: '2025-05-03T10:00:00Z',
-        children: [],
-        ancestors: [{ id: '2', name: 'Shared with me' }],
-        parentId: '2',
-      },
-    ],
-    parentId: null,
-  },
 ];

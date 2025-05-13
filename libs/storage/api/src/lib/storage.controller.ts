@@ -39,4 +39,10 @@ export class StorageController {
   getSuggestedFiles() {
     return this.storageService.getSuggestedFiles();
   }
+
+  @Get('tree')
+  @Serialize(new PaginationDto(FileMinViewDto))
+  getFoldersForTree(@Query() filters: FolderFilterDto) {
+    return this.storageService.getFoldersForTree(filters);
+  }
 }

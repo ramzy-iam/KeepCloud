@@ -13,10 +13,10 @@ export class UserRepository extends BaseRepository<
   Prisma.UserWhereUniqueInput,
   Prisma.UserWhereInput,
   Prisma.UserInclude,
-  PrismaClient['user']
+  Prisma.UserOrderByWithRelationInput
 > {
   constructor(protected readonly prisma: PrismaService) {
-    super(prisma, prisma.user);
+    super(prisma.user);
   }
 
   get scoped() {
