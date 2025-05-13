@@ -28,11 +28,14 @@ export default function FolderDetailsComponent({
     query: { withAncestors: true },
   });
 
-  const { data: folderChildren = [], isLoading: isLoadingChildren } =
-    useGetFolderChildren({
-      id: params.folderId,
-      enabled: !!folder,
-    });
+  const {
+    data: folderChildren = [],
+    isLoading: isLoadingChildren,
+    isFetched,
+  } = useGetFolderChildren({
+    id: params.folderId,
+    enabled: !!folder,
+  });
 
   useEffect(() => {
     if (!folder) return;
@@ -42,10 +45,8 @@ export default function FolderDetailsComponent({
     });
   }, [folder]);
 
-  if (isLoading || isLoadingChildren) return <div>Loading...</div>;
-
-  if (error || !folder) {
-    return (
+  if (error || !folder || !isFetched) {
+    return isFetched ? null : (
       <div>
         <h3 className="sticky top-0 z-[1] bg-background p-1.5 text-18-medium text-heading">
           Folder not found
@@ -88,6 +89,7 @@ export default function FolderDetailsComponent({
         }}
         columns={columns}
         title={folder.name}
+        isLoading={isLoading || isLoadingChildren}
         onBreadcrumbClick={handleBreadcrumbClick}
       />
     </div>
