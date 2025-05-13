@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma';
 import { BaseRepository } from '../base';
 import { SubscriptionPlan } from '../../entities';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '../../prisma';
 import { SubscriptionPlanScope } from './plan.scope';
 
 @Injectable()
@@ -13,10 +13,10 @@ export class SubscriptionPlanRepository extends BaseRepository<
   Prisma.SubscriptionPlanWhereUniqueInput,
   Prisma.SubscriptionPlanWhereInput,
   Prisma.SubscriptionPlanInclude,
-  PrismaService['subscriptionPlan']
+  Prisma.SubscriptionPlanOrderByWithRelationInput
 > {
   constructor(protected readonly prisma: PrismaService) {
-    super(prisma, prisma.subscriptionPlan);
+    super(prisma.subscriptionPlan);
   }
 
   get scoped() {

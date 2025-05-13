@@ -12,14 +12,13 @@ import {
 import { UserProfileIcon } from '../../user';
 import { UserProfileDto } from '@keepcloud/commons/dtos';
 import { HomeMenu } from './menus/home';
-import { FileTree } from './menus/folder';
 import { NavLink, useLocation } from 'react-router';
 import {
   SidebarHomeIcon,
   SidebarFolderIcon,
   SidebarOverviewIcon,
 } from './icons';
-import { fileTreeFolders } from '@keepcloud/commons/types';
+import { RootTree } from './menus/file-tree';
 
 const SidebarItems = [
   {
@@ -34,7 +33,7 @@ const SidebarItems = [
   },
 ];
 
-const contents = [<HomeMenu />, <FileTree files={fileTreeFolders} />];
+const contents = [<HomeMenu />, <RootTree />];
 
 interface AppSidebarProps {
   user: UserProfileDto;

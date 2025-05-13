@@ -37,6 +37,12 @@ class StorageService extends BaseHttpService {
       params: { page: 1, pageSize: 15 },
     });
   }
+
+  async getFoldersForTree(filters: FolderFilterDto) {
+    return this.get<PaginationDto<FileMinViewDto>>('/tree', {
+      params: filters,
+    });
+  }
 }
 
 export default new StorageService();

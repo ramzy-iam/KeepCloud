@@ -2,38 +2,79 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-  ROUTE_PATH,
+  DEFAULT_ACTIVE_FOLDER,
   SidebarMenuButton,
+  useGetActiveFolder,
 } from '@keepcloud/web-core/react';
-import { FolderIcon } from '../../../ui';
-import { ChevronRightIcon } from 'lucide-react';
+import { FolderIcon } from '../../../../ui';
+import { ChevronRightIcon, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { File } from '@keepcloud/commons/types';
 import { useLocation, useNavigate } from 'react-router';
+import { FileMinViewDto } from '@keepcloud/commons/dtos';
 
 interface FileNodeProps {
-  file: File;
+  file: FileMinViewDto;
   icon?: React.ReactNode;
   noIcon?: boolean;
   children?: React.ReactNode;
+  fetchChildren?: () => Promise<FileMinViewDto[]>;
+  isRoot?: boolean;
+  url: string;
 }
 
-const FileNode = ({
+export const FileNode = ({
   file,
   icon = <FolderIcon />,
   noIcon = false,
   children,
+  fetchChildren,
+  isRoot = false,
+  url,
 }: FileNodeProps) => {
   const { name, id } = file;
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const { setActiveFolder } = useGetActiveFolder();
   const [open, setOpen] = useState(false);
   const [isActive, setIsActive] = useState(false);
-  const url = ROUTE_PATH.folderDetails(id);
-  const { pathname } = useLocation();
+  const [loadedChildren, setLoadedChildren] = useState<FileMinViewDto[]>(
+    file.children || [],
+  );
+  const [isChildrenLoading, setIsChildrenLoading] = useState(false);
 
   useEffect(() => {
     setIsActive(pathname === url);
   }, [pathname, url]);
+
+  const handleFetchChildren = async () => {
+    if (fetchChildren && !loadedChildren.length) {
+      setIsChildrenLoading(true);
+      try {
+        const children = await fetchChildren();
+        setLoadedChildren(children);
+      } finally {
+        setIsChildrenLoading(false);
+      }
+    }
+  };
+
+  const handleToggle = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setOpen((prev) => !prev);
+    if (!open && fetchChildren) {
+      await handleFetchChildren();
+    }
+  };
+
+  const handleNavigate = () => {
+    if (isRoot) {
+      setActiveFolder(DEFAULT_ACTIVE_FOLDER);
+      navigate('/folders');
+    } else if (id) {
+      setActiveFolder({ id, name, system: false });
+      navigate(url);
+    }
+  };
 
   return (
     <Collapsible
@@ -44,16 +85,11 @@ const FileNode = ({
       <SidebarMenuButton
         isActive={isActive}
         className="flex w-full gap-0 hover:bg-sidebar-accent/30 dark:hover:bg-sidebar-accent/50"
-        onClick={() => {
-          navigate(url);
-        }}
+        onClick={handleNavigate}
       >
         <CollapsibleTrigger asChild>
           <span
-            onClick={(e) => {
-              e.stopPropagation();
-              setOpen((prev) => !prev);
-            }}
+            onClick={handleToggle}
             aria-expanded={open}
             aria-label={`Toggle ${name} folder`}
           >
@@ -74,51 +110,16 @@ const FileNode = ({
       </SidebarMenuButton>
 
       <CollapsibleContent className="-pl-3 relative before:absolute before:top-0 before:bottom-0 before:left-2 before:w-px before:bg-border">
-        <div className="ml-2">{children}</div>
+        <div className="ml-2">
+          {isChildrenLoading ? (
+            <div className="flex items-center justify-center p-2">
+              <Loader2 className="animate-spin" size={16} />
+            </div>
+          ) : (
+            children
+          )}
+        </div>
       </CollapsibleContent>
     </Collapsible>
-  );
-};
-
-const FileTreeNode = ({ file }: { file: File }) => {
-  if (file.fileType !== 'folder') {
-    return null;
-  }
-
-  const sortedChildren = file.children
-    ? [...file.children]
-        .filter((child) => child.fileType === 'folder')
-        .sort((a, b) => a.name.localeCompare(b.name))
-    : [];
-
-  return (
-    <FileNode file={file} icon={<FolderIcon />} noIcon={false}>
-      {sortedChildren.map((child) => (
-        <FileTreeNode key={child.id} file={child} />
-      ))}
-    </FileNode>
-  );
-};
-
-interface FileTreeProps {
-  files: File[];
-}
-
-export const FileTree = ({ files }: FileTreeProps) => {
-  const rootFolders = [...files]
-    .filter((file) => file.fileType === 'folder')
-    .sort((a, b) => a.name.localeCompare(b.name));
-
-  return (
-    <div>
-      {rootFolders.map((file) => (
-        <FileNode key={file.id} file={file} noIcon={true}>
-          {file.children
-            ?.filter((child) => child.fileType === 'folder')
-            .sort((a, b) => a.name.localeCompare(b.name))
-            .map((child) => <FileTreeNode key={child.id} file={child} />)}
-        </FileNode>
-      ))}
-    </div>
   );
 };

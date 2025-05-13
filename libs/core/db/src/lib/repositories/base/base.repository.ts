@@ -1,6 +1,6 @@
 import { PAGINATION } from '@keepcloud/commons/constants';
-import { PrismaService } from '../../prisma';
 import { PaginationDto, MetaDto } from '@keepcloud/commons/dtos';
+import { GenericPrismaModel } from './model';
 
 export interface Scoped<T> {
   readonly scoped: T;
@@ -13,34 +13,18 @@ export abstract class BaseRepository<
   WhereUniqueInput extends object,
   WhereInput extends object,
   Include extends object,
-  PrismaModel extends {
-    findFirst: (args: {
-      where: WhereInput;
-      include: Include;
-    }) => Promise<T | null>;
-    findMany: (args: {
-      where?: WhereInput;
-      include?: Include;
-      skip?: number;
-      take?: number;
-    }) => Promise<T[]>;
-    count: (args: { where?: WhereInput }) => Promise<number>;
-    create: (args: { data: CreateInput }) => Promise<T>;
-    update: (args: {
-      where: WhereUniqueInput;
-      data: UpdateInput;
-    }) => Promise<T>;
-    delete: (args: { where: WhereUniqueInput }) => Promise<T>;
-    findFirstOrThrow: (args: {
-      where?: WhereInput;
-      include?: Include;
-    }) => Promise<T>;
-  },
-> implements Scoped<unknown>
-{
+  OrderByWithRelationInput extends object,
+> {
   constructor(
-    protected readonly prisma: PrismaService,
-    protected readonly model: PrismaModel,
+    protected readonly model: GenericPrismaModel<
+      T,
+      CreateInput,
+      UpdateInput,
+      WhereUniqueInput,
+      WhereInput,
+      Include,
+      OrderByWithRelationInput
+    >,
   ) {}
 
   abstract get scoped(): unknown;
@@ -58,17 +42,31 @@ export abstract class BaseRepository<
   async findMany({
     where,
     include,
-  }: { where?: WhereInput; include?: Include } = {}) {
+    orderBy,
+  }: {
+    where?: WhereInput;
+    include?: Include;
+    orderBy?: OrderByWithRelationInput;
+  } = {}) {
     return this.model.findMany({
       where,
       include,
+      orderBy,
     });
   }
 
   async findManyPaginated(
     page: number = PAGINATION.DEFAULT_PAGE,
     pageSize: number = PAGINATION.DEFAULT_PAGE_SIZE,
-    { where, include }: { where?: WhereInput; include?: Include } = {},
+    {
+      where,
+      include,
+      orderBy,
+    }: {
+      where?: WhereInput;
+      include?: Include;
+      orderBy?: OrderByWithRelationInput;
+    } = {},
   ): Promise<PaginationDto<T>> {
     const safePage = Math.max(1, page);
     const safePageSize = Math.max(
@@ -82,6 +80,7 @@ export abstract class BaseRepository<
       this.model.findMany({
         where,
         include,
+        orderBy,
         skip,
         take: safePageSize,
       }),

@@ -38,16 +38,13 @@ export class FolderController {
     return this.folderService.create({ ...dto, ownerId: user.id });
   }
 
-  @Get(':id/children')
+  @Get('children')
   @Serialize(new PaginationDto(FileMinViewDto))
   async getChildren(
     @Param('id') id: string,
     @Query() filters: FolderFilterDto,
   ) {
     return this.folderService.getChildren(id, filters);
-    // const { items, meta } = await this.folderService.getChildren(id, filters);
-    // console.log({ items, meta });
-    // return { items, meta };
   }
 
   @Get(':id')

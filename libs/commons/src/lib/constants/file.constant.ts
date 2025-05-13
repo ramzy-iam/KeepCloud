@@ -73,7 +73,7 @@ export const SYSTEM_FILE = {
   },
   SHARED_WITH_ME: {
     id: 'null',
-    name: 'shared-with-me',
+    name: 'Shared with me',
     code: 'SHARED_WITH_ME',
     isSystem: true,
     invalidationKey: 'SHARED_WITH_ME',

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma, PrismaClient, User } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import { PrismaService } from '../../prisma';
 import { BaseScope } from '../base/base.scope';
 import { UserRepository } from './user.repository';
@@ -12,7 +12,7 @@ export class UserScope extends BaseScope<
   Prisma.UserWhereUniqueInput,
   Prisma.UserWhereInput,
   Prisma.UserInclude,
-  PrismaClient['user']
+  Prisma.UserOrderByWithRelationInput
 > {
   constructor(
     protected readonly prisma: PrismaService,
