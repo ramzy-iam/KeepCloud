@@ -55,15 +55,34 @@ export const useGetTrashedItems = ({
   });
 };
 
-// export const useGetSuggestedRessource({
-
-//   GetSuggestedResourceProps
-// })
-
 export const useGetKeyToInvalidateBasedOnActiveFolder = () => {
   const { activeFolder } = useGetActiveFolder();
   if (activeFolder.system) {
     return [activeFolder.invalidationKey];
   }
   return ['folder', activeFolder.id, 'children'];
+};
+
+export const useGetSuggestedFolders = () => {
+  return useQuery<FileMinViewDto[], ApiError>({
+    queryKey: ['storage', 'suggested-folders'],
+    queryFn: async () => {
+      const data = await StorageService.getSuggestedFolders();
+      return data.items;
+    },
+    enabled: true,
+    retry: false,
+  });
+};
+
+export const useGetSuggestedFiles = () => {
+  return useQuery<FileMinViewDto[], ApiError>({
+    queryKey: ['storage', 'suggested-files'],
+    queryFn: async () => {
+      const data = await StorageService.getSuggestedFiles();
+      return data.items;
+    },
+    enabled: true,
+    retry: false,
+  });
 };
