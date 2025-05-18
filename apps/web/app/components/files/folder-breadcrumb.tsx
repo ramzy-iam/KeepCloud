@@ -97,7 +97,7 @@ export const FolderBreadcrumb = ({
         ))}
 
         {/* Current folder */}
-        <TooltipProviderWrapper content={folder.name}>
+        <TooltipProviderWrapper content={folder.name} sideOffset={0}>
           <BreadcrumbItem className="max-w-[70%] md:max-w-[80%]">
             <BreadcrumbPage className="truncate">
               <h4 className="truncate text-20-medium text-heading">
