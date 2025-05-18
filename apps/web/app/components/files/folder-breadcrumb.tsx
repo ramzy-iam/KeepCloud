@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
   BreadcrumbEllipsis,
   useSidebar,
-  ROUTE_PATH,
+  TooltipProviderWrapper,
 } from '@keepcloud/web-core/react';
 import { useNavigate } from 'react-router';
 import { FileAncestor, FileMinViewDto } from '@keepcloud/commons/dtos';
@@ -82,31 +82,30 @@ export const FolderBreadcrumb = ({
         {/* Visible ancestors */}
         {visibleAncestors.map((ancestor) => (
           <React.Fragment key={ancestor.id}>
-            <BreadcrumbItem
-              className="cursor-pointer rounded-[16px] px-4 py-1 text-heading hover:bg-stroke-200 dark:hover:bg-white/5"
-              onClick={() => {
-                onBreadcrumbClick && onBreadcrumbClick(ancestor);
-              }}
-            >
-              <h4 className="truncate text-20-medium" title={ancestor.name}>
-                {ancestor.name}
-              </h4>
-            </BreadcrumbItem>
+            <TooltipProviderWrapper content={ancestor.name}>
+              <BreadcrumbItem
+                className="cursor-pointer rounded-[16px] px-4 py-1 text-heading hover:bg-stroke-200 dark:hover:bg-white/5"
+                onClick={() => {
+                  onBreadcrumbClick && onBreadcrumbClick(ancestor);
+                }}
+              >
+                <h4 className="truncate text-20-medium">{ancestor.name}</h4>
+              </BreadcrumbItem>
+            </TooltipProviderWrapper>
             <BreadcrumbSeparator />
           </React.Fragment>
         ))}
 
         {/* Current folder */}
-        <BreadcrumbItem className="max-w-[70%] md:max-w-[80%]">
-          <BreadcrumbPage className="truncate">
-            <h4
-              className="truncate text-20-medium text-heading"
-              title={folder.name}
-            >
-              {folder.name}
-            </h4>
-          </BreadcrumbPage>
-        </BreadcrumbItem>
+        <TooltipProviderWrapper content={folder.name}>
+          <BreadcrumbItem className="max-w-[70%] md:max-w-[80%]">
+            <BreadcrumbPage className="truncate">
+              <h4 className="truncate text-20-medium text-heading">
+                {folder.name}
+              </h4>
+            </BreadcrumbPage>
+          </BreadcrumbItem>
+        </TooltipProviderWrapper>
       </BreadcrumbList>
     </Breadcrumb>
   );
