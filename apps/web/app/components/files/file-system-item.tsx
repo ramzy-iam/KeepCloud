@@ -1,10 +1,7 @@
 import {
   Button,
   ROUTE_PATH,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
+  TooltipProviderWrapper,
   cn,
   useFileMenu,
   useGetActiveFolder,
@@ -45,23 +42,19 @@ export const FileSystemItem = ({ file, className }: FileSystemItemProps) => {
       )}
       onClick={handleClick}
     >
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="flex max-w-[calc(100%-24px)] items-center gap-2 overflow-hidden">
-              {isFolder ? (
-                <FolderIconOutline />
-              ) : (
-                <FileTextIcon className="h-4 w-4 text-app-accent" />
-              )}
-              <p className="truncate text-left text-14-medium text-secondary-foreground">
-                {file.name}
-              </p>
-            </div>
-          </TooltipTrigger>
-          <TooltipContent>{file.name}</TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <TooltipProviderWrapper content={file.name} sideOffset={12}>
+        <div className="flex max-w-[calc(100%-24px)] items-center gap-2 overflow-hidden">
+          {isFolder ? (
+            <FolderIconOutline />
+          ) : (
+            <FileTextIcon className="h-4 w-4 text-app-accent" />
+          )}
+          <p className="truncate text-left text-14-medium text-secondary-foreground">
+            {file.name}
+          </p>
+        </div>
+      </TooltipProviderWrapper>
+
       <FileMenu>
         <Button
           variant={'text'}
