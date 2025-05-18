@@ -66,15 +66,21 @@ function TooltipContent({
 function TooltipProviderWrapper({
   children,
   content,
+  withArrow,
+  sideOffset = 5,
 }: {
   children: React.ReactNode;
   content: React.ReactNode;
+  withArrow?: boolean;
+  sideOffset?: number;
 }) {
   return (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>{children}</TooltipTrigger>
-        <TooltipContent>{content}</TooltipContent>
+        <TooltipContent withArrow={withArrow} sideOffset={sideOffset}>
+          {content}
+        </TooltipContent>
       </Tooltip>
     </TooltipProvider>
   );
