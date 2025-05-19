@@ -142,7 +142,7 @@ const MiniBreadcrumb = ({
                   ? onBreadcrumbClick(ancestor)
                   : defaultOnClick(ancestor);
               }}
-              className="rounded-[16px] px-4 py-2 text-secondary-foreground hover:bg-stroke-200 dark:hover:bg-white/5"
+              className="cursor-pointer rounded-[16px] px-4 py-2 text-secondary-foreground hover:bg-stroke-200 dark:hover:bg-white/5"
             >
               {ancestor.name}
             </BreadcrumbItem>
