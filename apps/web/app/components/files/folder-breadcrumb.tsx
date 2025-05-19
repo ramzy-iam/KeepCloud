@@ -179,7 +179,7 @@ export const FileLocationBreadcrumbHover = ({
       <HoverCardContent
         side="left"
         sideOffset={-200}
-        className="w-fit max-w-svw rounded-[16px] p-2"
+        className="w-fit max-w-svw rounded-[32px] p-2"
       >
         <MiniBreadcrumb folder={folder} />
       </HoverCardContent>
