@@ -60,23 +60,23 @@ export default function FolderDetailsComponent({
     );
   }
 
-  const enhancedAncestors: FileAncestor[] = [
-    { id: 'null', name: SYSTEM_FILE.MY_STORAGE.name },
-    ...(folder.ancestors || []),
-  ];
+  const enhancedAncestors: FileAncestor[] = folder.ancestors || [];
 
   const handleBreadcrumbClick = (ancestor: FileAncestor) => {
-    if (ancestor.id == 'null') {
-      setActiveFolder(DEFAULT_ACTIVE_FOLDER);
-      navigate(ROUTE_PATH.folder);
-    } else {
-      setActiveFolder({
-        id: ancestor.id,
-        name: ancestor.name,
-      });
+    const activeFolder =
+      ancestor.id === 'null'
+        ? DEFAULT_ACTIVE_FOLDER
+        : {
+            id: ancestor.id,
+            name: ancestor.name,
+          };
+    setActiveFolder(activeFolder);
 
-      navigate(ROUTE_PATH.folderDetails(ancestor.id));
-    }
+    const route = ancestor.isSystem
+      ? ROUTE_PATH.system(ancestor.code)
+      : ROUTE_PATH.folderDetails(ancestor.id);
+
+    navigate(route);
   };
 
   return (

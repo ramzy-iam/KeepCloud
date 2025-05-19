@@ -118,6 +118,12 @@ export class FileAncestor {
 
   @Expose()
   name: string;
+
+  @Expose()
+  code?: string;
+
+  @Expose()
+  isSystem?: boolean;
 }
 
 export class GetOneFolderQueryDto {
