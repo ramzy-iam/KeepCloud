@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { File, FileRepository, FileType } from '@keepcloud/core/db';
 import { PaginationDto, FolderFilterDto } from '@keepcloud/commons/dtos';
+import { SYSTEM_FILE } from '@keepcloud/commons/constants';
 
 @Injectable()
 export class StorageService {
@@ -35,7 +36,15 @@ export class StorageService {
       const ancestors = await this.fileRepository.getAncestors(item.id);
       return {
         ...item,
-        ancestors,
+        ancestors: [
+          {
+            id: SYSTEM_FILE.MY_STORAGE.id,
+            name: SYSTEM_FILE.MY_STORAGE.name,
+            code: SYSTEM_FILE.MY_STORAGE.code,
+            isSystem: true,
+          },
+          ...ancestors,
+        ],
       };
     });
 

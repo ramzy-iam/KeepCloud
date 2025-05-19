@@ -12,7 +12,7 @@ import { DayjsHelper } from '@keepcloud/commons/helpers';
 import {
   FolderIconOutline,
   OwnerIcon,
-  FileLocationBreadcrumbHover,
+  FileLocationBreadcrumb,
 } from '../../../../components';
 import { ColumnDef } from '@tanstack/react-table';
 import { useNavigate } from 'react-router';
@@ -128,7 +128,7 @@ export const columns: ColumnDef<FileMinViewDto>[] = [
     cell: ({ row }) => {
       return (
         <div className="w-full max-w-[130px] truncate overflow-hidden text-right whitespace-nowrap">
-          <FileLocationBreadcrumbHover folder={row.original} />
+          <FileLocationBreadcrumb folder={row.original} />
         </div>
       );
     },
