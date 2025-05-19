@@ -10,6 +10,7 @@ import {
 } from '@keepcloud/web-core/react';
 import { UserProfileDto } from '@keepcloud/commons/dtos';
 import {
+  AppDialogsWrapper,
   AppSidebar,
   GlobalSearch,
   QuickActionButtons,
@@ -61,6 +62,7 @@ export default function Layout() {
             </div>
           </div>
         </main>
+        <AppDialogsWrapper />
       </SidebarProvider>
     </div>
   );

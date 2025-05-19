@@ -7,17 +7,5 @@ export abstract class BaseFileService {
 
   abstract create(dto: unknown): Promise<File>;
 
-  rename(id: string, name: string): Promise<File> {
-    return this.fileRepository.update({ id }, { name });
-  }
-
-  delete(id: string): Promise<unknown> {
-    return this.fileRepository.update({ id }, { trashedAt: new Date() });
-  }
-
-  restore(id: string): Promise<File> {
-    return this.fileRepository.update({ id }, { trashedAt: null });
-  }
-
   abstract getOne(...args: unknown[]): Promise<unknown>;
 }

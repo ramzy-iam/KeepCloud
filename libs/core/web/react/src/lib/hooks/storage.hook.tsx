@@ -1,16 +1,21 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   PaginationDto,
   FolderFilterDto,
   FileMinViewDto,
 } from '@keepcloud/commons/dtos';
-import { StorageService, ApiError } from '../services';
+import { StorageService, ApiError, KeyToInvalidate } from '../services';
 import { SYSTEM_FILE } from '@keepcloud/commons/constants';
 import { useGetActiveFolder } from './folder.hook';
+import { toast } from 'sonner';
 
 interface StorageQueryProps {
   filters?: FolderFilterDto;
   enabled?: boolean;
+}
+
+interface RenameResourceProps extends KeyToInvalidate {
+  resourceName: string;
 }
 
 export const useGetRootItems = ({
@@ -46,7 +51,7 @@ export const useGetTrashedItems = ({
   enabled = true,
 }: StorageQueryProps = {}) => {
   return useQuery<PaginationDto<FileMinViewDto>, ApiError>({
-    queryKey: [SYSTEM_FILE.SHARED_WITH_ME.invalidationKey],
+    queryKey: [SYSTEM_FILE.TRASH.invalidationKey],
     queryFn: () => {
       return StorageService.getTrashedItems(filters);
     },
@@ -57,7 +62,7 @@ export const useGetTrashedItems = ({
 
 export const useGetKeyToInvalidateBasedOnActiveFolder = () => {
   const { activeFolder } = useGetActiveFolder();
-  if (activeFolder.system) {
+  if (activeFolder.isSystem) {
     return [activeFolder.invalidationKey];
   }
   return ['folder', activeFolder.id, 'children'];
@@ -98,5 +103,78 @@ export const useGetFoldersForTree = ({
     },
     enabled,
     retry: false,
+  });
+};
+
+export const useRenameResource = ({
+  keysToInvalidate,
+  resourceName,
+}: RenameResourceProps) => {
+  const queryClient = useQueryClient();
+
+  return useMutation<FileMinViewDto, ApiError, { id: string; name: string }>({
+    mutationFn: ({ id, name }) => StorageService.rename(id, name),
+    onSuccess: () => {
+      toast.success(`${resourceName} renamed successfully`);
+    },
+    onSettled: () => {
+      keysToInvalidate.map((key) => {
+        queryClient.invalidateQueries({ queryKey: key });
+      });
+    },
+  });
+};
+
+export const useMoveToTrash = ({
+  keysToInvalidate,
+  resourceName,
+}: RenameResourceProps) => {
+  const queryClient = useQueryClient();
+  return useMutation<FileMinViewDto, ApiError, string>({
+    mutationFn: (id) => StorageService.moveToTrash(id),
+    onSuccess: () => {
+      toast.success(`${resourceName}  moved to trash`);
+    },
+    onSettled: () => {
+      keysToInvalidate.map((key) => {
+        queryClient.invalidateQueries({ queryKey: key });
+      });
+    },
+  });
+};
+
+export const useRestoreResource = ({
+  keysToInvalidate,
+  resourceName,
+}: RenameResourceProps) => {
+  const queryClient = useQueryClient();
+  return useMutation<FileMinViewDto, ApiError, string>({
+    mutationFn: (id) => StorageService.restore(id),
+    onSuccess: () => {
+      toast.success(`${resourceName} restored successfully`);
+    },
+    onSettled: () => {
+      keysToInvalidate.map((key) => {
+        queryClient.invalidateQueries({ queryKey: key });
+      });
+    },
+  });
+};
+
+export const useDeletePermanently = ({
+  keysToInvalidate,
+  resourceName,
+}: RenameResourceProps) => {
+  const queryClient = useQueryClient();
+  return useMutation<FileMinViewDto, ApiError, string>({
+    mutationFn: (id) => StorageService.deletePermanently(id),
+    onSuccess: () => {
+      toast.success(`${resourceName} deleted permanently`);
+    },
+    onSettled: () => {
+      keysToInvalidate.map((key) => {
+        queryClient.invalidateQueries({ queryKey: key });
+      });
+    },
   });
 };
