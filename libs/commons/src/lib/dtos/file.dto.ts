@@ -149,3 +149,8 @@ export class FolderFilterDto extends BaseFilterDto {
   @IsOptional()
   type?: FileType;
 }
+
+export class TrashedFileDto extends FileMinViewDto {
+  @Expose()
+  trashedAt: Date;
+}

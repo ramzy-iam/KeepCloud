@@ -2,6 +2,7 @@ import {
   PaginationDto,
   FolderFilterDto,
   FileMinViewDto,
+  TrashedFileDto,
 } from '@keepcloud/commons/dtos';
 import { BaseHttpService } from './base.service';
 
@@ -21,7 +22,7 @@ class StorageService extends BaseHttpService {
   }
 
   async getTrashedItems(filters: FolderFilterDto) {
-    return this.get<PaginationDto<FileMinViewDto>>('/trash', {
+    return this.get<PaginationDto<TrashedFileDto>>('/trash', {
       params: filters,
     });
   }

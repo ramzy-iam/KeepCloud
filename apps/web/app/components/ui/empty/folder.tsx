@@ -11,3 +11,17 @@ export const FolderEmpty = () => {
     </div>
   );
 };
+
+export const TrashEmpty = () => {
+  return (
+    <div className="flex flex-col items-center justify-center py-5">
+      <img src="/assets/svg/empty-folder.svg" className="h-20 md:h-60" alt="" />
+      <h3 className="text-16-medium text-heading md:text-18-medium">
+        Trash is empty
+      </h3>
+      <p className="text-12 md:text-14">
+        The items in the trash will be deleted permanently after 30 days.
+      </p>
+    </div>
+  );
+};
