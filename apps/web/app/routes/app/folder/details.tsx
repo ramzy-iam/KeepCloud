@@ -45,8 +45,8 @@ export default function FolderDetailsComponent({
     });
   }, [folder]);
 
-  if (error || !folder || !isFetched) {
-    return isFetched ? null : (
+  if (error || !folder) {
+    return isLoading ? null : (
       <div>
         <h3 className="sticky top-0 z-[1] bg-background p-1.5 text-18-medium text-heading">
           Folder not found
@@ -80,18 +80,16 @@ export default function FolderDetailsComponent({
   };
 
   return (
-    <div className="flex flex-col gap-6">
-      <FolderView
-        folder={{
-          ...folder,
-          ancestors: enhancedAncestors,
-          children: folderChildren,
-        }}
-        columns={columns}
-        title={folder.name}
-        isLoading={isLoading || isLoadingChildren}
-        onBreadcrumbClick={handleBreadcrumbClick}
-      />
-    </div>
+    <FolderView
+      folder={{
+        ...folder,
+        ancestors: enhancedAncestors,
+        children: folderChildren,
+      }}
+      columns={columns}
+      title={folder.name}
+      isLoading={isLoading || isLoadingChildren}
+      onBreadcrumbClick={handleBreadcrumbClick}
+    />
   );
 }

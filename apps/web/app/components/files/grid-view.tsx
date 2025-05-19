@@ -1,6 +1,7 @@
 import { FileSystemItem } from './file-system-item';
 import { FileMinViewDto } from '@keepcloud/commons/dtos';
-import { Skeleton } from '@keepcloud/web-core/react';
+import { Skeleton, cn } from '@keepcloud/web-core/react';
+import { FolderEmpty } from '../ui';
 
 interface GridViewProps {
   data: FileMinViewDto[];
@@ -31,6 +32,8 @@ export const GridView = ({
   let itemsToDisplay: FileMinViewDto[] = onlyFolders
     ? data.filter((item) => !item.format)
     : data;
+
+  const isFolderEmpty = itemsToDisplay.length === 0;
 
   if (group) {
     const files = data.filter((item) => item.format);
@@ -63,10 +66,19 @@ export const GridView = ({
   }
 
   return (
-    <div className="flex flex-col flex-wrap gap-3 sm:flex-row md:gap-8">
-      {itemsToDisplay.map((item) => (
-        <FileSystemItem key={item.id} file={item} />
-      ))}
+    <div
+      className={cn(
+        'flex h-full flex-col flex-wrap gap-3 sm:flex-row md:gap-8',
+        isFolderEmpty && 'flex-row items-center justify-center',
+      )}
+    >
+      {isFolderEmpty ? (
+        <FolderEmpty />
+      ) : (
+        itemsToDisplay.map((item) => (
+          <FileSystemItem key={item.id} file={item} />
+        ))
+      )}
     </div>
   );
 };

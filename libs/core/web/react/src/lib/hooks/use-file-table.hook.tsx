@@ -23,6 +23,7 @@ import {
   Skeleton,
 } from '../components';
 import { AlertCircle } from 'lucide-react';
+import { cn } from '../helpers';
 
 interface UseFileTableProps<TData> {
   data: TData[];
@@ -46,6 +47,7 @@ interface UseFileTableReturn<TData> {
 const renderDefaultNoRowsComponent = () => (
   <div className="flex flex-col items-center justify-center gap-2 py-4 text-muted-foreground">
     <AlertCircle className="h-8 w-8 text-primary" />
+    <img src={'/'} alt="" />
     <h2 className="text-16-medium-medium text-heading">
       Drag and drop files here
     </h2>
@@ -119,6 +121,8 @@ export function useFileTable<TData>({
     },
   });
 
+  const hasRows = table.getRowModel().rows?.length > 0;
+
   const TableComponent: React.FC<{
     header?: React.ReactNode;
     footer?: React.ReactNode;
@@ -137,16 +141,14 @@ export function useFileTable<TData>({
         );
       }
 
-      const hasRows = table.getRowModel().rows?.length > 0;
-
       if (!hasRows) {
         return (
           <TableRow className="hover:bg-none">
             <TableCell
               colSpan={columns.length}
-              className="h-24 text-center hover:bg-none"
+              className="bg-white-light text-center hover:bg-none dark:bg-background"
             >
-              {noRowsComponent || renderDefaultNoRowsComponent()}
+              <div>{noRowsComponent || renderDefaultNoRowsComponent()}</div>
             </TableCell>
           </TableRow>
         );
@@ -171,32 +173,33 @@ export function useFileTable<TData>({
     };
 
     return (
-      <div className="w-full">
+      <div className={cn('w-full', !hasRows && 'h-full')}>
         {header}
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow
-                  key={headerGroup.id}
-                  className="bg-stroke-50 hover:bg-stroke-50 dark:bg-neutral-800 dark:hover:bg-neutral-800"
-                >
-                  {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
-                    </TableHead>
-                  ))}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>{renderTableBody()}</TableBody>
-          </Table>
-        </div>
+        <Table
+          className={cn(!hasRows && 'h-full')}
+          containerClassName={cn(' rounded-md border', !hasRows && 'h-full')}
+        >
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow
+                key={headerGroup.id}
+                className="bg-stroke-50 hover:bg-stroke-50 dark:bg-neutral-800 dark:hover:bg-neutral-800"
+              >
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>{renderTableBody()}</TableBody>
+        </Table>
         {table.getRowModel().rows.length > 0 && footer}
       </div>
     );

@@ -11,6 +11,7 @@ import {
 } from '@keepcloud/web-core/react';
 import { ColumnDef, Table } from '@tanstack/react-table';
 import { FileMinViewDto } from '@keepcloud/commons/dtos';
+import { FolderEmpty } from '../ui';
 
 interface TableViewProps {
   data: FileMinViewDto[];
@@ -65,12 +66,14 @@ export function TableView({
   header,
   footer: customFooter,
   columns,
+
   onlyFolders = false,
   isLoading = false,
 }: TableViewProps) {
   const { table, TableComponent } = useFileTable({
     data: isLoading ? [] : data, // Pass empty array during loading to avoid table rendering
     columns,
+    noRowsComponent: <FolderEmpty />,
   });
 
   const footer = (
@@ -103,7 +106,7 @@ export function TableView({
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <div className="rounded-md border">
+        <div className="h-full rounded-md border">
           <table className="w-full">
             <thead>
               <tr>

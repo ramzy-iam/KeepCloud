@@ -127,9 +127,14 @@ const ActionButton = ({ action }: ActionButtonProps) => {
   );
 };
 
-export const QuickActionButtons = () => {
+export const QuickActionButtons = ({ className }: { className?: string }) => {
   return (
-    <div className="flex flex-wrap justify-start gap-8 bg-background py-6 md:gap-16">
+    <div
+      className={cn(
+        'flex flex-wrap justify-start gap-8 bg-background py-6 md:gap-16',
+        className,
+      )}
+    >
       {actions.map((action) => (
         <ActionButton key={action.label} action={action} />
       ))}

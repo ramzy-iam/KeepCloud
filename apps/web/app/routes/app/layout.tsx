@@ -52,9 +52,13 @@ export default function Layout() {
               <ModeToggle />
             </div>
           </div>
-          <div className="h-[calc(100%-72px)] max-h-[calc(100%-72px)] overflow-auto px-6 md:px-8">
-            <QuickActionButtons />
-            <Outlet />
+          <div className="mb-2 grid h-[calc(100%-72px)] max-h-[calc(100%-72px)] grid-rows-12 overflow-x-hidden">
+            <div className="row-span-3 px-2 md:px-8">
+              <QuickActionButtons />
+            </div>
+            <div className="row-span-9 overflow-y-auto px-2 md:px-8">
+              <Outlet />
+            </div>
           </div>
         </main>
       </SidebarProvider>
