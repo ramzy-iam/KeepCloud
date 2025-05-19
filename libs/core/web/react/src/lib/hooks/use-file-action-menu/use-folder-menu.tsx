@@ -1,25 +1,21 @@
 import {
   Info,
   Share2,
-  Link,
-  UserCog,
   Copy,
   Move,
   Trash2,
-  Star,
-  Pin,
-  Eye,
   Activity,
   TextCursorInput as RenameIcon,
   FolderOpen,
 } from 'lucide-react';
 import { FileMinViewDto } from '@keepcloud/commons/dtos';
-import { MenuItem, ROUTE_PATH } from '@keepcloud/web-core/react';
+import { MenuItem, ROUTE_PATH, useDialog } from '@keepcloud/web-core/react';
 import { iconClassName, itemClassName } from './config';
 import { useNavigate } from 'react-router';
 
 export const useFolderMenuItems = (file: FileMinViewDto): MenuItem[] => {
   const navigate = useNavigate();
+  const { openDialog } = useDialog();
 
   return [
     {
@@ -43,7 +39,11 @@ export const useFolderMenuItems = (file: FileMinViewDto): MenuItem[] => {
     {
       label: 'Rename',
       icon: <RenameIcon className={iconClassName} />,
-      onClick: () => console.log(`Rename ${file.name}`),
+      onClick: () =>
+        openDialog({
+          type: 'rename',
+          item: file,
+        }),
       className: itemClassName,
     },
     {

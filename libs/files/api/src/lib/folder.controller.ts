@@ -21,7 +21,6 @@ import {
   FolderFilterDto,
   GetOneFolderQueryDto,
   PaginationDto,
-  RenameFolderDto,
 } from '@keepcloud/commons/dtos';
 import { User } from '@keepcloud/core/db';
 
@@ -55,23 +54,5 @@ export class FolderController {
       query.withAncestors,
     );
     return { ...file, ancestors };
-  }
-
-  @Patch(':id/rename')
-  @Serialize(FileMinViewDto)
-  rename(@Param('id') id: string, @Body() dto: RenameFolderDto) {
-    return this.folderService.rename(id, dto.name);
-  }
-
-  @Post(':id/restore')
-  @Serialize(FileMinViewDto)
-  restore(@Param('id') id: string, @Body() dto: RenameFolderDto) {
-    return this.folderService.restore(id);
-  }
-
-  @Delete(':id')
-  @Serialize(FileMinViewDto)
-  delete(@Param('id') id: string) {
-    return this.folderService.delete(id);
   }
 }

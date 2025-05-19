@@ -17,17 +17,6 @@ async function bootstrap() {
       transform: true,
       whitelist: true,
       stopAtFirstError: true,
-      // exceptionFactory: (errors) => {
-      //   const errorsMessages: { [key: string]: string } = {};
-      //   errors.forEach((error) => {
-      //     let message = error.constraints
-      //       ? error.constraints[Object.keys(error.constraints)[0]]
-      //       : '';
-
-      //     errorsMessages[error.property] = message;
-      //   });
-      //   return new BadRequestException(errorsMessages);
-      // },
     }),
   );
   const port = process.env.PORT || 3000;

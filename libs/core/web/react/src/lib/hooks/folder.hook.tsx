@@ -8,7 +8,7 @@ import {
   GetOneFolderQueryDto,
 } from '@keepcloud/commons/dtos';
 import { toast } from 'sonner';
-import { FolderService, ApiError } from '../services';
+import { FolderService, ApiError, KeyToInvalidate } from '../services';
 import {
   ActiveFolder,
   DEFAULT_ACTIVE_FOLDER,
@@ -33,9 +33,7 @@ interface GetChildrenProps {
   enabled?: boolean;
 }
 
-interface CreateFolderProps {
-  keyToInvalidate: unknown[];
-}
+interface CreateFolderProps extends KeyToInvalidate {}
 
 export const useGetActiveFolder = () => {
   const setFolder = useSetAtom(activeFolderAtom);
@@ -74,7 +72,7 @@ export const useInitializeFolderViewMode = () => {
   }, [setView]);
 };
 
-export const useCreateFolder = ({ keyToInvalidate }: CreateFolderProps) => {
+export const useCreateFolder = ({ keysToInvalidate }: CreateFolderProps) => {
   const queryClient = useQueryClient();
   return useMutation<FileMinViewDto, ApiError, CreateFolderDto>({
     mutationFn: async (dto) => {
@@ -86,7 +84,9 @@ export const useCreateFolder = ({ keyToInvalidate }: CreateFolderProps) => {
     },
 
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: [...keyToInvalidate] });
+      keysToInvalidate.map((key) => {
+        queryClient.invalidateQueries({ queryKey: key });
+      });
     },
   });
 };

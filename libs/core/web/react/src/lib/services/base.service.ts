@@ -17,9 +17,9 @@ export abstract class BaseHttpService {
     return data;
   }
 
-  protected async post<T, U>(
+  protected async post<T, U = unknown>(
     endpoint: string,
-    body: U,
+    body?: U,
     config?: AxiosRequestConfig,
   ): Promise<T> {
     const { data } = await this.client.post<T>(
@@ -30,7 +30,7 @@ export abstract class BaseHttpService {
     return data;
   }
 
-  protected async put<T, U>(
+  protected async put<T, U = unknown>(
     endpoint: string,
     body: U,
     config?: AxiosRequestConfig,
@@ -43,9 +43,9 @@ export abstract class BaseHttpService {
     return data;
   }
 
-  protected async patch<T, U>(
+  protected async patch<T, U = unknown>(
     endpoint: string,
-    body: U,
+    body?: U,
     config?: AxiosRequestConfig,
   ): Promise<T> {
     const { data } = await this.client.patch<T>(

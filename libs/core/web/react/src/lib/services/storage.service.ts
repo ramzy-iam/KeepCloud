@@ -43,6 +43,27 @@ class StorageService extends BaseHttpService {
       params: filters,
     });
   }
+
+  async rename(id: string, name: string) {
+    return this.patch<FileMinViewDto, { name: string }>(
+      `/resources/${id}/rename`,
+      {
+        name,
+      },
+    );
+  }
+
+  async moveToTrash(id: string) {
+    return this.post<FileMinViewDto>(`/resources/${id}/trash`);
+  }
+
+  async deletePermanently(id: string) {
+    return this.delete<FileMinViewDto>(`/resources/${id}`);
+  }
+
+  async restore(id: string) {
+    return this.patch<FileMinViewDto>(`/resources/${id}/restore`);
+  }
 }
 
 export default new StorageService();

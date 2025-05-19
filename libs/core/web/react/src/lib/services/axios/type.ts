@@ -12,4 +12,8 @@ interface ApiErrorData {
   details: ApiErrorDetail[];
 }
 
+export interface KeyToInvalidate {
+  keysToInvalidate: unknown[][];
+}
+
 export type ApiError = AxiosError<ApiErrorData>;
