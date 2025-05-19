@@ -25,3 +25,14 @@ export const TrashEmpty = () => {
     </div>
   );
 };
+
+export const SuggestionEmpty = () => {
+  return (
+    <div className="flex flex-col items-center justify-center py-5">
+      <img src="/assets/svg/empty-folder.svg" className="h-20 md:h-60" alt="" />
+      <h3 className="text-16-medium text-heading md:text-18-medium">
+        No suggestions
+      </h3>
+    </div>
+  );
+};

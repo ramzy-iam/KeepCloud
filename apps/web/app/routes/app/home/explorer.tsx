@@ -1,4 +1,4 @@
-import { FolderView } from '../../../components';
+import { FolderView, SuggestionEmpty } from '../../../components';
 import { columns } from './columns';
 import {
   useGetSuggestedFiles,
@@ -20,6 +20,7 @@ export default function ExplorerComponent() {
         fixedView="grid"
         className="mb-0"
         isLoading={isLoadingSuggestedFolders}
+        noDataComponent={<SuggestionEmpty />}
       />
 
       <FolderView
@@ -27,7 +28,7 @@ export default function ExplorerComponent() {
         items={suggestedFiles}
         isLoading={isLoadingSuggestedFiles}
         title="Suggested Files"
-        group={true}
+        noDataComponent={<SuggestionEmpty />}
       />
     </div>
   );
