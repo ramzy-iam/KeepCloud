@@ -14,6 +14,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { GridView } from './grid-view';
 import { TableView } from './table-view';
 import { FolderBreadcrumb } from './folder-breadcrumb';
+import { FolderEmpty } from '../ui';
 
 interface FolderViewProps {
   folder?: FileMinViewDto;
@@ -27,6 +28,7 @@ interface FolderViewProps {
   className?: string;
   isLoading?: boolean;
   onBreadcrumbClick?: (ancestor: FileAncestor) => void;
+  noDataComponent?: React.ReactNode;
 }
 
 export const FolderView = ({
@@ -40,6 +42,7 @@ export const FolderView = ({
   isLoading = false,
   onBreadcrumbClick,
   columns,
+  noDataComponent = <FolderEmpty />,
 }: FolderViewProps) => {
   const { view: preferredViewMode, setFolderViewMode } = useFolderViewMode();
   const [viewMode, setViewMode] = useState<FolderViewMode>(
@@ -122,6 +125,7 @@ export const FolderView = ({
           onlyFolders={displayOnlyFolders}
           group={group}
           isLoading={internalLoading}
+          noDataComponent={noDataComponent}
         />
       ) : (
         <TableView
@@ -129,6 +133,7 @@ export const FolderView = ({
           onlyFolders={displayOnlyFolders}
           columns={columns}
           isLoading={internalLoading}
+          noDataComponent={noDataComponent}
         />
       )}
     </div>

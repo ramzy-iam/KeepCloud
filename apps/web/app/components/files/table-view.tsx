@@ -20,6 +20,7 @@ interface TableViewProps {
   onlyFolders?: boolean;
   columns: ColumnDef<FileMinViewDto>[];
   isLoading?: boolean;
+  noDataComponent?: React.ReactNode;
 }
 
 interface BeforeTableProps {
@@ -66,14 +67,14 @@ export function TableView({
   header,
   footer: customFooter,
   columns,
-
+  noDataComponent = <FolderEmpty />,
   onlyFolders = false,
   isLoading = false,
 }: TableViewProps) {
   const { table, TableComponent } = useFileTable({
     data: isLoading ? [] : data, // Pass empty array during loading to avoid table rendering
     columns,
-    noRowsComponent: <FolderEmpty />,
+    noRowsComponent: noDataComponent,
   });
 
   const footer = (

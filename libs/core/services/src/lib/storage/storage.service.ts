@@ -25,10 +25,24 @@ export class StorageService {
       .getManyPaginated(filters.page, filters.pageSize);
   }
 
-  getTrashedItems(filters: FolderFilterDto): Promise<PaginationDto<File>> {
-    return this.fileRepository.scoped
-      .filterByNotTrashed()
+  async getTrashedItems(filters: FolderFilterDto) {
+    const data = await this.fileRepository.scoped
+      .filterByTrashed()
+      .joinOwner()
       .getManyPaginated(filters.page, filters.pageSize);
+
+    const items = data.items.map(async (item) => {
+      const ancestors = await this.fileRepository.getAncestors(item.id);
+      return {
+        ...item,
+        ancestors,
+      };
+    });
+
+    return {
+      ...data,
+      items: await Promise.all(items),
+    };
   }
 
   getSuggestedFolders(): Promise<PaginationDto<File>> {

@@ -80,7 +80,7 @@ export const SYSTEM_FILE = {
   },
   TRASH: {
     id: 'null',
-    name: 'trash',
+    name: 'Trash',
     code: 'TRASH',
     system: true,
     invalidationKey: 'TRASH',

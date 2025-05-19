@@ -14,6 +14,7 @@ import {
   PaginationDto,
   FolderFilterDto,
   RenameFolderDto,
+  TrashedFileDto,
 } from '@keepcloud/commons/dtos';
 
 @Controller('storage')
@@ -33,8 +34,8 @@ export class StorageController {
   }
 
   @Get('trash')
-  @Serialize(new PaginationDto(FileMinViewDto))
-  getTrashedItems(filters: FolderFilterDto) {
+  @Serialize(new PaginationDto(TrashedFileDto))
+  getTrashedItems(@Query() filters: FolderFilterDto) {
     return this.storageService.getTrashedItems(filters);
   }
 
@@ -64,7 +65,7 @@ export class StorageController {
 
   @Post('resources/:id/restore')
   @Serialize(FileMinViewDto)
-  restore(@Param('id') id: string, @Body() dto: RenameFolderDto) {
+  restore(@Param('id') id: string) {
     return this.storageService.restore(id);
   }
 

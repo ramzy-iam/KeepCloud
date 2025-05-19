@@ -35,7 +35,7 @@ export function CreateFolderDialog() {
   const form = useForm<FormInput>({
     resolver: zodResolver(schema),
     defaultValues: {
-      name: '',
+      name: 'Untitled folder',
     },
   });
 

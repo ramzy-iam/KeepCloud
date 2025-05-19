@@ -8,6 +8,7 @@ interface GridViewProps {
   onlyFolders?: boolean;
   group?: boolean;
   isLoading?: boolean;
+  noDataComponent?: React.ReactNode;
 }
 
 export const GridView = ({
@@ -15,6 +16,7 @@ export const GridView = ({
   onlyFolders = true,
   group = false,
   isLoading = false,
+  noDataComponent = <FolderEmpty />,
 }: GridViewProps) => {
   if (isLoading) {
     return (
@@ -72,13 +74,11 @@ export const GridView = ({
         isFolderEmpty && 'flex-row items-center justify-center',
       )}
     >
-      {isFolderEmpty ? (
-        <FolderEmpty />
-      ) : (
-        itemsToDisplay.map((item) => (
-          <FileSystemItem key={item.id} file={item} />
-        ))
-      )}
+      {isFolderEmpty
+        ? noDataComponent
+        : itemsToDisplay.map((item) => (
+            <FileSystemItem key={item.id} file={item} />
+          ))}
     </div>
   );
 };
