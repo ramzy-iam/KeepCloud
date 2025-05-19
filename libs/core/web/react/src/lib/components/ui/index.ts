@@ -24,3 +24,4 @@ export * from './accordion';
 export * from './tabs';
 export * from './breadcrumb';
 export * from './sonner';
+export * from './hover-card';

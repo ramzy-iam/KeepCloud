@@ -8,7 +8,12 @@ import {
   useFileMenu,
   ROUTE_PATH,
 } from '@keepcloud/web-core/react';
-import { FolderIconOutline, OwnerIcon } from '../../../components';
+import { DayjsHelper } from '@keepcloud/commons/helpers';
+import {
+  FolderIconOutline,
+  OwnerIcon,
+  FileLocationBreadcrumbHover,
+} from '../../../../components';
 import { ColumnDef } from '@tanstack/react-table';
 import { useNavigate } from 'react-router';
 import { FileMinViewDto, UserProfileDto } from '@keepcloud/commons/dtos';
@@ -83,35 +88,58 @@ export const columns: ColumnDef<FileMinViewDto>[] = [
   },
   {
     accessorKey: 'size',
-    header: () => <div className="text-right">Size</div>,
+    header: () => <div>Size</div>,
     meta: {
       name: 'Size',
     },
     cell: ({ row }) => {
       const isFolder = row.original.contentType === 'folder';
-      if (isFolder)
-        return (
-          <div className="flex justify-center md:justify-end">
-            <Minus size={16} />
-          </div>
-        );
+      if (isFolder) return <Minus size={16} />;
       const formatted = filesize(row.getValue('size'));
 
       return (
-        <div className="truncate text-right text-14-medium text-secondary-foreground">
+        <div className="truncate text-14-medium text-secondary-foreground">
           {formatted}
         </div>
       );
     },
   },
-
+  {
+    id: 'trashedAt',
+    header: () => <div>Deletion Date</div>,
+    enableHiding: false,
+    cell: ({ row }) => {
+      const formatted = DayjsHelper.new(row.getValue('trashedAt')).format(
+        'YYYY-MM-DD HH:mm:ss',
+      );
+      return (
+        <div className="truncate text-14-medium text-secondary-foreground">
+          {formatted}
+        </div>
+      );
+    },
+  },
+  {
+    id: 'location',
+    header: () => <div>Location</div>,
+    enableHiding: false,
+    minSize: 130,
+    maxSize: 300,
+    cell: ({ row }) => {
+      return (
+        <div className="w-full max-w-[130px] truncate overflow-hidden text-right whitespace-nowrap">
+          <FileLocationBreadcrumbHover folder={row.original} />
+        </div>
+      );
+    },
+  },
   {
     id: 'actions',
-    header: () => <div className="text-center">Actions</div>,
+    header: () => <div className="text-center"></div>,
     enableHiding: false,
     cell: ({ row }) => {
       return (
-        <div className="flex items-center justify-center">
+        <div className="justify-centewr flex items-center">
           {RenderActionMenu(row.original)}
         </div>
       );
