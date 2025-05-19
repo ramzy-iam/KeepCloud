@@ -78,8 +78,8 @@ export const FolderView = ({
   }, [preferredViewMode, fixedView, setFolderViewMode]);
 
   return (
-    <div className={cn('mb-8 flex flex-col gap-3', className)}>
-      <div className="sticky -top-[1px] z-[1] flex items-center justify-between bg-background p-1.5 pl-0">
+    <div className={cn('mb-8 flex h-full flex-col gap-3', className)}>
+      <div className="sticky -top-[1px] z-[1] flex h-12 items-center justify-between bg-background p-1.5 pl-0">
         {internalLoading && (
           <div className="flex items-center gap-2 py-4">
             <Skeleton className="h-[30px] w-[200px]" />
