@@ -8,7 +8,6 @@ import {
 import { FolderView } from '../../../components';
 import type { Route } from './+types/details';
 import { FileAncestor } from '@keepcloud/commons/dtos';
-import { SYSTEM_FILE } from '@keepcloud/commons/constants';
 import { useNavigate } from 'react-router';
 import { useEffect } from 'react';
 import { columns } from './columns';
@@ -28,14 +27,11 @@ export default function FolderDetailsComponent({
     query: { withAncestors: true },
   });
 
-  const {
-    data: folderChildren = [],
-    isLoading: isLoadingChildren,
-    isFetched,
-  } = useGetFolderChildren({
-    id: params.folderId,
-    enabled: !!folder,
-  });
+  const { data: folderChildren = [], isLoading: isLoadingChildren } =
+    useGetFolderChildren({
+      id: params.folderId,
+      enabled: !!folder,
+    });
 
   useEffect(() => {
     if (!folder) return;
