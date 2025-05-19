@@ -1,7 +1,6 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-
 import {
   Button,
   Dialog,
@@ -12,48 +11,41 @@ import {
   DialogHeader,
   DialogTitle,
   Input,
-  useGetActiveFolder,
   Form,
   FormField,
   FormItem,
-  FormLabel,
   FormControl,
   FormMessage,
   useCreateFolder,
   useGetKeyToInvalidateBasedOnActiveFolder,
+  dialogAtom,
 } from '@keepcloud/web-core/react';
+import { useAtom } from 'jotai';
 
-const createFolderSchema = z.object({
+const schema = z.object({
   name: z.string().min(1, 'Folder name is required'),
 });
 
-type CreateFolderInput = z.infer<typeof createFolderSchema>;
+type FormInput = z.infer<typeof schema>;
 
-interface AddFolderFormDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}
-
-export function AddFolderFormDialog({
-  open,
-  onOpenChange,
-}: AddFolderFormDialogProps) {
-  const { activeFolder } = useGetActiveFolder();
+export function CreateFolderDialog() {
+  const [dialogState, setDialogState] = useAtom(dialogAtom);
+  const { isOpen, type, context } = dialogState;
   const keyToInvalidate = useGetKeyToInvalidateBasedOnActiveFolder();
-  const form = useForm<CreateFolderInput>({
-    resolver: zodResolver(createFolderSchema),
+  const form = useForm<FormInput>({
+    resolver: zodResolver(schema),
     defaultValues: {
       name: '',
     },
   });
 
-  const createFolder = useCreateFolder({
-    keyToInvalidate,
-  });
+  const createFolder = useCreateFolder({ keysToInvalidate: [keyToInvalidate] });
 
-  const onSubmit = (data: CreateFolderInput) => {
+  const onSubmit = (data: FormInput) => {
     const parentId =
-      activeFolder?.id == 'null' ? undefined : (activeFolder?.id ?? undefined);
+      context.folderId === 'null' || !context.folderId
+        ? undefined
+        : context.folderId;
     createFolder.mutate(
       {
         name: data.name,
@@ -61,15 +53,27 @@ export function AddFolderFormDialog({
       },
       {
         onSuccess: () => {
-          onOpenChange(false);
+          setDialogState({ isOpen: false, type: null, context: {} });
           form.reset();
         },
       },
     );
   };
 
+  if (!isOpen || type !== 'createFolder') return null;
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) =>
+        setDialogState((prev) => ({
+          ...prev,
+          isOpen: open,
+          type: open ? prev.type : null,
+          context: open ? prev.context : {},
+        }))
+      }
+    >
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-left text-18-medium text-heading">
@@ -87,9 +91,12 @@ export function AddFolderFormDialog({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Folder Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter folder name" {...field} />
+                    <Input
+                      placeholder="Enter a name"
+                      {...field}
+                      autoFocus={true}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

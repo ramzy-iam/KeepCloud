@@ -36,6 +36,7 @@ export class StorageService {
       .filterByParentId(null)
       .filterByType(FileType.FOLDER)
       .filterByNotTrashed()
+      .orderBy({ name: 'asc' })
       .getManyPaginated(1, 15);
   }
 
@@ -44,6 +45,7 @@ export class StorageService {
       .filterByParentId(null)
       .filterByType(FileType.FILE)
       .filterByNotTrashed()
+      .orderBy({ name: 'asc' })
       .getManyPaginated(1, 15);
   }
 
@@ -54,5 +56,24 @@ export class StorageService {
       .filterByNotTrashed()
       .orderBy({ name: 'asc' })
       .getManyPaginated(filters.page, filters.pageSize);
+  }
+
+  rename(id: string, name: string): Promise<File> {
+    return this.fileRepository.update({ id }, { name });
+  }
+
+  moveToTrash(id: string): Promise<File> {
+    return this.fileRepository.update({ id }, { trashedAt: new Date() });
+  }
+
+  delete(id: string): Promise<File> {
+    return this.fileRepository.update(
+      { id },
+      { deletedAt: new Date(), trashedAt: null },
+    );
+  }
+
+  restore(id: string): Promise<File> {
+    return this.fileRepository.update({ id }, { trashedAt: null });
   }
 }

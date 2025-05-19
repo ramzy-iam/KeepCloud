@@ -5,7 +5,7 @@ import { FolderViewMode } from '@keepcloud/commons/types';
 export interface ActiveFolder {
   id: string;
   name: string;
-  system?: boolean;
+  isSystem?: boolean;
   invalidationKey?: string;
 }
 
