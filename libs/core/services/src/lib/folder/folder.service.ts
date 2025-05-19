@@ -10,7 +10,7 @@ import {
   BadRequestException,
   NotFoundException,
 } from '@keepcloud/commons/backend';
-import { ErrorCode } from '@keepcloud/commons/constants';
+import { ErrorCode, SYSTEM_FILE } from '@keepcloud/commons/constants';
 import { Prisma } from '@prisma/client';
 import { BaseFileService } from '../file/base-file-service';
 
@@ -91,6 +91,17 @@ export class FolderService extends BaseFileService {
     if (typeof withAncestors === 'boolean' && withAncestors) {
       ancestors = await this.fileRepository.getAncestors(id);
     }
-    return { file, ancestors };
+    return {
+      file,
+      ancestors: [
+        {
+          id: SYSTEM_FILE.MY_STORAGE.id,
+          name: SYSTEM_FILE.MY_STORAGE.name,
+          code: SYSTEM_FILE.MY_STORAGE.code,
+          isSystem: true,
+        },
+        ...ancestors,
+      ],
+    };
   }
 }

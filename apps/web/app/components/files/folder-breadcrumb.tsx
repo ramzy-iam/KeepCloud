@@ -35,7 +35,6 @@ export const FolderBreadcrumb = ({
   folder,
   onBreadcrumbClick,
 }: FolderBreadcrumbProps) => {
-  const navigate = useNavigate();
   const ancestors = folder.ancestors ?? [];
   const { isMobile } = useSidebar();
 
@@ -128,7 +127,11 @@ const MiniBreadcrumb = ({
   const ancestors = folder.ancestors ?? [];
   const navigate = useNavigate();
   const defaultOnClick = (ancestor: FileAncestor) => {
-    navigate(ROUTE_PATH.folderDetails(ancestor.id));
+    const route = ancestor.isSystem
+      ? ROUTE_PATH.system(ancestor.code)
+      : ROUTE_PATH.folderDetails(ancestor.id);
+
+    navigate(route);
   };
 
   return (
@@ -154,9 +157,9 @@ const MiniBreadcrumb = ({
   );
 };
 
-export const FileLocationBreadcrumbHover = ({
+export const FileLocationBreadcrumb = ({
   folder,
-  className = '',
+  className,
 }: {
   folder: FileMinViewDto;
   className?: string;
