@@ -16,6 +16,7 @@ interface FileSystemItemProps {
   file: FileMinViewDto;
   className?: string;
   CustomMenu?: React.FC<{ children: React.ReactNode }>;
+  clickable?: boolean;
 }
 
 const buttonSecondaryClassName =
@@ -25,6 +26,7 @@ export const FileSystemItem = ({
   file,
   className,
   CustomMenu,
+  clickable = true,
 }: FileSystemItemProps) => {
   const { FileMenu: DefaultFileMenu } = useFileMenu({ file });
   const isFolder = file.contentType === 'folder';
@@ -34,6 +36,7 @@ export const FileSystemItem = ({
   const Menu = CustomMenu || DefaultFileMenu;
 
   const handleClick = () => {
+    if (!clickable) return;
     if (isFolder) {
       setActiveFolder(file);
       navigate(ROUTE_PATH.folderDetails(file.id));
@@ -80,5 +83,5 @@ export const FileSystemItem = ({
 export const TrashedSystemItem = ({ file }: { file: FileMinViewDto }) => {
   const Menu = useTrashedFileMenu(file).FileMenu;
 
-  return <FileSystemItem file={file} CustomMenu={Menu} />;
+  return <FileSystemItem file={file} CustomMenu={Menu} clickable={false} />;
 };
