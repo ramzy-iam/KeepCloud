@@ -106,7 +106,7 @@ export const columns: ColumnDef<FileMinViewDto>[] = [
   },
   {
     id: 'trashedAt',
-    header: () => <div>Deletion Date</div>,
+    header: () => <div>Trashed On</div>,
     enableHiding: false,
     cell: ({ row }) => {
       const formatted = DayjsHelper.new(row.getValue('trashedAt')).format(
