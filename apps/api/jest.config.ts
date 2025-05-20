@@ -1,5 +1,5 @@
 export default {
-  displayName: 'taskito-api',
+  displayName: 'keepcloud-api',
   preset: '../../jest.preset.js',
   testEnvironment: 'node',
   transform: {
