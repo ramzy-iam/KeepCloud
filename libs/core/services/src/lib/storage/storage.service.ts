@@ -2,6 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { File, FileRepository, FileType } from '@keepcloud/core/db';
 import { PaginationDto, FolderFilterDto } from '@keepcloud/commons/dtos';
 import { SYSTEM_FILE } from '@keepcloud/commons/constants';
+import {
+  FileNotFoundException,
+  FolderNotFoundException,
+} from '@keepcloud/commons/backend';
 
 @Injectable()
 export class StorageService {
@@ -89,11 +93,18 @@ export class StorageService {
     return this.fileRepository.update({ id }, { trashedAt: new Date() });
   }
 
-  delete(id: string): Promise<File> {
-    return this.fileRepository.update(
-      { id },
-      { deletedAt: new Date(), trashedAt: null },
-    );
+  async delete(id: string): Promise<File> {
+    const resource = await this.fileRepository.scoped
+      .filterById(id)
+      .getOneOrFail();
+
+    if (resource.deletedAt) {
+      if (this.fileRepository.isFolder(resource))
+        throw new FolderNotFoundException(id);
+      throw new FileNotFoundException(id);
+    }
+
+    return this.fileRepository.update({ id }, { deletedAt: new Date() });
   }
 
   restore(id: string): Promise<File> {

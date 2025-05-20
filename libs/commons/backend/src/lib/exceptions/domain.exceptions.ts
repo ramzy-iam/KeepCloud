@@ -48,3 +48,25 @@ export class ParentFolderTrashedException extends ConflictException {
     );
   }
 }
+
+export class FileNotFoundException extends NotFoundException {
+  constructor(id: string) {
+    super(
+      ErrorCode.FILE_NOT_FOUND,
+      `File with ID '${id}' was not found`,
+      undefined,
+      ErrorCode.RESOURCE_NOT_FOUND,
+    );
+  }
+}
+
+export class FolderNotFoundException extends NotFoundException {
+  constructor(id: string) {
+    super(
+      ErrorCode.FOLDER_NOT_FOUND,
+      `Folder with ID '${id}' was not found`,
+      undefined,
+      ErrorCode.RESOURCE_NOT_FOUND,
+    );
+  }
+}

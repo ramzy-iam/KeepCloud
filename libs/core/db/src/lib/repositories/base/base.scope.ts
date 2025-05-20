@@ -1,5 +1,5 @@
 import { PaginationDto } from '@keepcloud/commons/dtos';
-import { PrismaService } from '../../prisma';
+import { Prisma, PrismaService } from '../../prisma';
 import { BaseRepository } from './base.repository';
 import { PAGINATION } from '@keepcloud/commons/constants';
 import { GenericPrismaModel } from './model';
@@ -47,6 +47,33 @@ export abstract class BaseScope<
   filterById(id: string) {
     (this._where as { id: string }).id = id;
     return this;
+  }
+
+  filterByDeleted() {
+    (
+      this._where as {
+        deletedAt:
+          | string
+          | Date
+          | Prisma.DateTimeNullableFilter<T>
+          | null
+          | undefined;
+      }
+    ).deletedAt = { not: null };
+    return this;
+  }
+
+  filterByNotDeleted() {
+    (
+      this._where as {
+        deletedAt:
+          | string
+          | Date
+          | Prisma.DateTimeNullableFilter<T>
+          | null
+          | undefined;
+      }
+    ).deletedAt = null;
   }
 
   getOne(): Promise<T | null> {

@@ -25,3 +25,4 @@ export * from './tabs';
 export * from './breadcrumb';
 export * from './sonner';
 export * from './hover-card';
+export * from './alert-dialog';

@@ -14,7 +14,7 @@ import {
   Activity,
   TextCursorInput as RenameIcon,
   Eye as PreviewIcon,
-  FolderOpen,
+  History,
 } from 'lucide-react';
 import { MenuItem, ROUTE_PATH } from '@keepcloud/web-core/react';
 import { iconClassName, itemClassName } from './config';
@@ -125,13 +125,16 @@ export const useTrashedFileMenuItems = (file: FileMinViewDto): MenuItem[] => {
   return [
     {
       label: 'Restore',
-      icon: <FolderOpen className={iconClassName} />,
+      icon: <History className={iconClassName} />,
       onClick: () => navigate(ROUTE_PATH.folderDetails(file.id)),
       className: itemClassName,
     },
+
     {
       label: 'Delete permanently',
-      icon: <Info className={iconClassName} />,
+      icon: (
+        <Trash2 className="mr-2 h-4 w-4 text-error-500 hover:text-error-500 dark:hover:text-neutral-200" />
+      ),
       onClick: () => console.log(`View info for ${file.name}`),
       className: itemClassName,
     },
