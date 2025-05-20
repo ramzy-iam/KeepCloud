@@ -16,6 +16,7 @@ import {
 } from '@keepcloud/web-core/react';
 import { useNavigate } from 'react-router';
 import { FileAncestor, FileMinViewDto } from '@keepcloud/commons/dtos';
+import { FolderIconOutline } from '../ui';
 
 interface FileLocationBreadcrumbHoverProps {
   folder: FileMinViewDto;
@@ -63,8 +64,9 @@ const MiniBreadcrumb = ({
             e.stopPropagation();
             handleClick(first);
           }}
-          className="cursor-pointer rounded-[16px] px-4 py-2 text-heading hover:bg-stroke-200 dark:hover:bg-white/5"
+          className="cursor-pointer items-center gap-2 rounded-[16px] px-4 py-2 text-heading hover:bg-stroke-200 dark:hover:bg-white/5"
         >
+          <FolderIconOutline />
           {first.name}
         </BreadcrumbItem>
         <BreadcrumbSeparator />
@@ -83,8 +85,9 @@ const MiniBreadcrumb = ({
             e.stopPropagation();
             handleClick(last);
           }}
-          className="cursor-pointer rounded-[16px] px-4 py-2 text-heading hover:bg-stroke-200 dark:hover:bg-white/5"
+          className="cursor-pointer items-center gap-2 rounded-[16px] px-4 py-2 text-heading hover:bg-stroke-200 dark:hover:bg-white/5"
         >
+          <FolderIconOutline />
           {last.name}
         </BreadcrumbItem>
       </>
@@ -100,8 +103,9 @@ const MiniBreadcrumb = ({
               e.stopPropagation();
               handleClick(ancestor);
             }}
-            className="cursor-pointer rounded-[16px] px-4 py-2 text-heading hover:bg-stroke-200 dark:hover:bg-white/5"
+            className="cursor-pointer items-center gap-2 rounded-[16px] px-4 py-2 text-heading hover:bg-stroke-200 dark:hover:bg-white/5"
           >
+            <FolderIconOutline />
             {ancestor.name}
           </BreadcrumbItem>
           {index !== ancestors.length - 1 && <BreadcrumbSeparator />}
@@ -139,9 +143,14 @@ export const FileLocationBreadcrumb = ({
   const nearestAncestor = ancestors[ancestors.length - 1];
   const TriggerContent = (
     <div
-      className={`w-full max-w-[130px] cursor-pointer truncate overflow-hidden text-right whitespace-nowrap text-secondary-foreground ${className}`}
+      className={`flex w-full max-w-[130px] cursor-pointer items-center gap-2 overflow-hidden ${className}`}
     >
-      {nearestAncestor.name}
+      <span className="flex-shrink-0">
+        <FolderIconOutline />
+      </span>
+      <span className="truncate whitespace-nowrap text-secondary-foreground">
+        {nearestAncestor.name}
+      </span>
     </div>
   );
 

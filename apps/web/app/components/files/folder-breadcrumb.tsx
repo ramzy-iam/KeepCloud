@@ -13,7 +13,6 @@ import {
   useSidebar,
   TooltipProviderWrapper,
 } from '@keepcloud/web-core/react';
-import { useNavigate } from 'react-router';
 import { FileAncestor, FileMinViewDto } from '@keepcloud/commons/dtos';
 
 interface FolderBreadcrumbProps {
