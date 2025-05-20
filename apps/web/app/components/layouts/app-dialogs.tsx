@@ -2,6 +2,7 @@ import { useAtom } from 'jotai';
 import { dialogAtom } from '@keepcloud/web-core/react';
 import {
   CreateFolderDialog,
+  DeletePermanentlyDialog,
   RenameResourceDialog,
   ResourceTrashedDialog,
 } from '../dialogs';
@@ -33,6 +34,9 @@ export const AppDialogs = () => {
 
     case 'resourceTrashed':
       return <ResourceTrashedDialog />;
+
+    case 'deletePermanently':
+      return <DeletePermanentlyDialog />;
 
     default:
       return null;

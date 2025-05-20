@@ -7,15 +7,31 @@ import {
   Activity,
   TextCursorInput as RenameIcon,
   FolderOpen,
+  History,
 } from 'lucide-react';
 import { FileMinViewDto } from '@keepcloud/commons/dtos';
-import { MenuItem, ROUTE_PATH, useDialog } from '@keepcloud/web-core/react';
+import {
+  MenuItem,
+  ROUTE_PATH,
+  cn,
+  useDialog,
+  useGetKeyToInvalidateBasedOnActiveFolder,
+  useMoveToTrash,
+  useRestoreResource,
+} from '@keepcloud/web-core/react';
 import { iconClassName, itemClassName } from './config';
 import { useNavigate } from 'react-router';
+import { SYSTEM_FILE } from '@keepcloud/commons/constants';
 
 export const useFolderMenuItems = (file: FileMinViewDto): MenuItem[] => {
   const navigate = useNavigate();
   const { openDialog } = useDialog();
+  const keyToInvalidate = useGetKeyToInvalidateBasedOnActiveFolder();
+
+  const moveToTrash = useMoveToTrash({
+    keysToInvalidate: [keyToInvalidate],
+    resourceName: 'Folder',
+  });
 
   return [
     {
@@ -61,7 +77,9 @@ export const useFolderMenuItems = (file: FileMinViewDto): MenuItem[] => {
     {
       label: 'Move to trash',
       icon: <Trash2 className={iconClassName} />,
-      onClick: () => console.log(`Move ${file.name} to trash`),
+      onClick: () => {
+        moveToTrash.mutate(file.id);
+      },
       className: itemClassName,
       separatorAfter: true,
     },
@@ -75,20 +93,35 @@ export const useFolderMenuItems = (file: FileMinViewDto): MenuItem[] => {
 };
 
 export const useTrashedFolderMenuItems = (file: FileMinViewDto): MenuItem[] => {
-  const navigate = useNavigate();
+  const { openDialog } = useDialog();
+
+  const restoreFolder = useRestoreResource({
+    keysToInvalidate: [[SYSTEM_FILE.TRASH.invalidationKey]],
+    resourceName: 'Folder',
+  });
 
   return [
     {
       label: 'Restore',
-      icon: <FolderOpen className={iconClassName} />,
-      onClick: () => navigate(ROUTE_PATH.folderDetails(file.id)),
+      icon: <History className={iconClassName} />,
+      onClick: () => {
+        restoreFolder.mutate(file.id);
+      },
       className: itemClassName,
+      disabled: restoreFolder.isPending,
     },
     {
       label: 'Delete permanently',
-      icon: <Info className={iconClassName} />,
-      onClick: () => console.log(`View info for ${file.name}`),
-      className: itemClassName,
+      icon: (
+        <Trash2 className="mr-2 h-4 w-4 text-error-500 hover:text-error-500 dark:hover:text-neutral-200" />
+      ),
+      onClick: () => {
+        openDialog({
+          type: 'deletePermanently',
+          item: file,
+        });
+      },
+      className: cn(itemClassName, 'text-error-500! hover:text-error-500!'),
     },
   ];
 };

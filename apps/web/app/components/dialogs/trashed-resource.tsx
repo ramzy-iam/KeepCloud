@@ -1,11 +1,11 @@
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
   Button,
   dialogAtom,
   ROUTE_PATH,
@@ -37,7 +37,7 @@ export function ResourceTrashedDialog() {
   if (!isOpen || type !== 'resourceTrashed') return null;
 
   return (
-    <Dialog
+    <AlertDialog
       open={isOpen}
       onOpenChange={(open) => {
         if (!open) {
@@ -46,22 +46,24 @@ export function ResourceTrashedDialog() {
         }
       }}
     >
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="text-left text-18-medium text-heading">
+      <AlertDialogContent className="sm:max-w-md">
+        <AlertDialogHeader>
+          <AlertDialogTitle className="text-left text-18-medium text-heading">
             {title}
-          </DialogTitle>
-          <DialogDescription className="py-2">{description}</DialogDescription>
-        </DialogHeader>
+          </AlertDialogTitle>
+          <AlertDialogDescription className="py-2">
+            {description}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
 
-        <DialogFooter className="flex-row justify-end space-x-2">
-          <DialogClose asChild>
+        <AlertDialogFooter className="flex-row justify-end space-x-2">
+          <AlertDialogCancel asChild>
             <Button type="button" variant="secondary">
               Close
             </Button>
-          </DialogClose>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          </AlertDialogCancel>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
