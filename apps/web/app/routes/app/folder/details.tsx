@@ -4,12 +4,13 @@ import {
   useGetActiveFolder,
   DEFAULT_ACTIVE_FOLDER,
   ROUTE_PATH,
+  useDialog,
 } from '@keepcloud/web-core/react';
 import { FolderView } from '../../../components';
 import type { Route } from './+types/details';
 import { FileAncestor } from '@keepcloud/commons/dtos';
 import { useNavigate } from 'react-router';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { columns } from './columns';
 
 export default function FolderDetailsComponent({
@@ -17,6 +18,8 @@ export default function FolderDetailsComponent({
 }: Route.ComponentProps) {
   const navigate = useNavigate();
   const { setActiveFolder } = useGetActiveFolder();
+  const { openDialog } = useDialog();
+  const hasOpenedRef = useRef(false);
 
   const {
     data: folder,
@@ -40,6 +43,30 @@ export default function FolderDetailsComponent({
       name: folder.name,
     });
   }, [folder]);
+
+  useEffect(() => {
+    if (
+      !hasOpenedRef.current &&
+      error?.code === 'RESOURCE_TRASHED' &&
+      error.details?.length
+    ) {
+      const detail = error.details[0];
+
+      if (
+        detail.code === 'FOLDER_TRASHED' ||
+        detail.code === 'PARENT_FOLDER_TRASHED'
+      ) {
+        openDialog({
+          type: 'resourceTrashed',
+          context: {
+            isFolder: true,
+            code: detail.code,
+          },
+        });
+        hasOpenedRef.current = true; // prevent re-firing
+      }
+    }
+  }, [error, openDialog]);
 
   if (error || !folder) {
     return isLoading ? null : (
