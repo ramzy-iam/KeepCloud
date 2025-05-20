@@ -14,7 +14,27 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "strictPropertyInitialization": false,
+    "esModuleInterop": true,
+    "paths": {
+      "@keepcloud/commons/constants": [
+        "libs/commons/src/lib/constants/index.ts"
+      ],
+      "@keepcloud/commons/dtos": ["libs/commons/src/lib/dtos/index.ts"],
+      "@keepcloud/commons/helpers": [
+        "libs/commons/src/lib/helpers/shared/index.ts"
+      ],
+      "@keepcloud/commons/backend": ["libs/commons/backend/src/index.ts"],
+      "@keepcloud/commons/types": ["libs/commons/src/lib/types/index.ts"],
+      "@keepcloud/core/db": ["libs/core/db/src/index.ts"],
+      "@keepcloud/core/services": ["libs/core/services/src/index.ts"],
+      "@keepcloud/files/api": ["libs/files/api/src/index.ts"],
+      "@keepcloud/iam/api": ["libs/iam/api/src/index.ts"],
+      "@keepcloud/storage/api": ["libs/storage/api/src/index.ts"],
+      "@keepcloud/users/api": ["libs/users/api/src/index.ts"],
+      "@keepcloud/web-core/react": ["libs/core/web/react/src/index.ts"]
+    }
   },
+  "include": ["./env.d.ts", "**/*.ts"],
   "exclude": ["node_modules", "tmp"]
 }

@@ -1,0 +1,19 @@
+model User {
+  id        String    @id @default(dbgenerated("nanoid()"))
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  firstName String?
+  lastName  String?
+  picture   String?
+  email     String  @unique
+
+  planId         String
+  plan           SubscriptionPlan @relation(fields: [planId], references: [id])
+  sharedFiles    SharedFile[]     @relation("UserSharedFiles")
+  fileAccessLogs FileAccessLog[]  @relation("UserFileAccessLogs")
+  files          File[]           @relation("UserFiles")
+
+  storageUsed BigInt @default(0) //in bytes
+}

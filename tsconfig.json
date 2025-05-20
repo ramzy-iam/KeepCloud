@@ -1,0 +1,4 @@
+{
+  "extends": "./tsconfig.base.json"
+}
+//this file is used by shadcn
