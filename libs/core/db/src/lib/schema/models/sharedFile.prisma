@@ -1,0 +1,24 @@
+
+enum PermissionType {
+  VIEW
+  EDIT
+  COMMENT
+}
+
+model SharedFile {
+  id        String   @id @default(dbgenerated("nanoid()"))
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  deletedAt  DateTime?
+
+  fileId    String
+  file      File     @relation(fields: [fileId], references: [id])
+
+  sharedWithId String
+  sharedWith    User    @relation("UserSharedFiles", fields: [sharedWithId], references: [id])
+
+  permission  PermissionType 
+ 
+
+  @@unique([fileId, sharedWithId])
+}

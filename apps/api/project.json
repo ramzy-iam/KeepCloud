@@ -1,5 +1,5 @@
 {
-  "name": "taskito-api",
+  "name": "keepcloud-api",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/api/src",
   "projectType": "application",
@@ -22,15 +22,15 @@
       "defaultConfiguration": "development",
       "dependsOn": ["build"],
       "options": {
-        "buildTarget": "taskito-api:build",
+        "buildTarget": "keepcloud-api:build",
         "runBuildTargetDependencies": false
       },
       "configurations": {
         "development": {
-          "buildTarget": "taskito-api:build:development"
+          "buildTarget": "keepcloud-api:build:development"
         },
         "production": {
-          "buildTarget": "taskito-api:build:production"
+          "buildTarget": "keepcloud-api:build:production"
         }
       }
     },

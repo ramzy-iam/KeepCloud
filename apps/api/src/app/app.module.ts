@@ -1,10 +1,24 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { DatabaseModule } from '@keepcloud/core/db';
+import { IamApiModule } from '@keepcloud/iam/api';
+import { FileApiModule } from '@keepcloud/files/api';
+import { StorageApiModule } from '@keepcloud/storage/api';
+import { GlobalExceptionFilter } from '@keepcloud/commons/backend';
+import { ServicesModule } from './services.module';
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    DatabaseModule,
+    ServicesModule,
+    IamApiModule,
+    FileApiModule,
+    StorageApiModule,
+  ],
+  providers: [
+    {
+      provide: 'APP_FILTER',
+      useClass: GlobalExceptionFilter,
+    },
+  ],
 })
 export class AppModule {}
