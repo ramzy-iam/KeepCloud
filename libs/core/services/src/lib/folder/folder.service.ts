@@ -87,6 +87,8 @@ export class FolderService extends BaseFileService {
     if (!file)
       throw new NotFoundException(ErrorCode.NOT_FOUND, 'Resource not found');
 
+    await this.checkAndThrowIfTrashed(id);
+
     let ancestors: FileAncestor[] = [];
     if (typeof withAncestors === 'boolean' && withAncestors) {
       ancestors = await this.fileRepository.getAncestors(id);

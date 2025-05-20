@@ -73,3 +73,22 @@ export const useFolderMenuItems = (file: FileMinViewDto): MenuItem[] => {
     },
   ];
 };
+
+export const useTrashedFolderMenuItems = (file: FileMinViewDto): MenuItem[] => {
+  const navigate = useNavigate();
+
+  return [
+    {
+      label: 'Restore',
+      icon: <FolderOpen className={iconClassName} />,
+      onClick: () => navigate(ROUTE_PATH.folderDetails(file.id)),
+      className: itemClassName,
+    },
+    {
+      label: 'Delete permanently',
+      icon: <Info className={iconClassName} />,
+      onClick: () => console.log(`View info for ${file.name}`),
+      className: itemClassName,
+    },
+  ];
+};

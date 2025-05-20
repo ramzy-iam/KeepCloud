@@ -2,12 +2,12 @@ import { ErrorCode } from '@keepcloud/commons/constants';
 import { AxiosError } from 'axios';
 
 interface ApiErrorDetail {
-  code?: string;
+  code?: ErrorCode;
   message: string;
   field?: string;
 }
 
-interface ApiErrorData {
+export interface ApiErrorData {
   code: ErrorCode;
   details: ApiErrorDetail[];
 }
@@ -16,4 +16,5 @@ export interface KeyToInvalidate {
   keysToInvalidate: unknown[][];
 }
 
-export type ApiError = AxiosError<ApiErrorData>;
+export type ApiError = ApiErrorData;
+export type ApiErrorResponse = AxiosError<ApiError>;

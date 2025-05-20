@@ -1,7 +1,13 @@
 import { SYSTEM_FILE } from '@keepcloud/commons/constants';
-import { TrashEmpty, FolderView } from '../../../../components';
+import {
+  TrashEmpty,
+  FolderView,
+  TrashedSystemItem,
+} from '../../../../components';
 import { columns } from './columns';
 import { useGetTrashedItems } from '@keepcloud/web-core/react';
+import { ColumnDef } from '@tanstack/react-table';
+import { FileMinViewDto } from '@keepcloud/commons/dtos';
 
 export default function TrashComponent() {
   const { data, isLoading } = useGetTrashedItems();
@@ -12,10 +18,11 @@ export default function TrashComponent() {
         <FolderView
           items={data?.items}
           title={SYSTEM_FILE.TRASH.name}
-          columns={columns}
+          columns={columns as ColumnDef<FileMinViewDto>[]}
           defaultViewMode="table"
           isLoading={isLoading}
           noDataComponent={<TrashEmpty />}
+          CustomFileSystemItem={TrashedSystemItem}
         />
       </div>
     </div>

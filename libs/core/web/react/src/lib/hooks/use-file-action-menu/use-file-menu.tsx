@@ -14,9 +14,12 @@ import {
   Activity,
   TextCursorInput as RenameIcon,
   Eye as PreviewIcon,
+  FolderOpen,
 } from 'lucide-react';
-import { MenuItem } from '@keepcloud/web-core/react';
+import { MenuItem, ROUTE_PATH } from '@keepcloud/web-core/react';
 import { iconClassName, itemClassName } from './config';
+import { useNavigate } from 'react-router';
+import { FileMinViewDto } from '@keepcloud/commons/dtos';
 
 export const useFileMenuItems = (file: {
   id: string;
@@ -115,3 +118,22 @@ export const useFileMenuItems = (file: {
     className: itemClassName,
   },
 ];
+
+export const useTrashedFileMenuItems = (file: FileMinViewDto): MenuItem[] => {
+  const navigate = useNavigate();
+
+  return [
+    {
+      label: 'Restore',
+      icon: <FolderOpen className={iconClassName} />,
+      onClick: () => navigate(ROUTE_PATH.folderDetails(file.id)),
+      className: itemClassName,
+    },
+    {
+      label: 'Delete permanently',
+      icon: <Info className={iconClassName} />,
+      onClick: () => console.log(`View info for ${file.name}`),
+      className: itemClassName,
+    },
+  ];
+};
