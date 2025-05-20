@@ -63,7 +63,7 @@ class StorageService extends BaseHttpService {
   }
 
   async restore(id: string) {
-    return this.patch<FileMinViewDto>(`/resources/${id}/restore`);
+    return this.post<FileMinViewDto>(`/resources/${id}/restore`);
   }
 }
 

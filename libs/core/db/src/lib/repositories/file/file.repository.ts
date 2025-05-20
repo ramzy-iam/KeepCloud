@@ -49,9 +49,7 @@ export class FileRepository extends BaseRepository<
     return ancestors;
   }
 
-  async isTrashed(
-    fileId: string,
-  ): Promise<{
+  async isTrashed(fileId: string): Promise<{
     trashed: boolean;
     trashedBy: 'self' | 'parent' | null;
     isFolder: boolean;
@@ -94,5 +92,9 @@ export class FileRepository extends BaseRepository<
     }
 
     return { trashed: false, trashedBy: null, isFolder };
+  }
+
+  isFolder(file: File): boolean {
+    return file.contentType === 'folder';
   }
 }

@@ -5,8 +5,6 @@ import { filesize } from 'filesize';
 import {
   Button,
   Checkbox,
-  useFileMenu,
-  ROUTE_PATH,
   useTrashedFileMenu,
 } from '@keepcloud/web-core/react';
 import { DayjsHelper } from '@keepcloud/commons/helpers';
@@ -16,7 +14,6 @@ import {
   FileLocationBreadcrumb,
 } from '../../../../components';
 import { ColumnDef } from '@tanstack/react-table';
-import { useNavigate } from 'react-router';
 import { TrashedFileDto, UserProfileDto } from '@keepcloud/commons/dtos';
 
 interface RenderActionMenuProps {
@@ -55,19 +52,9 @@ export const columns: ColumnDef<TrashedFileDto>[] = [
     },
     cell: ({ row }) => {
       const isFolder = row.original.contentType == 'folder';
-      const navigate = useNavigate();
-      const url = ROUTE_PATH.folderDetails(row.original.id);
 
-      const handleClick = () => {
-        if (isFolder) {
-          navigate(url);
-        }
-      };
       return (
-        <div
-          className="flex cursor-pointer items-center gap-2 truncate text-14-medium text-secondary-foreground"
-          onClick={handleClick}
-        >
+        <div className="flex cursor-pointer items-center gap-2 truncate text-14-medium text-secondary-foreground">
           {isFolder ? (
             <FolderIconOutline />
           ) : (
