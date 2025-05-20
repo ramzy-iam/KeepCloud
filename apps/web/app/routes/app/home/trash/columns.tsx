@@ -7,6 +7,7 @@ import {
   Checkbox,
   useFileMenu,
   ROUTE_PATH,
+  useTrashedFileMenu,
 } from '@keepcloud/web-core/react';
 import { DayjsHelper } from '@keepcloud/commons/helpers';
 import {
@@ -16,9 +17,13 @@ import {
 } from '../../../../components';
 import { ColumnDef } from '@tanstack/react-table';
 import { useNavigate } from 'react-router';
-import { FileMinViewDto, UserProfileDto } from '@keepcloud/commons/dtos';
+import { TrashedFileDto, UserProfileDto } from '@keepcloud/commons/dtos';
 
-export const columns: ColumnDef<FileMinViewDto>[] = [
+interface RenderActionMenuProps {
+  file: TrashedFileDto;
+}
+
+export const columns: ColumnDef<TrashedFileDto>[] = [
   {
     id: 'select',
     header: ({ table }) => (
@@ -140,15 +145,16 @@ export const columns: ColumnDef<FileMinViewDto>[] = [
     cell: ({ row }) => {
       return (
         <div className="justify-centewr flex items-center">
-          {RenderActionMenu(row.original)}
+          {RenderActionMenu({ file: row.original })}
         </div>
       );
     },
   },
 ];
 
-const RenderActionMenu = (file: FileMinViewDto) => {
-  const { FileMenu } = useFileMenu({ file });
+const RenderActionMenu = ({ file }: RenderActionMenuProps) => {
+  const { FileMenu } = useTrashedFileMenu(file);
+
   return (
     <div className="flex items-center justify-center">
       <FileMenu>

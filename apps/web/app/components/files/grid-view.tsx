@@ -1,7 +1,7 @@
-import { FileSystemItem } from './file-system-item';
+import { cn, Skeleton } from '@keepcloud/web-core/react';
 import { FileMinViewDto } from '@keepcloud/commons/dtos';
-import { Skeleton, cn } from '@keepcloud/web-core/react';
 import { FolderEmpty } from '../ui';
+import { FileSystemItem } from './file-system-item';
 
 interface GridViewProps {
   data: FileMinViewDto[];
@@ -9,14 +9,18 @@ interface GridViewProps {
   group?: boolean;
   isLoading?: boolean;
   noDataComponent?: React.ReactNode;
+  CustomFileSystemItem?: React.FC<{
+    file: FileMinViewDto;
+  }>;
 }
 
 export const GridView = ({
   data,
-  onlyFolders = true,
+  onlyFolders = false,
   group = false,
   isLoading = false,
   noDataComponent = <FolderEmpty />,
+  CustomFileSystemItem = FileSystemItem,
 }: GridViewProps) => {
   if (isLoading) {
     return (
@@ -48,7 +52,7 @@ export const GridView = ({
             <h4 className="mb-2 text-16-medium text-heading">Folders</h4>
             <div className="flex flex-wrap gap-3 sm:flex-row md:gap-8">
               {folders.map((item) => (
-                <FileSystemItem key={item.id} file={item} />
+                <CustomFileSystemItem key={item.id} file={item} />
               ))}
             </div>
           </div>
@@ -58,7 +62,7 @@ export const GridView = ({
             <h4 className="mb-2 text-16-medium text-heading">Files</h4>
             <div className="flex flex-wrap gap-3 sm:flex-row md:gap-8">
               {files.map((item) => (
-                <FileSystemItem key={item.id} file={item} />
+                <CustomFileSystemItem key={item.id} file={item} />
               ))}
             </div>
           </div>
@@ -77,7 +81,7 @@ export const GridView = ({
       {isFolderEmpty
         ? noDataComponent
         : itemsToDisplay.map((item) => (
-            <FileSystemItem key={item.id} file={item} />
+            <CustomFileSystemItem key={item.id} file={item} />
           ))}
     </div>
   );

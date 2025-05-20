@@ -1,6 +1,10 @@
 import { useAtom } from 'jotai';
 import { dialogAtom } from '@keepcloud/web-core/react';
-import { CreateFolderDialog, RenameResourceDialog } from '../dialogs';
+import {
+  CreateFolderDialog,
+  RenameResourceDialog,
+  ResourceTrashedDialog,
+} from '../dialogs';
 import { useEffect } from 'react';
 
 export function GlobalPointerEventsHandler() {
@@ -26,6 +30,10 @@ export const AppDialogs = () => {
       return <RenameResourceDialog />;
     case 'createFolder':
       return <CreateFolderDialog />;
+
+    case 'resourceTrashed':
+      return <ResourceTrashedDialog />;
+
     default:
       return null;
   }

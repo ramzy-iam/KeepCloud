@@ -9,9 +9,15 @@ export class AppException extends Error {
   public readonly status: number;
   public readonly details: ExceptionDetail[];
 
-  constructor(code: string, message: string, status: number, field?: string) {
+  constructor(
+    code: string,
+    message: string,
+    status: number,
+    field?: string,
+    parentCode?: string,
+  ) {
     super(message);
-    this.code = code;
+    this.code = parentCode ?? code;
     this.status = status;
     this.details = [
       {

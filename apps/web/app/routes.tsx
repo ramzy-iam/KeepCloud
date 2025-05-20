@@ -22,7 +22,7 @@ export default [
       ]),
     ]),
     layout('./routes/app/no-action-button-layout.tsx', [
-      ...prefix('home', [route('/trash', './routes/app/home/trash/index.tsx')]),
+      ...prefix('home', [route('/trash', './routes/app/home/trash/trash.tsx')]),
     ]),
   ]),
 ] satisfies RouteConfig;

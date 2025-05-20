@@ -6,9 +6,10 @@ export class NotFoundException extends AppException {
   constructor(
     code: string = ErrorCode.NOT_FOUND,
     message = 'Resource not found',
-    field?: string,
+    field?: string | undefined,
+    parentCode?: string,
   ) {
-    super(code, message, HttpStatus.NOT_FOUND, field);
+    super(code, message, HttpStatus.NOT_FOUND, field, parentCode);
   }
 }
 
@@ -16,9 +17,10 @@ export class ConflictException extends AppException {
   constructor(
     code: string = ErrorCode.CONFLICT,
     message = 'Request conflicts with an existing resource.',
-    field?: string,
+    field?: string | undefined,
+    parentCode?: string,
   ) {
-    super(code, message, HttpStatus.CONFLICT, field);
+    super(code, message, HttpStatus.CONFLICT, field, parentCode);
   }
 }
 
@@ -26,9 +28,10 @@ export class BadRequestException extends AppException {
   constructor(
     code: string = ErrorCode.BAD_REQUEST,
     message = 'Invalid input.',
-    field?: string,
+    field?: string | undefined,
+    parentCode?: string,
   ) {
-    super(code, message, HttpStatus.BAD_REQUEST, field);
+    super(code, message, HttpStatus.BAD_REQUEST, field, parentCode);
   }
 }
 

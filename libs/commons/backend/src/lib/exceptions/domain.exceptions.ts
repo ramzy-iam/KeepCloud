@@ -15,3 +15,36 @@ export class EmailAlreadyExistsException extends ConflictException {
     );
   }
 }
+
+export class FolderTrashedException extends ConflictException {
+  constructor() {
+    super(
+      ErrorCode.FOLDER_TRASHED,
+      `The folder is trashed and cannot be accessed.`,
+      undefined,
+      ErrorCode.RESOURCE_TRASHED,
+    );
+  }
+}
+
+export class FileTrashedException extends ConflictException {
+  constructor() {
+    super(
+      ErrorCode.FILE_TRASHED,
+      `The file is trashed and cannot be accessed.`,
+      undefined,
+      ErrorCode.RESOURCE_TRASHED,
+    );
+  }
+}
+
+export class ParentFolderTrashedException extends ConflictException {
+  constructor() {
+    super(
+      ErrorCode.PARENT_FOLDER_TRASHED,
+      `A parent folder is trashed and blocks access.`,
+      undefined,
+      ErrorCode.RESOURCE_TRASHED,
+    );
+  }
+}

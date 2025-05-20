@@ -6,7 +6,7 @@ import axios, {
 import { CookiesHelper } from '../../helpers';
 import { renewAccessToken } from './token.helper';
 import { ACCESS_TOKEN } from '@keepcloud/commons/constants';
-import { ApiError } from './type';
+import { ApiErrorResponse } from './type';
 
 const axiosOptions = {
   headers: {
@@ -47,12 +47,12 @@ export const createAxiosInstance = (baseURL: string): AxiosInstance => {
 
       return config;
     },
-    (error: ApiError) => Promise.reject(error),
+    (error: ApiErrorResponse) => Promise.reject(error),
   );
 
   axiosInstance.interceptors.response.use(
     (response: AxiosResponse) => response,
-    async (error: ApiError) => {
+    async (error: ApiErrorResponse) => {
       const { response, config } = error;
 
       if (axios.isCancel(error)) return handleCancelRequest();

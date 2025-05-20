@@ -1,19 +1,29 @@
 import { atom } from 'jotai';
 import { FileMinViewDto } from '@keepcloud/commons/dtos';
+import { ErrorCode } from '@keepcloud/commons/constants';
 
-export type DialogType = 'createFolder' | 'rename';
+type CommonDialogType = 'rename' | 'resourceTrashed';
+type FolderDialogType = 'createFolder' | 'folderTrashed' | 'folderDeleted';
+type FileDialogType = 'fileTrashed' | 'fileDeleted';
+
+export type DialogType = CommonDialogType | FolderDialogType | FileDialogType;
+
+export type DialogContext = {
+  folderId?: string | null;
+  item?: FileMinViewDto;
+  isFolder?: boolean;
+  code?: ErrorCode;
+};
 
 export interface DialogState {
   isOpen: boolean;
   type: DialogType | null;
-  context: {
-    folderId?: string | null;
-    item?: FileMinViewDto;
-  };
+  context: DialogContext;
 }
 
 export const dialogAtom = atom<DialogState>({
   isOpen: false,
+
   type: null,
   context: {},
 });

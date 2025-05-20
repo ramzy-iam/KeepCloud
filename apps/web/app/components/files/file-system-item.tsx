@@ -5,33 +5,40 @@ import {
   cn,
   useFileMenu,
   useGetActiveFolder,
+  useTrashedFileMenu,
 } from '@keepcloud/web-core/react';
 import { FileTextIcon, EllipsisVerticalIcon } from 'lucide-react';
 import { FolderIconOutline } from '../ui';
 import { useNavigate } from 'react-router';
-import { FileMinViewDto } from '@keepcloud/commons/dtos';
+import { FileMinViewDto, TrashedFileDto } from '@keepcloud/commons/dtos';
 
 interface FileSystemItemProps {
   file: FileMinViewDto;
   className?: string;
+  CustomMenu?: React.FC<{ children: React.ReactNode }>;
 }
 
-export const FileSystemItem = ({ file, className }: FileSystemItemProps) => {
-  const { FileMenu } = useFileMenu({ file });
+const buttonSecondaryClassName =
+  'inline-flex items-center cursor-pointer px-[24px] py-[13px] justify-center gap-2 whitespace-nowrap shadow-[0px_4px_8px_rgba(0, 0, 0, 0.16)] rounded-[8px] border border-1 text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-non shrink-0 [&_svg]:shrink-0 outline-none  text-secondary-foreground bg-white-light border-stroke-300 hover:bg-[#f0f0f0]/20 shadow-[0_4px_8px_rgba(0, 0, 0, 0.4)] dark:bg-neutral-800 dark:border-neutral-600';
+
+export const FileSystemItem = ({
+  file,
+  className,
+  CustomMenu,
+}: FileSystemItemProps) => {
+  const { FileMenu: DefaultFileMenu } = useFileMenu({ file });
   const isFolder = file.contentType === 'folder';
   const navigate = useNavigate();
-  const url = ROUTE_PATH.folderDetails(file.id);
   const { setActiveFolder } = useGetActiveFolder();
+
+  const Menu = CustomMenu || DefaultFileMenu;
 
   const handleClick = () => {
     if (isFolder) {
       setActiveFolder(file);
-      navigate(url);
+      navigate(ROUTE_PATH.folderDetails(file.id));
     }
   };
-
-  const buttonSecondaryClassName =
-    'inline-flex items-center cursor-pointer px-[24px] py-[13px] justify-center gap-2 whitespace-nowrap shadow-[0px_4px_8px_rgba(0, 0, 0, 0.16)] rounded-[8px] border border-1 text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-non shrink-0 [&_svg]:shrink-0 outline-none  text-secondary-foreground bg-white-light border-stroke-300 hover:bg-[#f0f0f0]/20 shadow-[0_4px_8px_rgba(0, 0, 0, 0.4)] dark:bg-neutral-800 dark:border-neutral-600 ';
 
   return (
     <div
@@ -55,16 +62,23 @@ export const FileSystemItem = ({ file, className }: FileSystemItemProps) => {
         </div>
       </TooltipProviderWrapper>
 
-      <FileMenu>
+      <Menu>
         <Button
-          variant={'text'}
-          size={'icon'}
+          variant="text"
+          size="icon"
           className="size-[24px] rounded-full p-1 hover:bg-stroke-200 dark:hover:bg-white/5"
           aria-label={`More options for ${file.name}`}
+          onClick={(e) => e.stopPropagation()}
         >
           <EllipsisVerticalIcon className="h-4 w-4" />
         </Button>
-      </FileMenu>
+      </Menu>
     </div>
   );
+};
+
+export const TrashedSystemItem = ({ file }: { file: FileMinViewDto }) => {
+  const Menu = useTrashedFileMenu(file).FileMenu;
+
+  return <FileSystemItem file={file} CustomMenu={Menu} />;
 };

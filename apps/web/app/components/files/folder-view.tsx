@@ -29,6 +29,9 @@ interface FolderViewProps {
   isLoading?: boolean;
   onBreadcrumbClick?: (ancestor: FileAncestor) => void;
   noDataComponent?: React.ReactNode;
+  CustomFileSystemItem?: React.FC<{
+    file: FileMinViewDto;
+  }>;
 }
 
 export const FolderView = ({
@@ -43,6 +46,7 @@ export const FolderView = ({
   onBreadcrumbClick,
   columns,
   noDataComponent = <FolderEmpty />,
+  CustomFileSystemItem,
 }: FolderViewProps) => {
   const { view: preferredViewMode, setFolderViewMode } = useFolderViewMode();
   const [viewMode, setViewMode] = useState<FolderViewMode>(
@@ -126,6 +130,7 @@ export const FolderView = ({
           group={group}
           isLoading={internalLoading}
           noDataComponent={noDataComponent}
+          CustomFileSystemItem={CustomFileSystemItem}
         />
       ) : (
         <TableView

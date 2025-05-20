@@ -48,4 +48,51 @@ export class FileRepository extends BaseRepository<
     }
     return ancestors;
   }
+
+  async isTrashed(
+    fileId: string,
+  ): Promise<{
+    trashed: boolean;
+    trashedBy: 'self' | 'parent' | null;
+    isFolder: boolean;
+  }> {
+    let currentId: string | null = fileId;
+    let isFolder = false;
+
+    while (currentId) {
+      const file: Pick<
+        File,
+        'id' | 'trashedAt' | 'parentId' | 'contentType'
+      > | null = await this.prisma.file.findFirst({
+        where: { id: currentId },
+        select: {
+          id: true,
+          trashedAt: true,
+          parentId: true,
+          contentType: true,
+        },
+      });
+
+      if (!file) {
+        return { trashed: false, trashedBy: null, isFolder: false };
+      }
+
+      // Capture if the original file is a folder
+      if (file.id === fileId) {
+        isFolder = file.contentType === 'folder';
+      }
+
+      if (file.trashedAt !== null) {
+        return {
+          trashed: true,
+          trashedBy: file.id === fileId ? 'self' : 'parent',
+          isFolder,
+        };
+      }
+
+      currentId = file.parentId;
+    }
+
+    return { trashed: false, trashedBy: null, isFolder };
+  }
 }
