@@ -24,6 +24,25 @@ interface FileLocationBreadcrumbHoverProps {
   onBreadcrumbClick?: (ancestor: FileAncestor) => void;
 }
 
+const BreadcrumbEntry = ({
+  ancestor,
+  onClick,
+}: {
+  ancestor: FileAncestor;
+  onClick: () => void;
+}) => (
+  <BreadcrumbItem
+    onClick={(e) => {
+      e.stopPropagation();
+      onClick();
+    }}
+    className="cursor-pointer items-center gap-2 rounded-[16px] px-4 py-2 text-heading hover:bg-stroke-200 dark:hover:bg-white/5"
+  >
+    <FolderIconOutline />
+    {ancestor.name}
+  </BreadcrumbItem>
+);
+
 const MiniBreadcrumb = ({
   folder,
   onBreadcrumbClick,
@@ -59,16 +78,7 @@ const MiniBreadcrumb = ({
 
     return (
       <>
-        <BreadcrumbItem
-          onClick={(e) => {
-            e.stopPropagation();
-            handleClick(first);
-          }}
-          className="cursor-pointer items-center gap-2 rounded-[16px] px-4 py-2 text-heading hover:bg-stroke-200 dark:hover:bg-white/5"
-        >
-          <FolderIconOutline />
-          {first.name}
-        </BreadcrumbItem>
+        <BreadcrumbEntry ancestor={first} onClick={() => handleClick(first)} />
         <BreadcrumbSeparator />
         <BreadcrumbItem
           onClick={(e) => {
@@ -80,16 +90,7 @@ const MiniBreadcrumb = ({
           <BreadcrumbEllipsis />
         </BreadcrumbItem>
         <BreadcrumbSeparator />
-        <BreadcrumbItem
-          onClick={(e) => {
-            e.stopPropagation();
-            handleClick(last);
-          }}
-          className="cursor-pointer items-center gap-2 rounded-[16px] px-4 py-2 text-heading hover:bg-stroke-200 dark:hover:bg-white/5"
-        >
-          <FolderIconOutline />
-          {last.name}
-        </BreadcrumbItem>
+        <BreadcrumbEntry ancestor={last} onClick={() => handleClick(last)} />
       </>
     );
   };
@@ -98,16 +99,10 @@ const MiniBreadcrumb = ({
     <>
       {ancestors.map((ancestor, index) => (
         <React.Fragment key={ancestor.id}>
-          <BreadcrumbItem
-            onClick={(e) => {
-              e.stopPropagation();
-              handleClick(ancestor);
-            }}
-            className="cursor-pointer items-center gap-2 rounded-[16px] px-4 py-2 text-heading hover:bg-stroke-200 dark:hover:bg-white/5"
-          >
-            <FolderIconOutline />
-            {ancestor.name}
-          </BreadcrumbItem>
+          <BreadcrumbEntry
+            ancestor={ancestor}
+            onClick={() => handleClick(ancestor)}
+          />
           {index !== ancestors.length - 1 && <BreadcrumbSeparator />}
         </React.Fragment>
       ))}
