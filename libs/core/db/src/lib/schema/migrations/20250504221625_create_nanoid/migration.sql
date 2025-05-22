@@ -2,6 +2,12 @@
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 
+-- SET search_path = prisma, public;
+-- Or persist it:
+-- ALTER ROLE postgres SET search_path = prisma, public; --all db
+-- ALTER DATABASE keepcloud SET search_path = prisma, public;
+
+
 CREATE OR REPLACE FUNCTION nanoid(
   nano_size int DEFAULT 21,        -- Length of the random nanoid part
   hash_size int DEFAULT 9,         -- Length of the timestamp-hash part
@@ -64,3 +70,4 @@ BEGIN
   RETURN shuffled_id;
 END
 $$ LANGUAGE PLPGSQL VOLATILE;
+
