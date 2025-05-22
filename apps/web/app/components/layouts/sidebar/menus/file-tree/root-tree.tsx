@@ -13,6 +13,7 @@ export const RootTree = () => {
     id: SYSTEM_FILE.MY_STORAGE.id,
     name: SYSTEM_FILE.MY_STORAGE.name,
     contentType: 'folder',
+    isFolder: true,
     size: '0',
     ancestors: [],
     children: [],
@@ -41,7 +42,7 @@ export const RootTree = () => {
           </div>
         ) : (
           data?.items
-            ?.filter((child) => child.contentType === 'folder')
+            ?.filter((child) => child.isFolder)
             .sort((a, b) => a.name.localeCompare(b.name))
             .map((child) => <FileTreeNode key={child.id} file={child} />)
         )}

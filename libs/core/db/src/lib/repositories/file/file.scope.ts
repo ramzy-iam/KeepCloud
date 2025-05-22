@@ -34,7 +34,7 @@ export class FileScope extends BaseScope<
   }
 
   filerByIsFolder() {
-    this._where.type = 'FOLDER';
+    this._where.isFolder = true;
     return this;
   }
 

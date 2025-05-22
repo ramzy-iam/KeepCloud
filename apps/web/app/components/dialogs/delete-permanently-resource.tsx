@@ -20,10 +20,9 @@ export function DeletePermanentlyDialog() {
   if (!isOpen || type !== 'deletePermanently') return null;
 
   const { item: file } = context;
-  const isFolder = file?.contentType === 'folder';
 
   const deleteMutation = useDeletePermanently({
-    resourceName: isFolder ? 'Folder' : 'File',
+    resourceName: file?.isFolder ? 'Folder' : 'File',
     keysToInvalidate: [[SYSTEM_FILE.TRASH.invalidationKey]],
   });
 
