@@ -43,7 +43,7 @@ export const RenameResourceDialog = () => {
 
   const renameResource = useRenameResource({
     keysToInvalidate: [keyToInvalidate],
-    resourceName: context.item?.contentType === 'folder' ? 'Folder' : 'File',
+    resourceName: context.item?.isFolder ? 'Folder' : 'File',
   });
 
   const onSubmit = (data: FormInput) => {

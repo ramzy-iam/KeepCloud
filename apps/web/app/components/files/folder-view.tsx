@@ -58,16 +58,16 @@ export const FolderView = ({
   const displayOnlyFolders = categoryToDisplay === 'folder';
 
   const filteredItems = data.filter((item) => {
-    if (categoryToDisplay === 'folder') return item.contentType === 'folder';
-    if (categoryToDisplay === 'file') return item.contentType !== 'folder';
+    if (categoryToDisplay === 'folder') return item.isFolder;
+    if (categoryToDisplay === 'file') return !item.isFolder;
     return true;
   });
 
   const sortedItems = [...filteredItems].sort((a, b) => {
-    if (a.contentType === 'folder' && b.contentType === 'folder') {
+    if (a.isFolder && b.isFolder) {
       return a.name.localeCompare(b.name);
     }
-    return a.contentType === 'folder' ? -1 : 1;
+    return a.isFolder ? -1 : 1;
   });
 
   const tabClassName =

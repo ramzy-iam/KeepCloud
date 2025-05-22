@@ -28,7 +28,7 @@ export const FileTreeNode = ({ file }: { file: FileMinViewDto }) => {
     ? [...data.items].sort((a, b) => a.name.localeCompare(b.name))
     : file.children
       ? [...file.children]
-          .filter((child) => child.contentType === 'folder')
+          .filter((child) => child.isFolder)
           .sort((a, b) => a.name.localeCompare(b.name))
       : [];
 

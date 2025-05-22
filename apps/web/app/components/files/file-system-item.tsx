@@ -29,7 +29,7 @@ export const FileSystemItem = ({
   clickable = true,
 }: FileSystemItemProps) => {
   const { FileMenu: DefaultFileMenu } = useFileMenu({ file });
-  const isFolder = file.contentType === 'folder';
+  const isFolder = file.isFolder;
   const navigate = useNavigate();
   const { setActiveFolder } = useGetActiveFolder();
 

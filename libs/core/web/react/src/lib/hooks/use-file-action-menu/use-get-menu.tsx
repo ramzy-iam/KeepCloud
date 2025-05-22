@@ -11,7 +11,7 @@ interface UseGetMenuProps {
 }
 
 export const useGetMenuItems = ({ file }: UseGetMenuProps): MenuItem[] => {
-  if (file.contentType === 'folder') {
+  if (file.isFolder) {
     return useFolderMenuItems(file);
   }
   return useFileMenuItems(file);
@@ -20,7 +20,7 @@ export const useGetMenuItems = ({ file }: UseGetMenuProps): MenuItem[] => {
 export const useGetMenuTrashedItems = ({
   file,
 }: UseGetMenuProps): MenuItem[] => {
-  if (file.contentType === 'folder') {
+  if (file.isFolder) {
     return useTrashedFolderMenuItems(file);
   }
   return useTrashedFileMenuItems(file);

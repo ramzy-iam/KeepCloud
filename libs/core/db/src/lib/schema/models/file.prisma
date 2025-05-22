@@ -3,34 +3,33 @@ enum FileType {
   FOLDER
 }
 
-
-
 model File {
-  id          String    @id @default(dbgenerated("nanoid()"))
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  deletedAt   DateTime?
+  id        String    @id @default(dbgenerated("nanoid()"))
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
-  trashedAt   DateTime?
+  trashedAt DateTime?
 
   name        String
   contentType String
-  format      String?     
-  size        BigInt    //in bytes     
+  isFolder    Boolean  @default(false)
+  format      String?
+  size        BigInt //in bytes     
   type        FileType @default(FILE)
-  isSystem    Boolean  @default(false)  
-  
-  storagePath String?     //null for folders
+  isSystem    Boolean  @default(false)
 
-  parentId    String?     
-  parent      File?       @relation("FileHierarchy", fields: [parentId], references: [id])
-  children    File[]      @relation("FileHierarchy")
+  storagePath String? //null for folders
 
-  ownerId     String
-  owner       User      @relation("UserFiles", fields: [ownerId], references: [id])
-  accessLogs  FileAccessLog[]  @relation("FileToAccessLog")
+  parentId String?
+  parent   File?   @relation("FileHierarchy", fields: [parentId], references: [id])
+  children File[]  @relation("FileHierarchy")
 
-  sharedWith  SharedFile[]  
+  ownerId    String
+  owner      User            @relation("UserFiles", fields: [ownerId], references: [id])
+  accessLogs FileAccessLog[] @relation("FileToAccessLog")
+
+  sharedWith SharedFile[]
 
   @@index([ownerId])
   @@index([parentId])

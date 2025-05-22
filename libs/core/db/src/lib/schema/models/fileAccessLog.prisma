@@ -6,18 +6,17 @@ enum AccessAction {
 }
 
 model FileAccessLog {
-  id         String    @id @default(dbgenerated("nanoid()"))
-  userId     String?   
-  user      User?    @relation("UserFileAccessLogs", fields: [userId], references: [id])
+  id     String  @id @default(dbgenerated("nanoid()"))
+  userId String?
+  user   User?   @relation("UserFileAccessLogs", fields: [userId], references: [id])
 
-
-  fileId     String
-  file      File     @relation("FileToAccessLog", fields: [fileId], references: [id])
+  fileId String
+  file   File   @relation("FileToAccessLog", fields: [fileId], references: [id])
 
   action     AccessAction
   ipAddress  String?
   deviceInfo String?
-  accessedAt DateTime  @default(now())
+  accessedAt DateTime     @default(now())
 
   @@index([userId])
   @@index([fileId])

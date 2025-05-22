@@ -51,7 +51,7 @@ export const columns: ColumnDef<TrashedFileDto>[] = [
       name: 'Name',
     },
     cell: ({ row }) => {
-      const isFolder = row.original.contentType == 'folder';
+      const isFolder = row.original.isFolder;
 
       return (
         <div className="flex cursor-pointer items-center gap-2 truncate text-14-medium text-secondary-foreground">
@@ -85,7 +85,7 @@ export const columns: ColumnDef<TrashedFileDto>[] = [
       name: 'Size',
     },
     cell: ({ row }) => {
-      const isFolder = row.original.contentType === 'folder';
+      const isFolder = row.original.isFolder;
       if (isFolder) return <Minus size={16} />;
       const formatted = filesize(row.getValue('size'));
 

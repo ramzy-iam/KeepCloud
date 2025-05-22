@@ -60,14 +60,14 @@ export class FileRepository extends BaseRepository<
     while (currentId) {
       const file: Pick<
         File,
-        'id' | 'trashedAt' | 'parentId' | 'contentType'
+        'id' | 'trashedAt' | 'parentId' | 'isFolder'
       > | null = await this.prisma.file.findFirst({
         where: { id: currentId },
         select: {
           id: true,
           trashedAt: true,
           parentId: true,
-          contentType: true,
+          isFolder: true,
         },
       });
 
@@ -77,7 +77,7 @@ export class FileRepository extends BaseRepository<
 
       // Capture if the original file is a folder
       if (file.id === fileId) {
-        isFolder = file.contentType === 'folder';
+        isFolder = file.isFolder;
       }
 
       if (file.trashedAt !== null) {
@@ -95,6 +95,6 @@ export class FileRepository extends BaseRepository<
   }
 
   isFolder(file: File): boolean {
-    return file.contentType === 'folder';
+    return file.isFolder;
   }
 }

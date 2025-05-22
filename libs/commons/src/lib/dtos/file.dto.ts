@@ -77,6 +77,9 @@ export class FileMinViewDto {
   contentType: string;
 
   @Expose()
+  isFolder: boolean;
+
+  @Expose()
   @Type(() => FileAncestor)
   ancestors: FileAncestor[];
 
