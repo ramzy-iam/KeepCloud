@@ -48,6 +48,7 @@ export class FolderService extends BaseFileService {
       name: dto.name,
       owner: { connect: { id: dto.ownerId } },
       contentType: 'folder',
+      isFolder: true,
       size: BigInt(0),
       type: FileType.FOLDER,
       storagePath: null,

@@ -44,7 +44,7 @@ export const columns: ColumnDef<FileMinViewDto>[] = [
       name: 'Name',
     },
     cell: ({ row }) => {
-      const isFolder = row.original.contentType == 'folder';
+      const isFolder = row.original.isFolder;
       const navigate = useNavigate();
       const url = ROUTE_PATH.folderDetails(row.original.id);
 
@@ -88,7 +88,7 @@ export const columns: ColumnDef<FileMinViewDto>[] = [
       name: 'Size',
     },
     cell: ({ row }) => {
-      const isFolder = row.original.contentType === 'folder';
+      const isFolder = row.original.isFolder;
       if (isFolder)
         return (
           <div className="flex justify-center md:justify-end">
