@@ -1,26 +1,28 @@
-import {
-  Injectable,
-  CanActivate,
-  ExecutionContext,
-  Scope,
-} from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { BY_PASS_RLS } from '../decorators';
-import { RLSContextService } from '@keepcloud/core/db';
+import { BY_PASS_RLS, IS_PUBLIC } from '../decorators';
+import { PrismaService, RLSContextService } from '@keepcloud/core/db';
 import { ForbiddenException } from '@keepcloud/commons/backend';
 
 @Injectable()
 export class RLSAuthGuard implements CanActivate {
-  constructor(private reflector: Reflector) {}
+  constructor(
+    private reflector: Reflector,
+    private readonly prismaService: PrismaService,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const byPassRLS = this.reflector.getAllAndOverride<boolean>(BY_PASS_RLS, [
+    const isPublicRoute = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC, [
       context.getHandler(),
       context.getClass(),
     ]);
+    const shouldByPass = this.reflector.getAllAndOverride<boolean>(
+      BY_PASS_RLS,
+      [context.getHandler(), context.getClass()],
+    );
 
-    if (byPassRLS) {
-      RLSContextService.byPassRLS();
+    if (isPublicRoute || shouldByPass) {
+      RLSContextService.prisma = this.prismaService.getClient();
       return true;
     }
 
@@ -31,7 +33,7 @@ export class RLSAuthGuard implements CanActivate {
       throw new ForbiddenException();
     }
 
-    RLSContextService.setUserId(userId);
+    RLSContextService.prisma = this.prismaService.getClient(userId);
 
     return true;
   }
