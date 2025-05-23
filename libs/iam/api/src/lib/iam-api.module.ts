@@ -1,13 +1,14 @@
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, Reflector } from '@nestjs/core';
 import { Module } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { UserRepository } from '@keepcloud/core/db';
+import { RLSContextService, UserRepository } from '@keepcloud/core/db';
 import {
   UserService,
   AuthService,
   AuthGuard,
   JwtStrategy,
+  RLSAuthGuard,
 } from '@keepcloud/core/services';
 import { AuthController } from './auth.controller';
 import { UserController } from './user.controller';
@@ -22,9 +23,15 @@ import { UserController } from './user.controller';
     AuthGuard,
     JwtStrategy,
     JwtService,
+    RLSContextService,
+    Reflector,
     {
       provide: APP_GUARD,
       useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RLSAuthGuard,
     },
   ],
 })

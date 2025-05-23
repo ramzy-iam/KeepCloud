@@ -16,9 +16,10 @@ export class SubscriptionPlanScope extends BaseScope<
 > {
   constructor(
     protected readonly prisma: PrismaService,
+
     repository: SubscriptionPlanRepository,
   ) {
-    super(prisma, prisma.subscriptionPlan, repository);
+    super(prisma, prisma.client.subscriptionPlan, repository);
   }
 
   filterByDefault() {

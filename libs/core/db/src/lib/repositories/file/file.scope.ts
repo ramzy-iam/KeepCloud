@@ -19,7 +19,7 @@ export class FileScope extends BaseScope<
     protected readonly prisma: PrismaService,
     repository: FileRepository,
   ) {
-    super(prisma, prisma.file, repository);
+    super(prisma, prisma.client.file, repository);
   }
 
   filterByOwnerId(id: string) {
