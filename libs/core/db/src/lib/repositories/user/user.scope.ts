@@ -15,11 +15,10 @@ export class UserScope extends BaseScope<
   Prisma.UserOrderByWithRelationInput
 > {
   constructor(
-    protected readonly prisma: PrismaService,
-
-    repository: UserRepository,
+    protected readonly prismaService: PrismaService,
+    protected repository: UserRepository,
   ) {
-    super(prisma, prisma.user, repository);
+    super(prismaService, repository);
   }
 
   filterByEmail(email: string) {

@@ -39,6 +39,7 @@ export class UserService {
     const scope = this.userRepository.scoped;
     if (email) scope.filterByEmail(email);
     if (id) scope.filterById(id);
+
     return scope.getOne();
   }
 }

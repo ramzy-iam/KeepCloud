@@ -38,7 +38,6 @@ export class AuthController {
   }
 
   @Serialize(UserProfileDto)
-  // @ByPassRLS()
   @Get('me')
   getProfile(@Req() req: Request extends { user: infer U } ? U : any) {
     const { email, userId: id } = req.user;

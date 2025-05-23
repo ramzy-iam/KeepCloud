@@ -7,6 +7,8 @@ declare global {
       DATABASE_PASSWORD: string;
       DATABASE_NAME: string;
       DATABASE_SCHEMA: string;
+      DATABASE_URL: string;
+      DATABASE_URL_MIGRATION: string;
       TYPEORM_LOGGING: string;
       JWT_SECRET: string;
       JWT_REFRESH_SECRET: string;
