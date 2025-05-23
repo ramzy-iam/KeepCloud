@@ -152,11 +152,11 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
     if (!this.clientCache.has(cacheKey)) {
       let client = this.baseClient;
 
-      if (shouldByPass) {
-        client = client.$extends(bypassRLS()) as PrismaClient;
-      } else if (userId !== 'anonymous') {
-        client = client.$extends(forUser()) as PrismaClient;
-      }
+      // if (shouldByPass) {
+      //   client = client.$extends(bypassRLS()) as PrismaClient;
+      // } else if (userId !== 'anonymous') {
+      //   client = client.$extends(forUser()) as PrismaClient;
+      // }
       console.log({ cacheKey });
       this.clientCache.set(cacheKey, client);
     }

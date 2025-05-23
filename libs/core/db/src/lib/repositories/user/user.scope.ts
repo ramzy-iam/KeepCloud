@@ -16,6 +16,7 @@ export class UserScope extends BaseScope<
 > {
   constructor(
     protected readonly prisma: PrismaService,
+
     repository: UserRepository,
   ) {
     super(prisma, prisma.user, repository);

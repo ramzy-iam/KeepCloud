@@ -1,5 +1,6 @@
 import {
   FileRepository,
+  RLSContextService,
   SubscriptionPlanRepository,
   UserRepository,
 } from '@keepcloud/core/db';
@@ -16,6 +17,7 @@ const services = [
   UserService,
   AuthService,
   JwtService,
+  RLSContextService,
 
   // Repositories
   UserRepository,
