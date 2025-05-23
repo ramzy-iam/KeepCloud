@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { File } from '../../entities';
 import { BaseRepository } from '../base';
-import { PrismaService, Prisma } from '../../prisma';
+import { PrismaService, Prisma, RLSContextService } from '../../prisma';
 import { FileAncestor } from '@keepcloud/commons/dtos';
 import { FileScope } from './file.scope';
 
@@ -15,16 +15,19 @@ export class FileRepository extends BaseRepository<
   Prisma.FileInclude,
   Prisma.FileOrderByWithRelationInput
 > {
-  constructor(protected readonly prisma: PrismaService) {
-    super(prisma.client.file);
+  constructor(
+    protected readonly prismaService: PrismaService,
+    protected context: RLSContextService,
+  ) {
+    super('file', context);
   }
 
   get scoped(): FileScope {
-    return new FileScope(this.prisma, this);
+    return new FileScope(this.prismaService, this);
   }
 
   async getAncestors(id: string): Promise<FileAncestor[]> {
-    const file = await this.prisma.client.file.findFirstOrThrow({
+    const file = await this.prisma.file.findFirstOrThrow({
       where: { id },
       select: { id: true, name: true, parentId: true },
     });
@@ -33,7 +36,7 @@ export class FileRepository extends BaseRepository<
     let currentId = file.parentId;
 
     while (currentId) {
-      const parent = await this.prisma.client.file.findFirst({
+      const parent = await this.prisma.file.findFirst({
         where: { id: currentId },
         select: { id: true, name: true, parentId: true },
       });
@@ -61,7 +64,7 @@ export class FileRepository extends BaseRepository<
       const file: Pick<
         File,
         'id' | 'trashedAt' | 'parentId' | 'isFolder'
-      > | null = await this.prisma.client.file.findFirst({
+      > | null = await this.prisma.file.findFirst({
         where: { id: currentId },
         select: {
           id: true,

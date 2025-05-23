@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../prisma';
+import { Prisma } from '@prisma/client';
+import { PrismaService, RLSContextService } from '../../prisma';
 import { User } from '../../entities';
-import { Prisma, PrismaClient } from '@prisma/client';
 import { BaseRepository } from '../base';
 import { UserScope } from './user.scope';
 
@@ -15,11 +15,14 @@ export class UserRepository extends BaseRepository<
   Prisma.UserInclude,
   Prisma.UserOrderByWithRelationInput
 > {
-  constructor(protected readonly prisma: PrismaService) {
-    super(prisma.user);
+  constructor(
+    protected readonly prismaService: PrismaService,
+    protected context: RLSContextService,
+  ) {
+    super('user', context);
   }
 
   get scoped() {
-    return new UserScope(this.prisma, this);
+    return new UserScope(this.prismaService, this);
   }
 }

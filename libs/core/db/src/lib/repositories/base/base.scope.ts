@@ -14,17 +14,8 @@ export abstract class BaseScope<
   OrderByWithRelationInput extends object,
 > {
   constructor(
-    protected readonly prisma: PrismaService,
-    protected readonly model: GenericPrismaModel<
-      T,
-      CreateInput,
-      UpdateInput,
-      WhereUniqueInput,
-      WhereInput,
-      Include,
-      OrderByWithRelationInput
-    >,
-    private readonly repository: BaseRepository<
+    protected readonly prismaService: PrismaService,
+    protected readonly repository: BaseRepository<
       T,
       CreateInput,
       UpdateInput,

@@ -15,11 +15,10 @@ export class SubscriptionPlanScope extends BaseScope<
   Prisma.SubscriptionPlanOrderByWithRelationInput
 > {
   constructor(
-    protected readonly prisma: PrismaService,
-
-    repository: SubscriptionPlanRepository,
+    protected readonly prismaService: PrismaService,
+    protected repository: SubscriptionPlanRepository,
   ) {
-    super(prisma, prisma.client.subscriptionPlan, repository);
+    super(prismaService, repository);
   }
 
   filterByDefault() {

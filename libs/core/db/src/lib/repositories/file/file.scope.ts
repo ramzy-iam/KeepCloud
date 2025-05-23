@@ -16,10 +16,10 @@ export class FileScope extends BaseScope<
   Prisma.FileOrderByWithRelationInput
 > {
   constructor(
-    protected readonly prisma: PrismaService,
-    repository: FileRepository,
+    protected readonly prismaService: PrismaService,
+    protected repository: FileRepository,
   ) {
-    super(prisma, prisma.client.file, repository);
+    super(prismaService, repository);
   }
 
   filterByOwnerId(id: string) {
