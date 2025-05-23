@@ -7,12 +7,7 @@ import {
   Get,
 } from '@nestjs/common';
 import { Request } from 'express';
-import {
-  AuthService,
-  ByPassRLS,
-  PublicRoute,
-  Serialize,
-} from '@keepcloud/core/services';
+import { AuthService, PublicRoute, Serialize } from '@keepcloud/core/services';
 import { AuthGoogleResponseDto, UserProfileDto } from '@keepcloud/commons/dtos';
 
 @Controller('auth')
