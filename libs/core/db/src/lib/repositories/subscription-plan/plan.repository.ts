@@ -16,7 +16,7 @@ export class SubscriptionPlanRepository extends BaseRepository<
   Prisma.SubscriptionPlanOrderByWithRelationInput
 > {
   constructor(protected readonly prisma: PrismaService) {
-    super(prisma.subscriptionPlan);
+    super(prisma.client.subscriptionPlan);
   }
 
   get scoped() {

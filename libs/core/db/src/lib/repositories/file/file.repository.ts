@@ -16,7 +16,7 @@ export class FileRepository extends BaseRepository<
   Prisma.FileOrderByWithRelationInput
 > {
   constructor(protected readonly prisma: PrismaService) {
-    super(prisma.file);
+    super(prisma.client.file);
   }
 
   get scoped(): FileScope {
@@ -24,7 +24,7 @@ export class FileRepository extends BaseRepository<
   }
 
   async getAncestors(id: string): Promise<FileAncestor[]> {
-    const file = await this.prisma.file.findFirstOrThrow({
+    const file = await this.prisma.client.file.findFirstOrThrow({
       where: { id },
       select: { id: true, name: true, parentId: true },
     });
@@ -33,7 +33,7 @@ export class FileRepository extends BaseRepository<
     let currentId = file.parentId;
 
     while (currentId) {
-      const parent = await this.prisma.file.findFirst({
+      const parent = await this.prisma.client.file.findFirst({
         where: { id: currentId },
         select: { id: true, name: true, parentId: true },
       });
@@ -61,7 +61,7 @@ export class FileRepository extends BaseRepository<
       const file: Pick<
         File,
         'id' | 'trashedAt' | 'parentId' | 'isFolder'
-      > | null = await this.prisma.file.findFirst({
+      > | null = await this.prisma.client.file.findFirst({
         where: { id: currentId },
         select: {
           id: true,

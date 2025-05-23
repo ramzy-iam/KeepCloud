@@ -7,7 +7,12 @@ import {
   Get,
 } from '@nestjs/common';
 import { Request } from 'express';
-import { AuthService, PublicRoute, Serialize } from '@keepcloud/core/services';
+import {
+  AuthService,
+  ByPassRLS,
+  PublicRoute,
+  Serialize,
+} from '@keepcloud/core/services';
 import { AuthGoogleResponseDto, UserProfileDto } from '@keepcloud/commons/dtos';
 
 @Controller('auth')
@@ -33,6 +38,7 @@ export class AuthController {
   }
 
   @Serialize(UserProfileDto)
+  // @ByPassRLS()
   @Get('me')
   getProfile(@Req() req: Request extends { user: infer U } ? U : any) {
     const { email, userId: id } = req.user;
