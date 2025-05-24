@@ -1,0 +1,6 @@
+GRANT USAGE ON SCHEMA prisma TO simple_user;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA prisma TO simple_user;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA prisma TO simple_user;
+
+-- To automatically give privileges on new tables:
+ALTER DEFAULT PRIVILEGES IN SCHEMA prisma GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO simple_user;
