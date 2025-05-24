@@ -15,6 +15,15 @@ declare global {
       GOOGLE_CLIENT_ID: string;
       VITE_GOOGLE_CLIENT_ID: string;
       API_BASE_URL: string;
+
+      APP_AWS_ACCESS_KEY_ID: string;
+      APP_AWS_SECRET_ACCESS_KEY: string;
+      APP_AWS_DEFAULT_REGION: string;
+      AWS_ACCESS_KEY_ID: string;
+      AWS_SECRET_ACCESS_KEY: string;
+      AWS_DEFAULT_REGION: string;
+
+      FILE_BUCKET: string;
     }
   }
 }

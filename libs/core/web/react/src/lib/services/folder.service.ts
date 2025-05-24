@@ -1,4 +1,3 @@
-import { APP_API } from './axios';
 import {
   CreateFolderDto,
   FolderFilterDto,

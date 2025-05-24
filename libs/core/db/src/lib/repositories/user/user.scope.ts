@@ -25,4 +25,9 @@ export class UserScope extends BaseScope<
     this._where.email = email;
     return this;
   }
+
+  joinSubscriptionPlan() {
+    this._include.plan = true;
+    return this;
+  }
 }
