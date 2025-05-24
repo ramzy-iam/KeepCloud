@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { SubscriptionPlanRepository, UserRepository } from '@keepcloud/core/db';
 import { TokenPayload } from 'google-auth-library';
 import { User } from '@prisma/client';
+import { UserNotFoundException } from '@keepcloud/commons/backend';
 
 @Injectable()
 export class UserService {
@@ -41,5 +42,35 @@ export class UserService {
     if (id) scope.filterById(id);
 
     return scope.getOne();
+  }
+
+  getOne(id?: string) {
+    if (!id) {
+      throw new UserNotFoundException('undefined');
+    }
+    return this.userRepository.scoped.filterById(id).getOneOrFail();
+  }
+
+  async getRemainingStorage(userId: string): Promise<bigint> {
+    const user = await this.userRepository.scoped
+      .filterById(userId)
+      .getOneOrFail();
+    const plan = await this.subscriptionPlanRepository.scoped
+      .filterById(user.planId)
+      .getOneOrFail();
+    return plan.maxStorage - user.storageUsed;
+  }
+
+  async updateStorageUsed(userId: string, storageUsed: number) {
+    const user = await this.userRepository.scoped
+      .filterById(userId)
+      .getOneOrFail();
+
+    return this.userRepository.update(
+      { id: user.id },
+      {
+        storageUsed: user.storageUsed + BigInt(storageUsed),
+      },
+    );
   }
 }

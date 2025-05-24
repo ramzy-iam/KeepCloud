@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client';
 
 export interface RLSContext {
   prisma?: PrismaClient;
+  prismaWithoutRLS?: PrismaClient;
   userId?: string | null;
 }
 
@@ -20,6 +21,19 @@ export class RLSContextService {
     }
 
     return context.prisma;
+  }
+
+  static get prismaWithoutRLS(): PrismaClient | undefined {
+    const context = this.getContext();
+    if (!context.prismaWithoutRLS) {
+      throw new Error('Prisma client without RLS is not set in the context');
+    }
+
+    return context.prismaWithoutRLS;
+  }
+
+  static set prismaWithoutRLS(prisma: PrismaClient) {
+    this.updateContext({ prismaWithoutRLS: prisma });
   }
 
   static set prisma(prisma: PrismaClient) {
