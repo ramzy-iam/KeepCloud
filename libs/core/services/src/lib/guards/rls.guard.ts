@@ -34,6 +34,7 @@ export class RLSAuthGuard implements CanActivate {
     }
 
     RLSContextService.prisma = this.prismaService.getClient(userId);
+    RLSContextService.userId = userId;
 
     return true;
   }

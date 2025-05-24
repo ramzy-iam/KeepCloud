@@ -17,10 +17,7 @@ export abstract class BaseRepository<
   Include extends object,
   OrderByWithRelationInput extends object,
 > {
-  constructor(
-    private modelName: Prisma.TypeMap['meta']['modelProps'],
-    protected context: RLSContextService,
-  ) {}
+  constructor(private modelName: Prisma.TypeMap['meta']['modelProps']) {}
 
   abstract get scoped(): unknown;
 
