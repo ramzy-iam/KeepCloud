@@ -7,9 +7,10 @@ export function bypassRLS() {
         $allModels: {
           async $allOperations({ args, query }) {
             const [, result] = await prisma.$transaction([
-              prisma.$executeRaw`SELECT set_config('app.bypass_rls', 'on', TRUE)`,
+              prisma.$queryRaw`SELECT set_config('app.bypass_rls', 'on', TRUE)`,
               query(args),
             ]);
+
             return result;
           },
         },
@@ -19,19 +20,19 @@ export function bypassRLS() {
 }
 
 export function forUser(userId: string) {
-  return Prisma.defineExtension((prisma) =>
-    prisma.$extends({
+  return Prisma.defineExtension((prisma) => {
+    return prisma.$extends({
       query: {
         $allModels: {
           async $allOperations({ args, query }) {
             const [, result] = await prisma.$transaction([
-              prisma.$executeRaw`SELECT set_config('app.current_user_id', ${userId}, TRUE)`,
+              prisma.$queryRaw`SELECT set_config('app.current_user_id', ${userId}, TRUE)`,
               query(args),
             ]);
             return result;
           },
         },
       },
-    }),
-  );
+    });
+  });
 }
