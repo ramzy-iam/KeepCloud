@@ -63,6 +63,7 @@ export class StorageService {
       .filterByParentId(null)
       .filterByType(FileType.FOLDER)
       .filterByNotTrashed()
+      .joinOwner()
       .orderBy({ name: 'asc' })
       .getManyPaginated(1, 15);
   }
@@ -72,6 +73,7 @@ export class StorageService {
       .filterByParentId(null)
       .filterByType(FileType.FILE)
       .filterByNotTrashed()
+      .joinOwner()
       .orderBy({ name: 'asc' })
       .getManyPaginated(1, 15);
   }
