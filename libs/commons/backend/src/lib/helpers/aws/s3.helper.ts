@@ -317,7 +317,7 @@ export class S3Helper extends AwsServiceHelper {
       });
 
       await this.s3Client.send(command);
-      this.logger.info('File deleted successfully', { bucket, key });
+      this.logger.debug('File deleted successfully', { bucket, key });
 
       return {
         success: true,
