@@ -8,4 +8,5 @@ export * from './use-file-action-menu';
 
 export * from './storage.hook';
 export * from './folder.hook';
+export * from './file.hook';
 export * from './use-dialog.hook';
