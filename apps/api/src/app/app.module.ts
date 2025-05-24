@@ -1,5 +1,5 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { DatabaseModule, RLSContextService } from '@keepcloud/core/db';
+import { DatabaseModule } from '@keepcloud/core/db';
 import { IamApiModule } from '@keepcloud/iam/api';
 import { FileApiModule } from '@keepcloud/files/api';
 import { StorageApiModule } from '@keepcloud/storage/api';

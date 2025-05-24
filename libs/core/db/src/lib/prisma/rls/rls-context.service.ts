@@ -1,12 +1,11 @@
 import { AsyncLocalStorage } from 'async_hooks';
-import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 
 export interface RLSContext {
   prisma?: PrismaClient;
+  userId?: string | null;
 }
 
-@Injectable()
 export class RLSContextService {
   private static asyncLocalStorage = new AsyncLocalStorage<RLSContext>();
 
@@ -25,6 +24,15 @@ export class RLSContextService {
 
   static set prisma(prisma: PrismaClient) {
     this.updateContext({ prisma });
+  }
+
+  static set userId(userId: string) {
+    this.updateContext({ userId });
+  }
+
+  static get userId(): string | null {
+    const context = this.getContext();
+    return context.userId ?? null;
   }
 
   // Set context for the current async operation
