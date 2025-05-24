@@ -1,4 +1,4 @@
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, Reflector } from '@nestjs/core';
 import { Module } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
@@ -8,6 +8,7 @@ import {
   AuthService,
   AuthGuard,
   JwtStrategy,
+  RLSAuthGuard,
 } from '@keepcloud/core/services';
 import { AuthController } from './auth.controller';
 import { UserController } from './user.controller';
@@ -25,6 +26,10 @@ import { UserController } from './user.controller';
     {
       provide: APP_GUARD,
       useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RLSAuthGuard,
     },
   ],
 })

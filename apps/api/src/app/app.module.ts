@@ -1,10 +1,11 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { DatabaseModule } from '@keepcloud/core/db';
 import { IamApiModule } from '@keepcloud/iam/api';
 import { FileApiModule } from '@keepcloud/files/api';
 import { StorageApiModule } from '@keepcloud/storage/api';
 import { GlobalExceptionFilter } from '@keepcloud/commons/backend';
 import { ServicesModule } from './services.module';
+import { RLSContextMiddleware } from '@keepcloud/core/services';
 
 @Module({
   imports: [
@@ -21,4 +22,8 @@ import { ServicesModule } from './services.module';
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(RLSContextMiddleware).forRoutes('*');
+  }
+}
