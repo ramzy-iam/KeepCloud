@@ -15,12 +15,12 @@ export class FileRepository extends BaseRepository<
   Prisma.FileInclude,
   Prisma.FileOrderByWithRelationInput
 > {
-  constructor(protected readonly prisma: PrismaService) {
-    super(prisma.file);
+  constructor(protected readonly prismaService: PrismaService) {
+    super('file');
   }
 
   get scoped(): FileScope {
-    return new FileScope(this.prisma, this);
+    return new FileScope(this.prismaService, this);
   }
 
   async getAncestors(id: string): Promise<FileAncestor[]> {
