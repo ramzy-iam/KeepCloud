@@ -20,18 +20,14 @@
       "outputs": ["{options.outputPath}"],
       "options": {
         "envFile": ".env",
-        "commands": [
-          "npx ts-node -P ./libs/core/db/tsconfig.migrations.json -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -d ./libs/core/db/typeorm.config.ts ./libs/core/db/migrations/migration"
-        ]
+        "command": "yarn prisma migrate dev"
       }
     },
     "migrations:run": {
       "executor": "nx:run-commands",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "commands": [
-          "npx ts-node -P ./libs/core/db/tsconfig.migrations.json -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -d ./libs/core/db/typeorm.config.ts"
-        ]
+        "commands": ["yarn prisma migrate deploy"]
       }
     }
   }
