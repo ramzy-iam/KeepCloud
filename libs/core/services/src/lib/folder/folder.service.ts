@@ -76,13 +76,14 @@ export class FolderService extends BaseFileService {
     return scope.getManyPaginated(filters.page, filters.pageSize);
   }
 
-  override async getOne(
+  async getOne(
     id: string,
     withAncestors = false,
   ): Promise<{ file: File; ancestors: FileAncestor[] }> {
     const file = await this.fileRepository.scoped
       .filterById(id)
       .filterByType(FileType.FOLDER)
+      .joinOwner()
       .getOne();
 
     if (!file)
