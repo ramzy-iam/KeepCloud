@@ -1,5 +1,9 @@
 import { ErrorCode } from '@keepcloud/commons/constants';
-import { NotFoundException, ConflictException } from './http.exceptions';
+import {
+  NotFoundException,
+  ConflictException,
+  BadRequestException,
+} from './http.exceptions';
 
 export class UserNotFoundException extends NotFoundException {
   constructor(id: string) {
@@ -67,6 +71,26 @@ export class FolderNotFoundException extends NotFoundException {
       `Folder with ID '${id}' was not found`,
       undefined,
       ErrorCode.RESOURCE_NOT_FOUND,
+    );
+  }
+}
+
+export class InsufficientStorageException extends BadRequestException {
+  constructor() {
+    super(
+      ErrorCode.INSUFFICIENT_STORAGE,
+      `Insufficient storage space available.`,
+      undefined,
+    );
+  }
+}
+
+export class FileKeyInvalidException extends BadRequestException {
+  constructor(storagePath: string) {
+    super(
+      ErrorCode.FILE_KEY_INVALID,
+      `File with storage path '${storagePath}' does not exist.`,
+      undefined,
     );
   }
 }

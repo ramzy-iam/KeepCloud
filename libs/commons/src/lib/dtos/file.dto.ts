@@ -16,25 +16,21 @@ import { Expose, Transform, Type } from 'class-transformer';
 import { FileType } from '@prisma/client';
 import { BaseFilterDto } from './base.dto';
 import castHelper from '../helpers/shared/cast.helper';
-import { ValueOf } from '../types';
 import { UserProfileDto } from './user.dto';
 
 export class CreateFileDto {
+  @IsNotEmpty(ErrorCode.FILE_KEY_REQUIRED)
+  @IsString()
+  storagePath: string;
+
   @IsNotEmpty(ErrorCode.FILE_NAME_REQUIRED)
   @IsString()
-  name: string;
-
-  @IsNotEmpty(ErrorCode.FILE_FORMAT_REQUIRED)
-  @IsEnum(FileFormat, ErrorCode.FILE_FORMAT_INVALID)
-  format: FileFormat;
-
-  @IsPositive(ErrorCode.FILE_SIZE_INVALID)
-  size: number;
+  filename: string;
 
   @IsNotEmpty(ErrorCode.PARENT_ID_REQUIRED)
   @IsString(ErrorCode.PARENT_ID_REQUIRED)
   @IsOptional()
-  parentId?: string;
+  parentId?: string | null;
 }
 
 export class CreateFolderDto {
@@ -162,4 +158,24 @@ export class FolderFilterDto extends BaseFilterDto {
 export class TrashedFileDto extends FileMinViewDto {
   @Expose()
   trashedAt: Date;
+}
+
+export class CreatePresignedPostBody {
+  @IsString()
+  @IsNotEmpty()
+  filename: string;
+}
+
+export class PresignedPostResultDto {
+  @Expose()
+  url: string;
+
+  @Expose()
+  fields: Record<string, string>;
+
+  @Expose()
+  bucket: string;
+
+  @Expose()
+  key: string;
 }

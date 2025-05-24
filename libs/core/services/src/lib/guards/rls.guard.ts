@@ -21,6 +21,8 @@ export class RLSAuthGuard implements CanActivate {
       [context.getHandler(), context.getClass()],
     );
 
+    RLSContextService.prismaWithoutRLS = this.prismaService.getClient(); //by pass rls by default
+
     if (isPublicRoute || shouldByPass) {
       RLSContextService.prisma = this.prismaService.getClient();
       return true;

@@ -11,9 +11,7 @@ import { Injectable } from '@nestjs/common';
 export abstract class BaseFileService {
   constructor(protected readonly fileRepository: FileRepository) {}
 
-  abstract create(dto: unknown): Promise<File>;
-
-  abstract getOne(...args: unknown[]): Promise<unknown>;
+  abstract create(...dto: unknown[]): Promise<File>;
 
   async checkAndThrowIfTrashed(fileId: string): Promise<void> {
     const { trashedBy, isFolder } = await this.fileRepository.isTrashed(fileId);

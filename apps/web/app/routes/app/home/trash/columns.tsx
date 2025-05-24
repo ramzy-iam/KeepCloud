@@ -1,13 +1,11 @@
 import { FileTextIcon, Minus, MoreVertical } from 'lucide-react';
 
-import { filesize } from 'filesize';
-
 import {
   Button,
   Checkbox,
   useTrashedFileMenu,
 } from '@keepcloud/web-core/react';
-import { DayjsHelper } from '@keepcloud/commons/helpers';
+import { DayjsHelper, FileHelper } from '@keepcloud/commons/helpers';
 import {
   FolderIconOutline,
   OwnerIcon,
@@ -87,7 +85,7 @@ export const columns: ColumnDef<TrashedFileDto>[] = [
     cell: ({ row }) => {
       const isFolder = row.original.isFolder;
       if (isFolder) return <Minus size={16} />;
-      const formatted = filesize(row.getValue('size'));
+      const formatted = FileHelper.formatBytes(row.getValue('size'));
 
       return (
         <div className="truncate text-14-medium text-secondary-foreground">

@@ -1,23 +1,16 @@
 import { FileTextIcon, Minus, MoreVertical } from 'lucide-react';
 
-import { filesize } from 'filesize';
-
 import {
   Button,
   Checkbox,
-  Avatar,
-  AvatarImage,
-  AvatarFallback,
-  cn,
   useFileMenu,
   ROUTE_PATH,
 } from '@keepcloud/web-core/react';
-import { DayjsHelper, NameFormatterHelper } from '@keepcloud/commons/helpers';
-import { Owner } from '@keepcloud/commons/types';
 import { FolderIconOutline, OwnerIcon } from '../../../components';
 import { ColumnDef } from '@tanstack/react-table';
 import { useNavigate } from 'react-router';
 import { FileMinViewDto, UserProfileDto } from '@keepcloud/commons/dtos';
+import { FileHelper } from '@keepcloud/commons/helpers';
 
 export const columns: ColumnDef<FileMinViewDto>[] = [
   {
@@ -101,7 +94,7 @@ export const columns: ColumnDef<FileMinViewDto>[] = [
             <Minus size={16} />
           </div>
         );
-      const formatted = filesize(row.getValue('size'));
+      const formatted = FileHelper.formatBytes(row.getValue('size'));
 
       return (
         <div className="truncate text-right text-14-medium text-secondary-foreground">

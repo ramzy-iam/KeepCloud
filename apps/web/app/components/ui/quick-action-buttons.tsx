@@ -1,12 +1,11 @@
+import React, { useRef } from 'react';
 import {
   FileUp,
   FolderPlus,
   FolderUp,
-  LucideProps,
   PlusIcon,
   UploadIcon,
 } from 'lucide-react';
-import React from 'react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,25 +16,27 @@ import {
   useDialog,
   useGetActiveFolder,
 } from '@keepcloud/web-core/react';
+import { FileHelper } from '@keepcloud/commons/helpers';
+import { FileUploadHandler } from './file-upload-handler';
 
 interface IActionButton {
-  icon: React.ComponentType<LucideProps>;
+  icon: React.ComponentType<any>;
   label: string;
   menuItems: MenuItem[];
 }
 
-interface ActionButtonProps {
-  action: IActionButton;
+interface QuickActionButtonsProps {
+  className?: string;
+  keysToInvalidate?: string[][];
+  maxFileSize?: number;
 }
 
-const iconClassName =
-  'mr-2 h-4 w-4 text-neutral-300 hover:text-neutral-300 dark:hover:text-neutral-200';
+const iconClassName = 'mr-2 h-4 w-4 text-neutral-300';
 const itemClassName =
-  'flex cursor-pointer items-center stroke-neutral-300 py-2 text-neutral-300! hover:bg-foreground hover:text-neutral-300 dark:stroke-200 dark:text-neutral-200 dark:hover:text-neutral-200';
+  'flex cursor-pointer items-center py-2 text-neutral-300 hover:bg-foreground hover:text-neutral-300 dark:text-neutral-200';
 
-const ActionButton = ({ action }: ActionButtonProps) => {
+const ActionButton = ({ action }: { action: IActionButton }) => {
   const { menuItems, label, icon: Icon } = action;
-
   return (
     <div className="flex flex-wrap justify-start gap-16 bg-background py-6">
       <DropdownMenu>
@@ -57,9 +58,17 @@ const ActionButton = ({ action }: ActionButtonProps) => {
   );
 };
 
-export const QuickActionButtons = ({ className }: { className?: string }) => {
+export const QuickActionButtons = ({
+  className,
+  keysToInvalidate = [],
+  maxFileSize = FileHelper.convertToBytes(10, 'MB'),
+}: QuickActionButtonsProps) => {
   const { openDialog } = useDialog();
   const { activeFolder } = useGetActiveFolder();
+
+  const uploadHandlerRef = useRef<{ triggerFileInput: () => void }>({
+    triggerFileInput: () => {},
+  });
 
   const actions: IActionButton[] = [
     {
@@ -86,7 +95,7 @@ export const QuickActionButtons = ({ className }: { className?: string }) => {
           label: 'Import a file',
           icon: <FileUp absoluteStrokeWidth className={iconClassName} />,
           className: itemClassName,
-          onClick: () => console.log('Import a file clicked'),
+          onClick: () => uploadHandlerRef.current.triggerFileInput(),
         },
         {
           label: 'Import a folder',
@@ -105,6 +114,11 @@ export const QuickActionButtons = ({ className }: { className?: string }) => {
         className,
       )}
     >
+      <FileUploadHandler
+        uploadHandlerRef={uploadHandlerRef.current}
+        maxFileSize={maxFileSize}
+        keysToInvalidate={keysToInvalidate}
+      />
       {actions.map((action) => (
         <ActionButton
           key={`${action.label}-${action.icon.name}`}
