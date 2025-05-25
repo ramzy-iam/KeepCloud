@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { File, FileType } from '@keepcloud/core/db';
 import {
   CreateFolderDto,
-  FileAncestor,
+  FileAncestorDto,
   FolderFilterDto,
   PaginationDto,
 } from '@keepcloud/commons/dtos';
@@ -79,7 +79,7 @@ export class FolderService extends BaseFileService {
   async getOne(
     id: string,
     withAncestors = false,
-  ): Promise<{ file: File; ancestors: FileAncestor[] }> {
+  ): Promise<{ file: File; ancestors: FileAncestorDto[] }> {
     const file = await this.fileRepository.scoped
       .filterById(id)
       .filterByType(FileType.FOLDER)
@@ -91,7 +91,7 @@ export class FolderService extends BaseFileService {
 
     await this.checkAndThrowIfTrashed(id);
 
-    let ancestors: FileAncestor[] = [];
+    let ancestors: FileAncestorDto[] = [];
     if (typeof withAncestors === 'boolean' && withAncestors) {
       ancestors = await this.fileRepository.getAncestors(id);
     }
