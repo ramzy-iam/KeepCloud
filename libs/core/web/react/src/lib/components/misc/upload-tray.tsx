@@ -115,7 +115,7 @@ export const UploadTray = ({
             const isCompleted = FileHelper.isUploadComplete(upload.progress);
             return (
               <div
-                key={upload.file.name}
+                key={upload.id}
                 className="flex items-center justify-between gap-3"
               >
                 <CircularProgress size={16} value={upload.progress} />
