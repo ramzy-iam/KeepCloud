@@ -76,8 +76,8 @@ export class FileMinViewDto {
   isFolder: boolean;
 
   @Expose()
-  @Type(() => FileAncestor)
-  ancestors: FileAncestor[];
+  @Type(() => FileAncestorDto)
+  ancestors: FileAncestorDto[];
 
   @Expose()
   @Type(() => FileMinViewDto)
@@ -99,9 +99,6 @@ export class FilePreviewDto extends FileMinViewDto {
   updatedAt: Date;
 
   @Expose()
-  @Type(() => FileMinViewDto)
-  parents: FileMinViewDto[];
-
   @Expose()
   ownerId: string;
 
@@ -111,7 +108,7 @@ export class FilePreviewDto extends FileMinViewDto {
 
 export class FileDetailsDto extends FilePreviewDto {}
 
-export class FileAncestor {
+export class FileAncestorDto {
   @Expose()
   id: string;
 

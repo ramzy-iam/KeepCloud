@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { File } from '../../entities';
 import { BaseRepository } from '../base';
 import { PrismaService, Prisma } from '../../prisma';
-import { FileAncestor } from '@keepcloud/commons/dtos';
+import { FileAncestorDto } from '@keepcloud/commons/dtos';
 import { FileScope } from './file.scope';
 
 @Injectable()
@@ -23,13 +23,13 @@ export class FileRepository extends BaseRepository<
     return new FileScope(this.prismaService, this);
   }
 
-  async getAncestors(id: string): Promise<FileAncestor[]> {
+  async getAncestors(id: string): Promise<FileAncestorDto[]> {
     const file = await this.prisma.file.findFirstOrThrow({
       where: { id },
       select: { id: true, name: true, parentId: true },
     });
 
-    const ancestors: FileAncestor[] = [];
+    const ancestors: FileAncestorDto[] = [];
     let currentId = file.parentId;
 
     while (currentId) {
