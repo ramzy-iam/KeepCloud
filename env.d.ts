@@ -24,6 +24,7 @@ declare global {
       AWS_DEFAULT_REGION: string;
 
       FILE_BUCKET: string;
+      LOG_LEVEL?: string;
     }
   }
 }
