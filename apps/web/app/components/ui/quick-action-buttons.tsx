@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import {
   FileUp,
   FolderPlus,
@@ -27,7 +27,6 @@ interface IActionButton {
 
 interface QuickActionButtonsProps {
   className?: string;
-  keysToInvalidate?: string[][];
   maxFileSize?: number;
 }
 
@@ -60,14 +59,12 @@ const ActionButton = ({ action }: { action: IActionButton }) => {
 
 export const QuickActionButtons = ({
   className,
-  keysToInvalidate = [],
   maxFileSize = FileHelper.convertToBytes(10, 'MB'),
 }: QuickActionButtonsProps) => {
   const { openDialog } = useDialog();
   const { activeFolder } = useGetActiveFolder();
 
   const { UploadHandler, triggerUpload } = useUploadTrigger({
-    keysToInvalidate,
     maxFileSize,
   });
 
