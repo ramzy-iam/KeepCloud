@@ -4,6 +4,7 @@ import { FileMinViewDto } from '@keepcloud/commons/dtos';
 import { useGetKeyToInvalidateBasedOnActiveFolder } from './storage.hook';
 
 export interface UploadEntry {
+  id: string;
   file: File;
   uploadFile?: FileMinViewDto;
   progress: number;
@@ -14,7 +15,7 @@ export const useUploadManager = () => {
   const [uploads, setUploads] = useState<UploadEntry[]>([]);
   const keyToInvalidate = useGetKeyToInvalidateBasedOnActiveFolder();
 
-  const { mutate } = useUploadFile({
+  const { mutateAsync } = useUploadFile({
     keysToInvalidate: [keyToInvalidate],
     onProgress: (progress, updatedFile) => {
       setUploads((prev) =>
@@ -25,25 +26,25 @@ export const useUploadManager = () => {
     },
   });
 
-  const uploadFile = (file: File) => {
+  const uploadFile = async (file: File) => {
     const abortController = new AbortController();
-    setUploads((prev) => [...prev, { file, progress: 0, abortController }]);
+    setUploads((prev) => [
+      ...prev,
+      { id: crypto.randomUUID(), file, progress: 0, abortController },
+    ]);
 
-    mutate(
-      { file, abortController },
-      {
-        onSuccess: (uploadedFile: FileMinViewDto) => {
-          setUploads((prev) =>
-            prev.map((u) =>
-              u.file.name === file.name
-                ? { ...u, uploadFile: uploadedFile, progress: 100 }
-                : u,
-            ),
-          );
-        },
-        onError: () => {},
-      },
-    );
+    try {
+      const uploadedFile = await mutateAsync({ file, abortController });
+      setUploads((prev) =>
+        prev.map((u) =>
+          u.file.name === file.name
+            ? { ...u, uploadFile: uploadedFile, progress: 100 }
+            : u,
+        ),
+      );
+    } catch (error) {
+      // TODO: Handle error
+    }
   };
 
   const cancelUpload = (file: File) => {

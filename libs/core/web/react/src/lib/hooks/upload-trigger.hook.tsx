@@ -2,7 +2,6 @@ import { useRef, useCallback } from 'react';
 import { FileHelper } from '@keepcloud/commons/helpers';
 import { useUploadManager } from './upload-manager.hook';
 import { UploadTray } from '../components';
-import { KeyToInvalidate } from '../services';
 
 interface UseUploadTriggerOptions {
   maxFileSize?: number;
