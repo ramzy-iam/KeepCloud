@@ -33,11 +33,20 @@ const myFormat = printf(({ timestamp, level, message, label, ...meta }) => {
   return `${timestamp} ${coloredLabel} ${coloredLevel}: ${coloredMessage}`;
 });
 
+function getLogLevel(): string {
+  const level = process.env.LOG_LEVEL?.toLowerCase();
+  if (level && ['error', 'warn', 'info', 'debug'].includes(level)) {
+    return level;
+  }
+  return 'info';
+}
+
 export class Logger {
   private logger: WinstonLogger;
 
   constructor(programName: string) {
     this.logger = winston.createLogger({
+      level: getLogLevel(),
       format: combine(
         label({ label: programName }),
         timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
