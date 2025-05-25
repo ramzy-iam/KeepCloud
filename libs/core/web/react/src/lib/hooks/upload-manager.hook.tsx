@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useUploadFile } from './file.hook';
 import { FileMinViewDto } from '@keepcloud/commons/dtos';
+import { useGetKeyToInvalidateBasedOnActiveFolder } from './storage.hook';
 
 export interface UploadEntry {
   file: File;
@@ -9,11 +10,12 @@ export interface UploadEntry {
   abortController: AbortController;
 }
 
-export const useUploadManager = (keysToInvalidate: string[][]) => {
+export const useUploadManager = () => {
   const [uploads, setUploads] = useState<UploadEntry[]>([]);
+  const keyToInvalidate = useGetKeyToInvalidateBasedOnActiveFolder();
 
   const { mutate } = useUploadFile({
-    keysToInvalidate,
+    keysToInvalidate: [keyToInvalidate],
     onProgress: (progress, updatedFile) => {
       setUploads((prev) =>
         prev.map((u) =>

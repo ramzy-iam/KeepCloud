@@ -5,12 +5,11 @@ import {
   FileMinViewDto,
   PresignedPostResultDto,
 } from '@keepcloud/commons/dtos';
-import { ApiError, FileService } from '../services';
+import { ApiError, FileService, KeyToInvalidate } from '../services';
 import { toast } from 'sonner';
 import { useGetActiveFolder } from './folder.hook';
 
-interface UploadFileProps {
-  keysToInvalidate: string[][];
+interface UploadFileProps extends KeyToInvalidate {
   onProgress?: (progress: number, file: File) => void;
 }
 
