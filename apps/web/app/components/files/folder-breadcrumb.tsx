@@ -13,11 +13,11 @@ import {
   useSidebar,
   TooltipProviderWrapper,
 } from '@keepcloud/web-core/react';
-import { FileAncestor, FileMinViewDto } from '@keepcloud/commons/dtos';
+import { FileAncestorDto, FileMinViewDto } from '@keepcloud/commons/dtos';
 
 interface FolderBreadcrumbProps {
   folder: FileMinViewDto;
-  onBreadcrumbClick?: (ancestor: FileAncestor) => void;
+  onBreadcrumbClick?: (ancestor: FileAncestorDto) => void;
 }
 
 export const FolderBreadcrumb = ({
@@ -34,13 +34,13 @@ export const FolderBreadcrumb = ({
     ? ancestors.length > 0
     : ancestors.length > 2;
 
-  const visibleAncestors: FileAncestor[] = shouldShowEllipsis
+  const visibleAncestors: FileAncestorDto[] = shouldShowEllipsis
     ? isMobile
       ? [] // hide all on mobile
       : ancestors.slice(-1) // show last on desktop
     : ancestors; // show all if 2 or fewer ancestors
 
-  const hiddenAncestors: FileAncestor[] = shouldShowEllipsis
+  const hiddenAncestors: FileAncestorDto[] = shouldShowEllipsis
     ? isMobile
       ? ancestors
       : ancestors.slice(0, -1)

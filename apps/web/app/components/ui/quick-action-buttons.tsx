@@ -15,9 +15,9 @@ import {
   renderMenuItem,
   useDialog,
   useGetActiveFolder,
+  useUploadTrigger,
 } from '@keepcloud/web-core/react';
 import { FileHelper } from '@keepcloud/commons/helpers';
-import { FileUploadHandler } from './file-upload-handler';
 
 interface IActionButton {
   icon: React.ComponentType<any>;
@@ -66,8 +66,9 @@ export const QuickActionButtons = ({
   const { openDialog } = useDialog();
   const { activeFolder } = useGetActiveFolder();
 
-  const uploadHandlerRef = useRef<{ triggerFileInput: () => void }>({
-    triggerFileInput: () => {},
+  const { UploadHandler, triggerUpload } = useUploadTrigger({
+    keysToInvalidate,
+    maxFileSize,
   });
 
   const actions: IActionButton[] = [
@@ -95,7 +96,7 @@ export const QuickActionButtons = ({
           label: 'Import a file',
           icon: <FileUp absoluteStrokeWidth className={iconClassName} />,
           className: itemClassName,
-          onClick: () => uploadHandlerRef.current.triggerFileInput(),
+          onClick: () => triggerUpload(),
         },
         {
           label: 'Import a folder',
@@ -114,11 +115,7 @@ export const QuickActionButtons = ({
         className,
       )}
     >
-      <FileUploadHandler
-        uploadHandlerRef={uploadHandlerRef.current}
-        maxFileSize={maxFileSize}
-        keysToInvalidate={keysToInvalidate}
-      />
+      <UploadHandler />
       {actions.map((action) => (
         <ActionButton
           key={`${action.label}-${action.icon.name}`}

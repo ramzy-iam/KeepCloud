@@ -5,7 +5,7 @@ export type Owner = {
   picture: string;
 };
 
-export type FileAncestor = {
+export type FileAncestorDto = {
   id: string;
   name: string;
 };
@@ -23,7 +23,8 @@ export type File = {
   parent?: File;
   parentId?: string | null;
   children: File[];
-  ancestors: FileAncestor[];
+  ancestors: FileAncestorDto[];
+  isFolder?: boolean;
 };
 
 export type FileMainCategory = 'folder' | 'file' | 'all';

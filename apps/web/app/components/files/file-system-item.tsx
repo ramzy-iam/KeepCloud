@@ -1,5 +1,6 @@
 import {
   Button,
+  FolderIconOutline,
   ROUTE_PATH,
   TooltipProviderWrapper,
   cn,
@@ -8,9 +9,8 @@ import {
   useTrashedFileMenu,
 } from '@keepcloud/web-core/react';
 import { FileTextIcon, EllipsisVerticalIcon } from 'lucide-react';
-import { FolderIconOutline } from '../ui';
 import { useNavigate } from 'react-router';
-import { FileMinViewDto, TrashedFileDto } from '@keepcloud/commons/dtos';
+import { FileMinViewDto } from '@keepcloud/commons/dtos';
 
 interface FileSystemItemProps {
   file: FileMinViewDto;
