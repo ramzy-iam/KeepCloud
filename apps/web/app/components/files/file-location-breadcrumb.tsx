@@ -13,22 +13,22 @@ import {
   Popover,
   PopoverTrigger,
   PopoverContent,
+  FolderIconOutline,
 } from '@keepcloud/web-core/react';
 import { useNavigate } from 'react-router';
-import { FileAncestor, FileMinViewDto } from '@keepcloud/commons/dtos';
-import { FolderIconOutline } from '../ui';
+import { FileAncestorDto, FileMinViewDto } from '@keepcloud/commons/dtos';
 
 interface FileLocationBreadcrumbHoverProps {
   folder: FileMinViewDto;
   className?: string;
-  onBreadcrumbClick?: (ancestor: FileAncestor) => void;
+  onBreadcrumbClick?: (ancestor: FileAncestorDto) => void;
 }
 
 const BreadcrumbEntry = ({
   ancestor,
   onClick,
 }: {
-  ancestor: FileAncestor;
+  ancestor: FileAncestorDto;
   onClick: () => void;
 }) => (
   <BreadcrumbItem
@@ -52,14 +52,14 @@ const MiniBreadcrumb = ({
   const navigate = useNavigate();
   const listRef = React.useRef<HTMLOListElement | null>(null);
 
-  const defaultOnClick = (ancestor: FileAncestor) => {
+  const defaultOnClick = (ancestor: FileAncestorDto) => {
     const route = ancestor.isSystem
       ? ROUTE_PATH.system(ancestor.code)
       : ROUTE_PATH.folderDetails(ancestor.id);
     navigate(route);
   };
 
-  const handleClick = (ancestor: FileAncestor) => {
+  const handleClick = (ancestor: FileAncestorDto) => {
     onBreadcrumbClick ? onBreadcrumbClick(ancestor) : defaultOnClick(ancestor);
   };
 

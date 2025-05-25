@@ -3,10 +3,10 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
   DEFAULT_ACTIVE_FOLDER,
+  FolderIcon,
   SidebarMenuButton,
   useGetActiveFolder,
 } from '@keepcloud/web-core/react';
-import { FolderIcon } from '../../../../ui';
 import { ChevronRightIcon, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
@@ -71,7 +71,7 @@ export const FileNode = ({
       setActiveFolder(DEFAULT_ACTIVE_FOLDER);
       navigate('/folders');
     } else if (id) {
-      setActiveFolder({ id, name, system: false });
+      setActiveFolder({ id, name, isSystem: false });
       navigate(url);
     }
   };
