@@ -8,7 +8,7 @@ import {
 } from '@keepcloud/web-core/react';
 import { FolderView } from '../../../components';
 import type { Route } from './+types/details';
-import { FileAncestor } from '@keepcloud/commons/dtos';
+import { FileAncestorDto } from '@keepcloud/commons/dtos';
 import { useNavigate } from 'react-router';
 import { useEffect, useRef } from 'react';
 import { columns } from './columns';
@@ -83,9 +83,9 @@ export default function FolderDetailsComponent({
     );
   }
 
-  const enhancedAncestors: FileAncestor[] = folder.ancestors || [];
+  const enhancedAncestors: FileAncestorDto[] = folder.ancestors || [];
 
-  const handleBreadcrumbClick = (ancestor: FileAncestor) => {
+  const handleBreadcrumbClick = (ancestor: FileAncestorDto) => {
     const activeFolder =
       ancestor.id === 'null'
         ? DEFAULT_ACTIVE_FOLDER

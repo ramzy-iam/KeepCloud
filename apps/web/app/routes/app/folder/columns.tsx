@@ -5,8 +5,9 @@ import {
   Checkbox,
   useFileMenu,
   ROUTE_PATH,
+  FolderIconOutline,
 } from '@keepcloud/web-core/react';
-import { FolderIconOutline, OwnerIcon } from '../../../components';
+import { OwnerIcon } from '../../../components';
 import { ColumnDef } from '@tanstack/react-table';
 import { useNavigate } from 'react-router';
 import { FileMinViewDto, UserProfileDto } from '@keepcloud/commons/dtos';

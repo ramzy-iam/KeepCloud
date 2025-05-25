@@ -285,6 +285,7 @@
   --color-section-border: var(--section-border);
   --color-placeholder: var(--placeholder);
   --color-app-accent: var(--app-accent);
+  --color-success: var(--success-500);
 
   /* Extend the default font family */
   --font-family-inter: Inter, sans-serif;
