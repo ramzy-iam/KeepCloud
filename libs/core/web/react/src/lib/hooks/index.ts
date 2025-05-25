@@ -10,3 +10,4 @@ export * from './storage.hook';
 export * from './folder.hook';
 export * from './file.hook';
 export * from './use-dialog.hook';
+export * from './upload-trigger.hook';

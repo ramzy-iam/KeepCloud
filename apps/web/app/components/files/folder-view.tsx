@@ -9,7 +9,7 @@ import {
 } from '@keepcloud/web-core/react';
 import { LayoutGrid, StretchHorizontal } from 'lucide-react';
 import { FileMainCategory, FolderViewMode } from '@keepcloud/commons/types';
-import { FileAncestor, FileMinViewDto } from '@keepcloud/commons/dtos';
+import { FileAncestorDto, FileMinViewDto } from '@keepcloud/commons/dtos';
 import { ColumnDef } from '@tanstack/react-table';
 import { GridView } from './grid-view';
 import { TableView } from './table-view';
@@ -27,7 +27,7 @@ interface FolderViewProps {
   group?: boolean;
   className?: string;
   isLoading?: boolean;
-  onBreadcrumbClick?: (ancestor: FileAncestor) => void;
+  onBreadcrumbClick?: (ancestor: FileAncestorDto) => void;
   noDataComponent?: React.ReactNode;
   CustomFileSystemItem?: React.FC<{
     file: FileMinViewDto;

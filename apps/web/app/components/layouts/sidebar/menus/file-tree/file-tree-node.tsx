@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { FileMinViewDto } from '@keepcloud/commons/dtos';
 import {
+  FolderIcon,
   ROUTE_PATH,
   Skeleton,
   useGetFoldersForTree,
 } from '@keepcloud/web-core/react';
-import { FolderIcon } from '../../../../ui';
 import { FileNode } from './file-node';
 
 export const FileTreeNode = ({ file }: { file: FileMinViewDto }) => {

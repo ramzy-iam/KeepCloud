@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { File, FileRepository, FileType } from '@keepcloud/core/db';
-import { CreateFileDto, PresignedPostResultDto } from '@keepcloud/commons/dtos';
+import {
+  CreateFileDto,
+  FileAncestorDto,
+  PresignedPostResultDto,
+} from '@keepcloud/commons/dtos';
 import {
   FileKeyInvalidException,
   FileNotFoundException,
@@ -12,6 +16,7 @@ import { Prisma } from '@prisma/client';
 import { BaseFileService } from './base-file-service';
 import { FileHelper } from '@keepcloud/commons/helpers';
 import { UserService } from '../user';
+import { SYSTEM_FILE } from '@keepcloud/commons/constants';
 
 @Injectable()
 export class FileService extends BaseFileService {
@@ -27,14 +32,16 @@ export class FileService extends BaseFileService {
     this.bucket = process.env.FILE_BUCKET;
   }
 
-  async create(ownerId: string, dto: CreateFileDto): Promise<File> {
+  async create(
+    ownerId: string,
+    dto: CreateFileDto,
+  ): Promise<File & { ancestors: FileAncestorDto[] }> {
     await this.validateParentFolder(dto.parentId);
     await this.validateFileExistsInStorage(dto.storagePath);
 
     const { name, format } = FileHelper.splitNameAndFormat(dto.filename);
     const filename = `${name}.${format}`;
     const size = await this.getFileSize(dto.storagePath);
-    console.log({});
 
     await this.checkUserStorageLimit(ownerId, size);
 
@@ -179,7 +186,7 @@ export class FileService extends BaseFileService {
     return `user-${userId}/tmp/${timestamp}_${filename}`;
   }
 
-  async getOne(id: string): Promise<File> {
+  async getOne(id: string): Promise<File & { ancestors: FileAncestorDto[] }> {
     const file = await this.fileRepository.scoped
       .filterById(id)
       .filterByType(FileType.FILE)
@@ -187,6 +194,21 @@ export class FileService extends BaseFileService {
       .getOne();
 
     if (!file) throw new FileNotFoundException(id);
-    return file;
+
+    let ancestors: FileAncestorDto[] = [];
+    ancestors = await this.fileRepository.getAncestors(id);
+
+    return {
+      ...file,
+      ancestors: [
+        {
+          id: SYSTEM_FILE.MY_STORAGE.id,
+          name: SYSTEM_FILE.MY_STORAGE.name,
+          code: SYSTEM_FILE.MY_STORAGE.code,
+          isSystem: true,
+        },
+        ...ancestors,
+      ],
+    };
   }
 }

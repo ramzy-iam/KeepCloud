@@ -60,6 +60,10 @@ export class FileHelper {
 
     return `${sizedValue.toFixed(dm)} ${sizes[i]}`;
   }
+
+  isUploadComplete(progress: number): boolean {
+    return progress === 100;
+  }
 }
 
 export default new FileHelper();

@@ -3,14 +3,11 @@ import { FileTextIcon, Minus, MoreVertical } from 'lucide-react';
 import {
   Button,
   Checkbox,
+  FolderIconOutline,
   useTrashedFileMenu,
 } from '@keepcloud/web-core/react';
 import { DayjsHelper, FileHelper } from '@keepcloud/commons/helpers';
-import {
-  FolderIconOutline,
-  OwnerIcon,
-  FileLocationBreadcrumb,
-} from '../../../../components';
+import { OwnerIcon, FileLocationBreadcrumb } from '../../../../components';
 import { ColumnDef } from '@tanstack/react-table';
 import { TrashedFileDto, UserProfileDto } from '@keepcloud/commons/dtos';
 
