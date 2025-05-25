@@ -4,13 +4,13 @@ import {
   ArgumentsHost,
   HttpException,
   HttpStatus,
-  Logger,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { AppException } from '../exceptions/base.exception';
 import { DatabaseExceptionFactory } from '../exceptions';
 import { ErrorCode } from '@keepcloud/commons/constants';
 import { RLSContextService } from '@keepcloud/core/db';
+import { Logger } from '../helpers';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
@@ -104,12 +104,10 @@ export class GlobalExceptionFilter implements ExceptionFilter {
   }
 
   private logException(exception: unknown) {
-    const at = new Date();
     const userId = RLSContextService.userId || 'unknown';
     if (exception instanceof AppException) {
       this.logger.error('Unhandled exception', {
         userId,
-        at,
         ...exception,
         ...{ details: exception.details },
         stack: exception.stack,
@@ -117,7 +115,6 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     } else {
       this.logger.error('Unhandled exception', {
         userId,
-        at,
         exception,
         stack: exception instanceof Error ? exception.stack : undefined,
       });
