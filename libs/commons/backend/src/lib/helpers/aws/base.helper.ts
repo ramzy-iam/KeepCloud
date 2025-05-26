@@ -1,10 +1,12 @@
 import { getAWSConfig } from './aws.config';
 
-class AwsServiceHelper {
+abstract class AwsServiceHelper<T> {
+  protected abstract client: T;
+
   protected static _getInstance<P>(
-    ctor: new (...args: any[]) => P,
+    ctor: new (...args: unknown[]) => P,
     targetRegion?: string,
-    ...args: any[]
+    ...args: unknown[]
   ): P {
     const instanceMap = (this as any).instanceMap as Map<string, P>; //should be defined in the inherited class as protected static property
     const { awsKeyId, awsSecret, awsRegion } = getAWSConfig();

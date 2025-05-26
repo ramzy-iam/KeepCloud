@@ -73,8 +73,8 @@ interface FileMetadata {
   storageClass?: string;
 }
 
-export class S3Helper extends AwsServiceHelper {
-  private s3Client: S3Client;
+export class S3Helper extends AwsServiceHelper<S3Client> {
+  protected client: S3Client;
   protected static instanceMap = new Map<string, S3Helper>();
   private logger = new Logger(S3Helper.name);
 
@@ -84,7 +84,7 @@ export class S3Helper extends AwsServiceHelper {
     region: string,
   ) {
     super();
-    this.s3Client = new S3Client({
+    this.client = new S3Client({
       credentials: {
         accessKeyId,
         secretAccessKey,
@@ -132,7 +132,7 @@ export class S3Helper extends AwsServiceHelper {
         ...options.additionalParams,
       });
 
-      const result = await this.s3Client.send(command);
+      const result = await this.client.send(command);
       this.logger.debug('File uploaded successfully', {
         bucket,
         key,
@@ -174,7 +174,7 @@ export class S3Helper extends AwsServiceHelper {
         Bucket: bucketName,
         Key: fileName,
       });
-      const data = await this.s3Client.send(command);
+      const data = await this.client.send(command);
       this.logger.debug('File read successfully', {
         bucketName,
         fileName,
@@ -211,7 +211,7 @@ export class S3Helper extends AwsServiceHelper {
         Key: fileKey,
         ResponseContentDisposition: contentDisposition,
       });
-      const url = await getSignedUrl(this.s3Client, command, {
+      const url = await getSignedUrl(this.client, command, {
         expiresIn,
       });
       this.logger.debug('Presigned GET URL created', {
@@ -267,7 +267,7 @@ export class S3Helper extends AwsServiceHelper {
       };
 
       const presignedPost: PresignedPost = await createPresignedPost(
-        this.s3Client,
+        this.client,
         {
           Bucket: bucket,
           Key: key,
@@ -316,7 +316,7 @@ export class S3Helper extends AwsServiceHelper {
         Key: key,
       });
 
-      await this.s3Client.send(command);
+      await this.client.send(command);
       this.logger.debug('File deleted successfully', { bucket, key });
 
       return {
@@ -351,7 +351,7 @@ export class S3Helper extends AwsServiceHelper {
         Key: key,
       });
 
-      await this.s3Client.send(command);
+      await this.client.send(command);
       this.logger.debug('File exists', { bucket, key });
       return true;
     } catch (error: any) {
@@ -392,7 +392,7 @@ export class S3Helper extends AwsServiceHelper {
         Delimiter: '/',
         Prefix: prefix,
       });
-      const data = await this.s3Client.send(command);
+      const data = await this.client.send(command);
       this.logger.debug('Objects listed successfully', {
         bucketName,
         prefix,
@@ -426,8 +426,7 @@ export class S3Helper extends AwsServiceHelper {
         Key: key,
       });
 
-      const response: HeadObjectCommandOutput =
-        await this.s3Client.send(command);
+      const response: HeadObjectCommandOutput = await this.client.send(command);
 
       this.logger.debug('Retrieved file metadata', {
         bucket,
@@ -507,7 +506,7 @@ export class S3Helper extends AwsServiceHelper {
         CopySource: oldSource,
         ACL: acl,
       });
-      return await this.s3Client.send(command);
+      return await this.client.send(command);
     } catch (error) {
       this.logger.error(
         `We faced this error while copying the object ${error}}`,
