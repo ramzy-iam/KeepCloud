@@ -4,15 +4,15 @@ import {
   ReceiveMessageCommand,
   ReceiveMessageCommandInput,
   ReceiveMessageCommandOutput,
-  SQS,
+  SQSClient,
   SendMessageCommand,
   SendMessageCommandOutput,
 } from '@aws-sdk/client-sqs';
 import AwsServiceHelper from './base.helper';
 import { Logger } from '../logger.helper';
 
-export class SQShelper extends AwsServiceHelper {
-  private sqsInstance: SQS;
+export class SQShelper extends AwsServiceHelper<SQSClient> {
+  protected client: SQSClient;
   protected static instanceMap = new Map<string, SQShelper>();
   private logger = new Logger(SQShelper.name);
 
@@ -22,7 +22,7 @@ export class SQShelper extends AwsServiceHelper {
     region: string,
   ) {
     super();
-    this.sqsInstance = new SQS({
+    this.client = new SQSClient({
       credentials: {
         accessKeyId,
         secretAccessKey,
@@ -48,7 +48,7 @@ export class SQShelper extends AwsServiceHelper {
         MessageBody,
       });
 
-      const data = await this.sqsInstance.send(command);
+      const data = await this.client.send(command);
       this.logger.info(
         `Data Queue Response for send message: ${JSON.stringify(data)}`,
       );
@@ -68,7 +68,7 @@ export class SQShelper extends AwsServiceHelper {
         QueueUrl: queueUrl,
         ReceiptHandle,
       });
-      const data = await this.sqsInstance.send(command);
+      const data = await this.client.send(command);
       this.logger.debug(
         `Data Queue Response for delete message: ${JSON.stringify(data)}`,
       );
@@ -91,7 +91,7 @@ export class SQShelper extends AwsServiceHelper {
         WaitTimeSeconds: 20,
       };
       const command = new ReceiveMessageCommand(params);
-      const data = await this.sqsInstance.send(command);
+      const data = await this.client.send(command);
       this.logger.debug(
         `Data Queue Response for receive message: ${JSON.stringify(data)}`,
       );
