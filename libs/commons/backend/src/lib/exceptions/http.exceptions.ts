@@ -49,7 +49,7 @@ export class ForbiddenException extends AppException {
 
 export class InternalServerErrorException extends AppException {
   constructor(
-    code: string = ErrorCode.INTERNAL_SERVER_ERROR,
+    code: string | undefined = ErrorCode.INTERNAL_SERVER_ERROR,
     message = 'An unexpected error occurred',
   ) {
     super(code, message, HttpStatus.INTERNAL_SERVER_ERROR);
