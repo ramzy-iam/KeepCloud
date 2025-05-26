@@ -6,6 +6,8 @@ import {
 import {
   AuthService,
   CurrentUserPipe,
+  SystemQueueService,
+  SystemQueueWorkerService,
   UserService,
 } from '@keepcloud/core/services';
 import { Global, Module } from '@nestjs/common';
@@ -24,6 +26,12 @@ const services = [
 
   // Miscellaneous
   CurrentUserPipe,
+
+  // Queues
+  SystemQueueService,
+
+  // Workers
+  SystemQueueWorkerService,
 ];
 
 @Global()

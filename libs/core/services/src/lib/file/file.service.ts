@@ -17,15 +17,17 @@ import { BaseFileService } from './base-file-service';
 import { FileHelper } from '@keepcloud/commons/helpers';
 import { UserService } from '../user';
 import { SYSTEM_FILE } from '@keepcloud/commons/constants';
+import { SystemQueueService } from '../queues';
 
 @Injectable()
 export class FileService extends BaseFileService {
-  private readonly s3helper: S3Helper;
-  private readonly bucket: string;
+  protected readonly s3helper: S3Helper;
+  protected readonly bucket: string;
 
   constructor(
     protected override readonly fileRepository: FileRepository,
     private readonly userService: UserService,
+    private readonly systemQueueService: SystemQueueService,
   ) {
     super(fileRepository);
     this.s3helper = S3Helper.getInstance();
@@ -59,37 +61,17 @@ export class FileService extends BaseFileService {
 
     await this.userService.updateStorageUsed(ownerId, size);
 
-    await this.updateUserStorageAndMoveFile(
+    await this.systemQueueService.moveFileInStorageAfterCreate({
       ownerId,
-      dto.storagePath,
-      createdFile.id,
+      sourcePath: dto.storagePath,
+      fileId: createdFile.id,
       filename,
-    );
+    });
 
     return this.getOne(createdFile.id);
   }
 
-  private async updateUserStorageAndMoveFile(
-    ownerId: string,
-    sourcePath: string,
-    fileId: string,
-    filename: string,
-  ): Promise<void> {
-    const destinationPath = this.generateStorageKey(ownerId, filename, fileId);
-    await this.moveFileInStorage(
-      `${this.bucket}/${sourcePath}`,
-      destinationPath,
-    );
-
-    await this.fileRepository.update(
-      { id: fileId },
-      { storagePath: destinationPath },
-    );
-
-    await this.s3helper.deleteFile(this.bucket, sourcePath);
-  }
-
-  private async moveFileInStorage(
+  protected async moveFileInStorage(
     sourcePath: string,
     destinationPath: string,
   ): Promise<void> {
@@ -174,7 +156,7 @@ export class FileService extends BaseFileService {
     };
   }
 
-  private generateStorageKey(
+  protected generateStorageKey(
     userId: string,
     filename: string,
     fileId?: string,
