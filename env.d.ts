@@ -25,6 +25,8 @@ declare global {
 
       FILE_BUCKET: string;
       LOG_LEVEL?: string;
+
+      SQS_SYSTEM_QUEUE_URL: string;
     }
   }
 }

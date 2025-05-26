@@ -6,11 +6,13 @@ import { StorageApiModule } from '@keepcloud/storage/api';
 import { GlobalExceptionFilter } from '@keepcloud/commons/backend';
 import { ServicesModule } from './services.module';
 import { RLSContextMiddleware } from '@keepcloud/core/services';
+import { ProcessorsModule } from '@keepcloud/processors';
 
 @Module({
   imports: [
     DatabaseModule,
     ServicesModule,
+    ProcessorsModule,
     IamApiModule,
     FileApiModule,
     StorageApiModule,
