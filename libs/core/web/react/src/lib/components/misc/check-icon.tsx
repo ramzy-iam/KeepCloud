@@ -4,7 +4,7 @@ import { Button } from '../ui';
 
 export const CheckIcon = ({
   className = '',
-  custom = true,
+  custom = false,
 }: {
   className?: string;
   custom?: boolean;

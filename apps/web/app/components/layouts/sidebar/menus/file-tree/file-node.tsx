@@ -3,7 +3,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
   DEFAULT_ACTIVE_FOLDER,
-  FolderIcon,
+  TreeFolderIcon,
   SidebarMenuButton,
   useGetActiveFolder,
 } from '@keepcloud/web-core/react';
@@ -21,10 +21,9 @@ interface FileNodeProps {
   isRoot?: boolean;
   url: string;
 }
-
 export const FileNode = ({
   file,
-  icon = <FolderIcon />,
+  icon,
   noIcon = false,
   children,
   fetchChildren,
@@ -76,6 +75,8 @@ export const FileNode = ({
     }
   };
 
+  const resolvedIcon = icon ?? <TreeFolderIcon isOpen={open} />;
+
   return (
     <Collapsible
       open={open}
@@ -102,7 +103,7 @@ export const FileNode = ({
         </CollapsibleTrigger>
 
         <div className="flex flex-1 cursor-pointer items-center gap-3 truncate pl-3">
-          {!noIcon && <span>{icon}</span>}
+          {!noIcon && <span>{resolvedIcon}</span>}
           <span className="truncate" title={name}>
             {name}
           </span>
@@ -112,8 +113,9 @@ export const FileNode = ({
       <CollapsibleContent className="-pl-3 relative before:absolute before:top-0 before:bottom-0 before:left-2 before:w-px before:bg-border">
         <div className="ml-2">
           {isChildrenLoading ? (
-            <div className="flex items-center justify-center p-2">
+            <div className="ml-6 flex items-center gap-2">
               <Loader2 className="animate-spin" size={16} />
+              <span className="">Loading</span>
             </div>
           ) : (
             children

@@ -1,17 +1,13 @@
-import { ChevronDown, ChevronUp, Folder, X } from 'lucide-react';
-import {
-  Button,
-  CircularProgress,
-  TooltipProviderWrapper,
-  useTheme,
-} from '../ui';
+import { ChevronDown, ChevronUp, X } from 'lucide-react';
+import { Button, CircularProgress, TooltipProviderWrapper } from '../ui';
 import { useState } from 'react';
 import { FileHelper } from '@keepcloud/commons/helpers';
 import { FileAncestorDto, FileMinViewDto } from '@keepcloud/commons/dtos';
 import { useNavigate } from 'react-router';
 import { ROUTE_PATH } from '../../constants';
-import { FolderIconOutline, CheckIcon } from './index';
+import { CheckIcon, FolderIcon } from './index';
 import { UploadEntry } from '../../hooks/upload-manager.hook';
+import { useFileIcon } from '../../hooks';
 
 export const UploadFileStatus = ({
   uploadFile,
@@ -20,7 +16,6 @@ export const UploadFileStatus = ({
 }) => {
   const ancestor = uploadFile.ancestors.at(-1) as FileAncestorDto;
   const navigate = useNavigate();
-  const { selectedTheme } = useTheme();
   const handleNavigate = () => {
     const route = ancestor.isSystem
       ? ROUTE_PATH.system(ancestor.code)
@@ -40,7 +35,7 @@ export const UploadFileStatus = ({
           onClick={handleNavigate}
           aria-label="Open folder"
         >
-          {selectedTheme === 'dark' ? <FolderIconOutline /> : <Folder />}
+          <FolderIcon />
         </Button>
       </TooltipProviderWrapper>
     </div>
@@ -113,12 +108,20 @@ export const UploadTray = ({
         <div className="mt-2 flex-1 space-y-3 overflow-y-auto px-4 pb-4">
           {uploads.map((upload) => {
             const isCompleted = FileHelper.isUploadComplete(upload.progress);
+            const FileIconComponent = upload.uploadFile
+              ? useFileIcon(upload.uploadFile)
+              : null;
+
             return (
               <div
                 key={upload.id}
                 className="flex items-center justify-between gap-3"
               >
-                <CircularProgress size={16} value={upload.progress} />
+                {FileIconComponent ? (
+                  <FileIconComponent />
+                ) : (
+                  <CircularProgress size={16} value={upload.progress} />
+                )}
                 <div className="flex-1 overflow-hidden">
                   <TooltipProviderWrapper content={upload.file.name}>
                     <p className="truncate text-sm">{upload.file.name}</p>

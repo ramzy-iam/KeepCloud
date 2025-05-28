@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { FileMinViewDto } from '@keepcloud/commons/dtos';
 import {
-  FolderIcon,
   ROUTE_PATH,
   Skeleton,
   useGetFoldersForTree,
@@ -36,7 +35,6 @@ export const FileTreeNode = ({ file }: { file: FileMinViewDto }) => {
     <FileNode
       url={ROUTE_PATH.folderDetails(file.id)}
       file={{ ...file, children: sortedChildren }}
-      icon={<FolderIcon />}
       fetchChildren={async () => {
         setShouldFetch(true);
         await fetchChildren();

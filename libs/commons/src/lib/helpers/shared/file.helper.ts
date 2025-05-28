@@ -3,7 +3,7 @@ import { MimeTypes } from '../../constants/file.constant';
 export class FileHelper {
   getContentType(fileName: string): string {
     const extension = fileName.split('.').pop()?.toLowerCase();
-    return MimeTypes[extension || ''] ?? 'application/octet-stream';
+    return MimeTypes[extension || ('' as any)] ?? 'application/octet-stream';
   }
 
   /**
