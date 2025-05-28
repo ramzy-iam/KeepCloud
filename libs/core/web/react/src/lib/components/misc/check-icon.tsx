@@ -68,13 +68,15 @@ export const CheckIcon = ({
     );
 
   return (
-    <Button
-      variant="outline"
-      size="icon"
-      className="size-[20px] rounded-full border-none bg-success text-muted-foreground group-hover:pointer-events-none group-hover:hidden"
-      aria-label="Open folder"
-    >
-      <Check size={6} strokeWidth={3} className="text-white-light" />
-    </Button>
+    <div className={cn(className)}>
+      <Button
+        variant="outline"
+        size="icon"
+        className="size-[20px] rounded-full border-none bg-success text-muted-foreground group-hover:pointer-events-none group-hover:hidden"
+        aria-label="Open folder"
+      >
+        <Check size={6} strokeWidth={3} className="text-white-light" />
+      </Button>
+    </div>
   );
 };

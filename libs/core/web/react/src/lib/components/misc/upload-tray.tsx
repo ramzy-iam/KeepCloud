@@ -25,13 +25,14 @@ export const UploadFileStatus = ({
   };
 
   return (
-    <div className="group relative flex items-center">
-      <CheckIcon className="group-hover:pointer-events-none group-hover:hidden" />
-      <TooltipProviderWrapper content={'Display file location'}>
+    <div className="group relative size-[25px]">
+      <CheckIcon className="absolute inset-0 z-10 opacity-100 transition-opacity duration-200 group-hover:z-0 group-hover:opacity-0" />
+
+      <TooltipProviderWrapper content="Display file location">
         <Button
           variant="outline"
           size="icon"
-          className="hidden size-[25px] rounded-full border-none text-muted-foreground group-hover:flex"
+          className="absolute inset-0 z-0 size-[20px] rounded-full border-none text-muted-foreground opacity-0 transition-opacity duration-200 group-hover:z-10 group-hover:opacity-100"
           onClick={handleNavigate}
           aria-label="Open folder"
         >
