@@ -71,10 +71,10 @@ export const CheckIcon = ({
     <Button
       variant="outline"
       size="icon"
-      className="size-[25px] rounded-full border-none bg-success text-muted-foreground group-hover:pointer-events-none group-hover:hidden"
+      className="size-[20px] rounded-full border-none bg-success text-muted-foreground group-hover:pointer-events-none group-hover:hidden"
       aria-label="Open folder"
     >
-      <Check size={16} strokeWidth={3} className="text-white-light" />
+      <Check size={6} strokeWidth={3} className="text-white-light" />
     </Button>
   );
 };
