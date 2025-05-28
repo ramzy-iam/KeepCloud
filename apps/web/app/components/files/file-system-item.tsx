@@ -1,14 +1,14 @@
 import {
   Button,
-  FolderIconOutline,
   ROUTE_PATH,
   TooltipProviderWrapper,
   cn,
+  useFileIcon,
   useFileMenu,
   useGetActiveFolder,
   useTrashedFileMenu,
 } from '@keepcloud/web-core/react';
-import { FileTextIcon, EllipsisVerticalIcon } from 'lucide-react';
+import { EllipsisVerticalIcon } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { FileMinViewDto } from '@keepcloud/commons/dtos';
 
@@ -32,6 +32,7 @@ export const FileSystemItem = ({
   const isFolder = file.isFolder;
   const navigate = useNavigate();
   const { setActiveFolder } = useGetActiveFolder();
+  const Icon = useFileIcon(file);
 
   const Menu = CustomMenu || DefaultFileMenu;
 
@@ -54,11 +55,7 @@ export const FileSystemItem = ({
     >
       <TooltipProviderWrapper content={file.name} sideOffset={12}>
         <div className="flex max-w-[calc(100%-24px)] items-center gap-2 overflow-hidden">
-          {isFolder ? (
-            <FolderIconOutline />
-          ) : (
-            <FileTextIcon className="h-4 w-4 text-app-accent" />
-          )}
+          <Icon />
           <p className="truncate text-left text-14-medium text-secondary-foreground">
             {file.name}
           </p>

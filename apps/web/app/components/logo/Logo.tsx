@@ -1,10 +1,9 @@
 import { useTheme } from '@keepcloud/web-core/react';
 
 export const Logo = () => {
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
+  const { isDarkMode } = useTheme();
 
-  if (isDark)
+  if (isDarkMode)
     return (
       <img
         src={'/assets/svg/full-logo-dark.svg'}

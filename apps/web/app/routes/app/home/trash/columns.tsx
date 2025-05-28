@@ -1,9 +1,9 @@
-import { FileTextIcon, Minus, MoreVertical } from 'lucide-react';
+import { Minus, MoreVertical } from 'lucide-react';
 
 import {
   Button,
   Checkbox,
-  FolderIconOutline,
+  useFileIcon,
   useTrashedFileMenu,
 } from '@keepcloud/web-core/react';
 import { DayjsHelper, FileHelper } from '@keepcloud/commons/helpers';
@@ -46,15 +46,11 @@ export const columns: ColumnDef<TrashedFileDto>[] = [
       name: 'Name',
     },
     cell: ({ row }) => {
-      const isFolder = row.original.isFolder;
+      const Icon = useFileIcon(row.original);
 
       return (
         <div className="flex cursor-pointer items-center gap-2 truncate text-14-medium text-secondary-foreground">
-          {isFolder ? (
-            <FolderIconOutline />
-          ) : (
-            <FileTextIcon size={16} className="text-app-accent" />
-          )}
+          <Icon />
           <div>{row.getValue('name')}</div>
         </div>
       );

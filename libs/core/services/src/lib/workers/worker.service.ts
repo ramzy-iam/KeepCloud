@@ -1,7 +1,7 @@
 import { Logger } from '@keepcloud/commons/backend';
 import { APP_LOCAL_QUEUES } from '@keepcloud/commons/constants';
 import { OnModuleDestroy, OnModuleInit } from '@nestjs/common';
-import { Worker, Job } from 'bullmq';
+import { Worker, Job, ConnectionOptions } from 'bullmq';
 import { ProcessorProvider } from '../processors';
 import { PrismaService, RLSContextService } from '@keepcloud/core/db';
 
@@ -11,7 +11,7 @@ export abstract class QueueWorkerService
   protected worker: Worker;
   protected abstract logger: Logger;
   protected abstract queueName: string;
-  protected connection = { host: 'localhost', port: 6379 };
+  protected connection: ConnectionOptions = { host: 'localhost', port: 6379 };
 
   constructor(
     protected processorProvider: ProcessorProvider,
