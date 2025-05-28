@@ -5,7 +5,7 @@ import {
   Checkbox,
   useFileMenu,
   ROUTE_PATH,
-  FolderIconOutline,
+  useFileIcon,
 } from '@keepcloud/web-core/react';
 import { OwnerIcon } from '../../../components';
 import { ColumnDef } from '@tanstack/react-table';
@@ -47,6 +47,7 @@ export const columns: ColumnDef<FileMinViewDto>[] = [
       const isFolder = row.original.isFolder;
       const navigate = useNavigate();
       const url = ROUTE_PATH.folderDetails(row.original.id);
+      const Icon = useFileIcon(row.original);
 
       const handleClick = () => {
         if (isFolder) {
@@ -58,12 +59,7 @@ export const columns: ColumnDef<FileMinViewDto>[] = [
           className="flex cursor-pointer items-center gap-2 truncate text-14-medium text-secondary-foreground"
           onClick={handleClick}
         >
-          {isFolder ? (
-            <FolderIconOutline />
-          ) : (
-            <FileTextIcon size={16} className="text-app-accent" />
-          )}
-          <div>{row.getValue('name')}</div>
+          <Icon />
         </div>
       );
     },

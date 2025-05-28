@@ -13,7 +13,7 @@ import {
   Popover,
   PopoverTrigger,
   PopoverContent,
-  FolderIconOutline,
+  FolderIcon,
 } from '@keepcloud/web-core/react';
 import { useNavigate } from 'react-router';
 import { FileAncestorDto, FileMinViewDto } from '@keepcloud/commons/dtos';
@@ -38,7 +38,7 @@ const BreadcrumbEntry = ({
     }}
     className="cursor-pointer items-center gap-2 rounded-[16px] px-4 py-2 text-heading hover:bg-stroke-200 dark:hover:bg-white/5"
   >
-    <FolderIconOutline />
+    <FolderIcon />
     {ancestor.name}
   </BreadcrumbItem>
 );
@@ -141,7 +141,7 @@ export const FileLocationBreadcrumb = ({
       className={`flex w-full max-w-[130px] cursor-pointer items-center gap-2 overflow-hidden ${className}`}
     >
       <span className="flex-shrink-0">
-        <FolderIconOutline />
+        <FolderIcon />
       </span>
       <span className="truncate whitespace-nowrap text-secondary-foreground">
         {nearestAncestor.name}
