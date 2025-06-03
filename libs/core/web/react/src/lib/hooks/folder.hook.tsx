@@ -84,7 +84,7 @@ export const useCreateFolder = ({ keysToInvalidate }: CreateFolderProps) => {
     },
 
     onSettled: () => {
-      keysToInvalidate.map((key) => {
+      keysToInvalidate.forEach((key) => {
         queryClient.invalidateQueries({ queryKey: key });
       });
     },
