@@ -1,11 +1,9 @@
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import { FileMinViewDto } from '@keepcloud/commons/dtos';
 import { useAtom } from 'jotai';
 import {
-  Button,
   Dialog,
   DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   dialogAtom,
@@ -24,26 +22,21 @@ export const FilePreviewDialog = () => {
 
   return (
     <Dialog open={true} onOpenChange={handleClose}>
-      <DialogContent className="max-w-4xl">
-        <DialogHeader>
-          <DialogTitle>{file?.name || 'Aperçu du fichier'}</DialogTitle>
+      <DialogContent className="w-full overflow-auto md:h-[95svh] md:max-w-[60svw]!">
+        <DialogHeader className="p-4">
+          <DialogTitle>{file?.name || 'File Preview'}</DialogTitle>
         </DialogHeader>
 
-        <div className="flex max-h-[80vh] min-h-[400px] items-center justify-center overflow-auto">
+        <div className="flex max-h-[80svh] min-h-[400px] items-center justify-center overflow-auto md:h-full md:max-h-full md:p-4">
           {error ? (
             <p className="text-sm text-muted-foreground">
-              Impossible d'afficher un aperçu pour ce fichier.
+              No preview available for this file type or the file is not
+              accessible. Please try downloading it instead.
             </p>
           ) : (
             PreviewComponent
           )}
         </div>
-
-        <DialogFooter>
-          <Button variant="secondary" onClick={handleClose}>
-            Fermer
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

@@ -6,6 +6,7 @@ import {
   useFileMenu,
   ROUTE_PATH,
   useFileIcon,
+  useDialog,
 } from '@keepcloud/web-core/react';
 import { OwnerIcon } from '../../../components';
 import { ColumnDef } from '@tanstack/react-table';
@@ -44,15 +45,21 @@ export const columns: ColumnDef<FileMinViewDto>[] = [
       name: 'Name',
     },
     cell: ({ row }) => {
-      const isFolder = row.original.isFolder;
+      const file = row.original;
+      const isFolder = file.isFolder;
       const navigate = useNavigate();
       const url = ROUTE_PATH.folderDetails(row.original.id);
       const Icon = useFileIcon(row.original);
+      const { openDialog } = useDialog();
 
       const handleClick = () => {
         if (isFolder) {
           navigate(url);
         }
+        openDialog({
+          type: 'previewFile',
+          item: file,
+        });
       };
       return (
         <div
