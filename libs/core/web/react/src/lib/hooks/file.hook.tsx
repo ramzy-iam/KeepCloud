@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   CreateFileDto,
   CreatePresignedPostBody,
@@ -8,6 +8,7 @@ import {
 import { ApiError, FileService, KeyToInvalidate } from '../services';
 import { toast } from 'sonner';
 import { useGetActiveFolder } from './folder.hook';
+import { useCallback } from 'react';
 
 interface UploadFileProps extends KeyToInvalidate {
   onProgress?: (progress: number, file: File) => void;
@@ -129,3 +130,47 @@ const useCreateFile = () =>
   useMutation<FileMinViewDto, ApiError, CreateFileDto>({
     mutationFn: (dto) => FileService.create(dto),
   });
+
+export const useGeneratePresignedGeOld = (fileId: string) => {
+  const {
+    mutateAsync: generatePresignedGet,
+    isPending,
+    error,
+    data,
+  } = useMutation<string, ApiError, string>({
+    mutationFn: (fileId) => FileService.getPresignedGet(fileId),
+  });
+
+  const fetchPreview = useCallback(async () => {
+    await generatePresignedGet(fileId);
+  }, [generatePresignedGet, fileId]);
+
+  return {
+    isLoading: isPending,
+    error,
+    presignedUrl: data,
+    fetchPreview,
+  };
+};
+
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+interface UseGeneratePresignedGetProps {
+  fileId?: string;
+  enabled?: boolean;
+}
+export const useGeneratePresignedGet = ({
+  fileId,
+  enabled = true,
+}: UseGeneratePresignedGetProps) => {
+  return useQuery<string, ApiError>({
+    queryKey: ['file', fileId, 'presigned-get'],
+    queryFn: async () => {
+      await wait(5000); // Simulate network delay
+      return FileService.getPresignedGet(fileId as string);
+    },
+    enabled: Boolean(fileId) && enabled,
+    retry: false,
+    staleTime: 60_000,
+  });
+};
