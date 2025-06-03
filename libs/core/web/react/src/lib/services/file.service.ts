@@ -19,6 +19,14 @@ class FileService extends BaseHttpService {
       dto,
     );
   }
+
+  getPresignedGet(fileId: string) {
+    return this.post<string>('/presigned-get', { fileId });
+  }
+
+  presignedGet(fileId: string) {
+    return this.get<string>(`${fileId}/presigned-get`);
+  }
 }
 
 export default new FileService();

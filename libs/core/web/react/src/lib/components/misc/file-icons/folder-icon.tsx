@@ -31,16 +31,16 @@ export const FolderIcon = ({ outlined = false }: { outlined?: boolean }) => {
       <path
         d="M15.5837 7.79169V12.0417C15.5837 14.875 14.8753 15.5834 12.042 15.5834H4.95866C2.12533 15.5834 1.41699 14.875 1.41699 12.0417V4.95835C1.41699 2.12502 2.12533 1.41669 4.95866 1.41669H6.02116C7.08366 1.41669 7.31741 1.72835 7.72116 2.26669L8.78366 3.68335C9.05283 4.03752 9.20866 4.25002 9.91699 4.25002H12.042C14.8753 4.25002 15.5837 4.95835 15.5837 7.79169Z"
         stroke="#FFCA28"
-        stroke-width="1.5"
+        strokeWidth="1.5"
         stroke-miterlimit="10"
       />
       <path
         d="M5.66699 1.41669H12.042C13.4587 1.41669 14.167 2.12502 14.167 3.54169V4.51919"
         stroke="#FFCA28"
-        stroke-width="1.5"
+        strokeWidth="1.5"
         stroke-miterlimit="10"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );
