@@ -19,14 +19,19 @@ const ImagePreview = ({ url, file }: { url: string; file: FileMinViewDto }) => (
   />
 );
 
-const PDFPreview = ({ url }: { url: string }) => (
-  <iframe
-    src={url}
-    title="PDF Preview"
-    className="h-[70vh] w-full rounded border"
-    onError={() => toast.error('Failed to load PDF preview')}
-  />
-);
+const PDFPreview = ({ url }: { url: string }) => {
+  const googleViewerUrl = `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(url)}`;
+
+  return (
+    <iframe
+      src={googleViewerUrl}
+      title="PDF Preview"
+      className="h-[70vh] w-full rounded border"
+      allow="fullscreen"
+      onError={() => toast.error('Failed to load PDF preview')}
+    />
+  );
+};
 
 const UnsupportedPreview = (
   <div className="text-center text-gray-500">
