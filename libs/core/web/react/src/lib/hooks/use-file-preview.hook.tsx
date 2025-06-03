@@ -1,50 +1,31 @@
-import React, { JSX, useEffect, useMemo, useRef, useState } from 'react';
+import { JSX, useMemo } from 'react';
 import { FileMinViewDto } from '@keepcloud/commons/dtos';
-import { Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
 import { useGeneratePresignedGet } from './file.hook';
+import {
+  ImagePreview,
+  LoadingPreview,
+  PDFPreview,
+  TextPreview,
+  OfficePreview,
+  UnsupportedPreview,
+} from '../components';
 
 interface UseFilePreviewerProps {
   file?: FileMinViewDto;
 }
 
-const supportedFormats = ['pdf', 'jpg', 'jpeg', 'png', 'gif'];
-
-const ImagePreview = ({ url, file }: { url: string; file: FileMinViewDto }) => (
-  <img
-    src={url}
-    alt={file.name}
-    className="max-h-[70vh] max-w-full object-contain"
-    onError={() => toast.error('Failed to load image preview')}
-  />
-);
-
-const PDFPreview = ({ url }: { url: string }) => {
-  const googleViewerUrl = `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(url)}`;
-
-  return (
-    <iframe
-      src={googleViewerUrl}
-      title="PDF Preview"
-      className="h-[70vh] w-full rounded border"
-      allow="fullscreen"
-      onError={() => toast.error('Failed to load PDF preview')}
-    />
-  );
-};
-
-const UnsupportedPreview = (
-  <div className="text-center text-gray-500">
-    No preview available for this file type
-  </div>
-);
-
-const LoadingPreview = (
-  <div className="flex flex-col items-center gap-4">
-    <Loader2 className="h-8 w-8 animate-spin" />
-    <span>Loading preview...</span>
-  </div>
-);
+const supportedFormats = [
+  'pdf',
+  'jpg',
+  'jpeg',
+  'png',
+  'gif',
+  'txt',
+  'doc',
+  'docx',
+  'xls',
+  'xlsx',
+];
 
 export const useFilePreviewer = ({ file }: UseFilePreviewerProps) => {
   const isPreviewable = useMemo(() => {
@@ -78,13 +59,21 @@ export const useFilePreviewer = ({ file }: UseFilePreviewerProps) => {
     if (!isPreviewable || !presignedUrl || !file) return UnsupportedPreview;
 
     const format = file.format.toLowerCase();
-    const isImage = ['jpg', 'jpeg', 'png', 'gif'].includes(format);
-    if (isImage) {
+
+    if (['jpg', 'jpeg', 'png', 'gif'].includes(format)) {
       return <ImagePreview url={presignedUrl} file={file} />;
     }
 
     if (format === 'pdf') {
       return <PDFPreview url={presignedUrl} />;
+    }
+
+    if (format === 'txt') {
+      return <TextPreview url={presignedUrl} />;
+    }
+
+    if (['doc', 'docx', 'xls', 'xlsx'].includes(format)) {
+      return <OfficePreview url={presignedUrl} />;
     }
 
     return UnsupportedPreview;
