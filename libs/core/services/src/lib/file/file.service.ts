@@ -98,9 +98,10 @@ export class FileService extends BaseFileService {
     const key = this.generateStorageKey(userId, filename);
     return this.s3helper.createPresignedPost(this.bucket, key);
   }
+
   async getPresignedGet(
     fileId: string,
-    disposition: DispositionType = 'inline', // 'inline' or 'attachment'
+    disposition: DispositionType = 'inline',
     customFilename?: string,
   ): Promise<string> {
     const file = await this.fileRepository.scoped
@@ -111,14 +112,22 @@ export class FileService extends BaseFileService {
       throw new InternalServerErrorException();
     }
 
-    // Get file extension from storagePath
-    const ext =
-      file.storagePath.substring(file.storagePath.lastIndexOf('.')) || '';
-
+    const fileFormat = file.format;
     const filename = customFilename || file.name;
 
-    const contentDisposition = `${disposition}; filename="${filename}"`;
-    // const contentDisposition = `${disposition}; filename="${filename}${ext}"`;
+    let finalFilename = filename;
+
+    if (fileFormat) {
+      const extRegex = /\.([a-zA-Z0-9]+)$/;
+      const match = extRegex.exec(filename);
+      const currentExt = match?.[1]?.toLowerCase();
+
+      if (!currentExt || currentExt !== fileFormat.toLowerCase()) {
+        finalFilename += `.${fileFormat}`;
+      }
+    }
+
+    const contentDisposition = `${disposition}; filename="${finalFilename}"`;
 
     return this.s3helper.createPresignedGet(file.storagePath, {
       bucket: this.bucket,
