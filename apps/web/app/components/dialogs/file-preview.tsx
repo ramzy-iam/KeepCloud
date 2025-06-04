@@ -9,13 +9,15 @@ import {
   dialogAtom,
   useFilePreviewer,
   TooltipProviderWrapper,
+  Button,
 } from '@keepcloud/web-core/react';
+import { DownloadIcon } from 'lucide-react';
 
 export const FilePreviewDialog = () => {
   const [dialogState, setDialogState] = useAtom(dialogAtom);
   const file = dialogState.context.item as FileMinViewDto;
 
-  const { PreviewComponent, error } = useFilePreviewer({ file });
+  const { PreviewComponent, error, presignedUrl } = useFilePreviewer({ file });
 
   const handleClose = useCallback(() => {
     setDialogState({ isOpen: false, type: null, context: {} });
@@ -23,13 +25,31 @@ export const FilePreviewDialog = () => {
 
   return (
     <Dialog open={true} onOpenChange={handleClose}>
-      <DialogContent className="w-full overflow-auto md:h-[95svh] md:max-w-[60svw]!">
-        <DialogHeader className="w-full max-w-full overflow-hidden text-left">
+      <DialogContent className="w-full gap-0 overflow-auto md:h-[95svh] md:max-w-[80svw]!">
+        <DialogHeader className="flex h-auto w-full max-w-full flex-row items-center justify-between gap-0 overflow-x-hidden text-left">
           <TooltipProviderWrapper content={file.name} sideOffset={-12}>
-            <DialogTitle className="w-full max-w-full truncate p-4">
+            <DialogTitle className="w-min max-w-full truncate p-4">
               {file.name ?? 'File Preview'}
             </DialogTitle>
           </TooltipProviderWrapper>
+          <div className="mr-2 flex gap-6">
+            <TooltipProviderWrapper content={'Download'} sideOffset={4}>
+              <div>
+                {presignedUrl && (
+                  <a
+                    href={presignedUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    download
+                  >
+                    <Button size="icon" variant="ghost">
+                      <DownloadIcon className="h-5 w-5" />
+                    </Button>
+                  </a>
+                )}
+              </div>
+            </TooltipProviderWrapper>
+          </div>
         </DialogHeader>
 
         <div className="flex max-h-[80svh] min-h-[80svh] items-center justify-center overflow-auto md:max-h-[80svh] md:p-4">
