@@ -10,6 +10,8 @@ import {
   FileNotFoundException,
   FolderNotFoundException,
   InsufficientStorageException,
+  InternalServerErrorException,
+  Logger,
   S3Helper,
 } from '@keepcloud/commons/backend';
 import { Prisma } from '@prisma/client';
@@ -18,11 +20,13 @@ import { FileHelper } from '@keepcloud/commons/helpers';
 import { UserService } from '../user';
 import { SYSTEM_FILE } from '@keepcloud/commons/constants';
 import { SystemQueueService } from '../queues';
+import { DispositionType } from '@keepcloud/commons/types';
 
 @Injectable()
 export class FileService extends BaseFileService {
   protected readonly s3helper: S3Helper;
   protected readonly bucket: string;
+  protected logger: Logger;
 
   constructor(
     protected override readonly fileRepository: FileRepository,
@@ -32,6 +36,7 @@ export class FileService extends BaseFileService {
     super(fileRepository);
     this.s3helper = S3Helper.getInstance();
     this.bucket = process.env.FILE_BUCKET;
+    this.logger = new Logger(FileService.name);
   }
 
   async create(
@@ -94,6 +99,42 @@ export class FileService extends BaseFileService {
     return this.s3helper.createPresignedPost(this.bucket, key);
   }
 
+  async getPresignedGet(
+    fileId: string,
+    disposition: DispositionType = 'inline',
+    customFilename?: string,
+  ): Promise<string> {
+    const file = await this.fileRepository.scoped
+      .filterById(fileId)
+      .getOneOrFail();
+
+    if (!file.storagePath) {
+      throw new InternalServerErrorException();
+    }
+
+    const fileFormat = file.format;
+    const filename = customFilename || file.name;
+
+    let finalFilename = filename;
+
+    if (fileFormat) {
+      const extRegex = /\.([a-zA-Z0-9]+)$/;
+      const match = extRegex.exec(filename);
+      const currentExt = match?.[1]?.toLowerCase();
+
+      if (!currentExt || currentExt !== fileFormat.toLowerCase()) {
+        finalFilename += `.${fileFormat}`;
+      }
+    }
+
+    const contentDisposition = `${disposition}; filename="${finalFilename}"`;
+
+    return this.s3helper.createPresignedGet(file.storagePath, {
+      bucket: this.bucket,
+      contentDisposition,
+    });
+  }
+
   private async validateParentFolder(parentId?: string | null): Promise<void> {
     if (!parentId) return;
 
@@ -121,7 +162,11 @@ export class FileService extends BaseFileService {
       this.bucket,
       storagePath,
     );
-    return contentLength as number;
+    if (typeof contentLength === 'undefined') {
+      this.logger.error('The file size is undefined');
+      throw new InternalServerErrorException();
+    }
+    return contentLength;
   }
 
   private async checkUserStorageLimit(

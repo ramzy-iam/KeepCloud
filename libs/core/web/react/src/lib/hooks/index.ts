@@ -12,3 +12,4 @@ export * from './file.hook';
 export * from './use-dialog.hook';
 export * from './upload-trigger.hook';
 export * from './use-file-icon.hook';
+export * from './use-file-preview.hook';

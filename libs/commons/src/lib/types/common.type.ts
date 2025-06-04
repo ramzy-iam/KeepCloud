@@ -6,3 +6,4 @@ export type Nullable<T> = {
 
 export type ValueOf<T> = T[keyof T];
 export type FolderViewMode = 'grid' | 'table';
+export type DispositionType = 'inline' | 'attachment' | (string & {});

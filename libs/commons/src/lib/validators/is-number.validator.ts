@@ -2,7 +2,6 @@ import {
   registerDecorator,
   ValidationOptions,
   ValidationArguments,
-  isEnum,
   ValidatorConstraintInterface,
   ValidatorConstraint,
   isNumber,
@@ -29,7 +28,7 @@ export function IsNumber(
   errorCode: ErrorCode = ErrorCode.INVALID_NUMBER,
   validationOptions?: ValidationOptions,
 ) {
-  return function (object: Object, propertyName: string) {
+  return function (object: object, propertyName: string) {
     registerDecorator({
       name: '_isNumber',
       target: object.constructor,

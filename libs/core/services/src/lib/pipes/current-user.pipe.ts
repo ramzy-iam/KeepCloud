@@ -2,7 +2,6 @@ import { Injectable, PipeTransform } from '@nestjs/common';
 import { UserService } from '../user/user.service'; // adjust path as needed
 import { Inject } from '@nestjs/common';
 import { UnauthorizedException } from '@keepcloud/commons/backend';
-import { ErrorCode } from '@keepcloud/commons/constants';
 
 @Injectable()
 export class CurrentUserPipe implements PipeTransform {
@@ -10,11 +9,11 @@ export class CurrentUserPipe implements PipeTransform {
 
   async transform(userId: string) {
     if (!userId) {
-      throw new UnauthorizedException(ErrorCode.UNAUTHORIZED);
+      throw new UnauthorizedException();
     }
 
     const user = await this.userService.findOne({ id: userId });
-    if (!user) throw new UnauthorizedException(ErrorCode.UNAUTHORIZED);
+    if (!user) throw new UnauthorizedException();
 
     return user;
   }

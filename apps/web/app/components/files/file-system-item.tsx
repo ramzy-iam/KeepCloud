@@ -3,6 +3,7 @@ import {
   ROUTE_PATH,
   TooltipProviderWrapper,
   cn,
+  useDialog,
   useFileIcon,
   useFileMenu,
   useGetActiveFolder,
@@ -29,6 +30,7 @@ export const FileSystemItem = ({
   clickable = true,
 }: FileSystemItemProps) => {
   const { FileMenu: DefaultFileMenu } = useFileMenu({ file });
+  const { openDialog } = useDialog();
   const isFolder = file.isFolder;
   const navigate = useNavigate();
   const { setActiveFolder } = useGetActiveFolder();
@@ -41,6 +43,11 @@ export const FileSystemItem = ({
     if (isFolder) {
       setActiveFolder(file);
       navigate(ROUTE_PATH.folderDetails(file.id));
+    } else {
+      openDialog({
+        type: 'previewFile',
+        item: file,
+      });
     }
   };
 
