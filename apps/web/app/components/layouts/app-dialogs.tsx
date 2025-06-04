@@ -3,6 +3,7 @@ import { dialogAtom } from '@keepcloud/web-core/react';
 import {
   CreateFolderDialog,
   DeletePermanentlyDialog,
+  FilePreviewDialog,
   RenameResourceDialog,
   ResourceTrashedDialog,
 } from '../dialogs';
@@ -37,6 +38,9 @@ export const AppDialogs = () => {
 
     case 'deletePermanently':
       return <DeletePermanentlyDialog />;
+
+    case 'previewFile':
+      return <FilePreviewDialog />;
 
     default:
       return null;

@@ -163,6 +163,12 @@ export class CreatePresignedPostBody {
   filename: string;
 }
 
+export class CreatePresignedGetBody {
+  @IsString()
+  @IsNotEmpty()
+  fileId: string;
+}
+
 export class PresignedPostResultDto {
   @Expose()
   url: string;

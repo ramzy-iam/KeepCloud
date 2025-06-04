@@ -8,7 +8,7 @@ export class MoveFileInAfterCreateProcessor
   extends FileService
   implements Processor
 {
-  private logger = new Logger(MoveFileInAfterCreateProcessor.name);
+  protected override logger = new Logger(MoveFileInAfterCreateProcessor.name);
 
   async execute(data: MoveFileInStorageData) {
     const { ownerId, sourcePath, fileId, filename } = data;

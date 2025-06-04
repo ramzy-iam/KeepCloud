@@ -4,7 +4,7 @@ import { ErrorCode } from '@keepcloud/commons/constants';
 
 type CommonDialogType = 'rename' | 'resourceTrashed' | 'deletePermanently';
 type FolderDialogType = 'createFolder' | 'folderTrashed' | 'folderDeleted';
-type FileDialogType = 'fileTrashed' | 'fileDeleted';
+type FileDialogType = 'fileTrashed' | 'fileDeleted' | 'previewFile';
 
 export type DialogType = CommonDialogType | FolderDialogType | FileDialogType;
 

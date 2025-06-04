@@ -30,7 +30,7 @@ export function Min(
   errorCode: ErrorCode = ErrorCode.INVALID_INPUT,
   validationOptions?: ValidationOptions,
 ) {
-  return function (object: Object, propertyName: string) {
+  return function (object: object, propertyName: string) {
     registerDecorator({
       name: '_min',
       target: object.constructor,

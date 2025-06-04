@@ -15,9 +15,8 @@ export async function processDefaultEvent(event: {
     return await initAppAndExecuteProcessor(message, data);
   } catch (error) {
     logger.error('Failed to invoke lambda ==> ', { message, error });
-    throw new InternalServerErrorException(
-      undefined,
-      'ProcessEvent: some messages failed',
-    );
+    throw new InternalServerErrorException({
+      message: 'ProcessEvent: some messages failed',
+    });
   }
 }
