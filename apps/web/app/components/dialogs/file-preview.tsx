@@ -8,6 +8,7 @@ import {
   DialogTitle,
   dialogAtom,
   useFilePreviewer,
+  TooltipProviderWrapper,
 } from '@keepcloud/web-core/react';
 
 export const FilePreviewDialog = () => {
@@ -23,11 +24,15 @@ export const FilePreviewDialog = () => {
   return (
     <Dialog open={true} onOpenChange={handleClose}>
       <DialogContent className="w-full overflow-auto md:h-[95svh] md:max-w-[60svw]!">
-        <DialogHeader className="p-4">
-          <DialogTitle>{file?.name || 'File Preview'}</DialogTitle>
+        <DialogHeader className="w-full max-w-full overflow-hidden text-left">
+          <TooltipProviderWrapper content={file.name} sideOffset={-12}>
+            <DialogTitle className="w-full max-w-full truncate p-4">
+              {file.name ?? 'File Preview'}
+            </DialogTitle>
+          </TooltipProviderWrapper>
         </DialogHeader>
 
-        <div className="flex max-h-[80svh] min-h-[400px] items-center justify-center overflow-auto md:h-full md:max-h-full md:p-4">
+        <div className="flex max-h-[80svh] min-h-[80svh] items-center justify-center overflow-auto md:max-h-[80svh] md:p-4">
           {error ? (
             <p className="text-sm text-muted-foreground">
               No preview available for this file type or the file is not
