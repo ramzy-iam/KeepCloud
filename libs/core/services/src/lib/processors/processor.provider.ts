@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { MoveFileInAfterCreateProcessor } from './move-file-after-create.processor';
-import { ProcessorAction } from '@keepcloud/commons/constants';
+import { ErrorCode, ProcessorAction } from '@keepcloud/commons/constants';
 import { AppException } from '@keepcloud/commons/backend';
 import { Processor } from '@keepcloud/commons/types';
 
@@ -20,11 +20,11 @@ export class ProcessorProvider {
 
     const processor = processorMap.get(message);
     if (!processor)
-      throw AppException.create(
-        'UNKNOWN_PROCESSOR',
-        `Unknown processor: ${message}`,
-        400,
-      );
+      throw AppException.create({
+        code: ErrorCode.UNKNOWN_PROCESSOR,
+        message: `Unknown processor: ${message}`,
+        status: 400,
+      });
 
     return processor;
   }

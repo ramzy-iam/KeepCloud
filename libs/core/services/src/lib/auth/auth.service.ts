@@ -36,10 +36,9 @@ export class AuthService {
       const payload = await this.verifyGoogleCode(code);
       const user = await this.userService.createOrUpdateGoogleUser(payload);
       if (!user) {
-        throw new InternalServerErrorException(
-          ErrorCode.INTERNAL_SERVER_ERROR,
-          'Failed to create user',
-        );
+        throw new InternalServerErrorException({
+          message: 'Failed to create user',
+        });
       }
 
       return this.generateTokens(user);
@@ -61,10 +60,10 @@ export class AuthService {
   private async verifyGoogleCode(code: string): Promise<TokenPayload> {
     const payload = await OAuthService.verifyGoogleCode(code); // Updated to call static method
     if (!payload.email || !payload.email_verified) {
-      throw new BadRequestException(
-        ErrorCode.EMAIL_NOT_VERIFIED,
-        'Google authentication failed: Email not verified',
-      );
+      throw new BadRequestException({
+        code: ErrorCode.EMAIL_NOT_VERIFIED,
+        message: 'Google authentication failed: Email not verified',
+      });
     }
     return payload;
   }
@@ -87,10 +86,10 @@ export class AuthService {
   async refreshAccessToken(refreshToken: string) {
     try {
       if (!refreshToken) {
-        throw new BadRequestException(
-          ErrorCode.INVALID_INPUT,
-          'Invalid refresh token',
-        );
+        throw new BadRequestException({
+          code: ErrorCode.INVALID_INPUT,
+          message: 'Invalid refresh token',
+        });
       }
 
       const { email, sub }: { sub: string; email: string } =
@@ -100,27 +99,27 @@ export class AuthService {
 
       const user = await this.userService.findOne({ id: sub, email });
       if (!user) {
-        throw new BadRequestException(
-          ErrorCode.INVALID_INPUT,
-          'Invalid refresh token',
-        );
+        throw new BadRequestException({
+          code: ErrorCode.INVALID_INPUT,
+          message: 'Invalid refresh token',
+        });
       }
 
       const { accessToken } = this.generateTokens(user);
       return { accessToken, refreshToken };
     } catch (error) {
       if (error instanceof BadRequestException) throw error;
-      throw new BadRequestException(
-        ErrorCode.INVALID_INPUT,
-        'Invalid refresh token',
-      );
+      throw new BadRequestException({
+        code: ErrorCode.INVALID_INPUT,
+        message: 'Invalid refresh token',
+      });
     }
   }
 
   async getUserProfile({ email, id }: { email: string; id: string }) {
     const user = await this.userService.findOne({ email, id });
     if (!user) {
-      throw new UnauthorizedException(ErrorCode.UNAUTHORIZED, 'Invalid token');
+      throw new UnauthorizedException({ message: 'Invalid token' });
     }
     return user;
   }
