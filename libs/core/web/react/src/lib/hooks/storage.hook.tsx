@@ -114,11 +114,8 @@ export const useRenameResource = ({
 
   return useMutation<FileMinViewDto, ApiError, { id: string; name: string }>({
     mutationFn: ({ id, name }) => StorageService.rename(id, name),
-    onSuccess: () => {
-      toast.success(`${resourceName} renamed successfully`);
-    },
     onSettled: () => {
-      keysToInvalidate.map((key) => {
+      keysToInvalidate.forEach((key) => {
         queryClient.invalidateQueries({ queryKey: key });
       });
     },
@@ -136,7 +133,7 @@ export const useMoveToTrash = ({
       toast.success(`${resourceName}  moved to trash`);
     },
     onSettled: () => {
-      keysToInvalidate.map((key) => {
+      keysToInvalidate.forEach((key) => {
         queryClient.invalidateQueries({ queryKey: key });
       });
     },
@@ -154,7 +151,7 @@ export const useRestoreResource = ({
       toast.success(`${resourceName} restored successfully`);
     },
     onSettled: () => {
-      keysToInvalidate.map((key) => {
+      keysToInvalidate.forEach((key) => {
         queryClient.invalidateQueries({ queryKey: key });
       });
     },
@@ -172,7 +169,7 @@ export const useDeletePermanently = ({
       toast.success(`${resourceName} deleted permanently`);
     },
     onSettled: () => {
-      keysToInvalidate.map((key) => {
+      keysToInvalidate.forEach((key) => {
         queryClient.invalidateQueries({ queryKey: key });
       });
     },
