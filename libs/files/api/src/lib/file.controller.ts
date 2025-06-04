@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import {
   CurrentUser,
   CurrentUserPipe,
@@ -8,6 +8,7 @@ import {
 import { User } from '@keepcloud/core/db';
 import {
   CreateFileDto,
+  CreatePresignedGetBody,
   CreatePresignedPostBody,
   FilePreviewDto,
 } from '@keepcloud/commons/dtos';
@@ -29,5 +30,15 @@ export class FileController {
   ) {
     const { filename } = payload;
     return this.fileService.getPresignedPost(user.id, filename);
+  }
+
+  @Post('presigned-get')
+  getPresignedGet(@Body() payload: CreatePresignedGetBody) {
+    return this.fileService.getPresignedGet(payload.fileId);
+  }
+
+  @Get(':fileId/presigned-get')
+  presignedGet(@Param('fileId') fileId: string) {
+    return this.fileService.getPresignedGet(fileId);
   }
 }

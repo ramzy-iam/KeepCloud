@@ -1,0 +1,89 @@
+import { JSX, useMemo } from 'react';
+import { FileMinViewDto } from '@keepcloud/commons/dtos';
+import { useGeneratePresignedGet } from './file.hook';
+import {
+  ImagePreview,
+  LoadingPreview,
+  PDFPreview,
+  TextPreview,
+  OfficePreview,
+  UnsupportedPreview,
+} from '../components';
+
+interface UseFilePreviewerProps {
+  file?: FileMinViewDto;
+}
+
+const supportedFormats = [
+  'pdf',
+  'jpg',
+  'jpeg',
+  'png',
+  'gif',
+  'txt',
+  'doc',
+  'docx',
+  'xls',
+  'xlsx',
+];
+
+export const useFilePreviewer = ({ file }: UseFilePreviewerProps) => {
+  const isPreviewable = useMemo(() => {
+    return Boolean(
+      file?.format && supportedFormats.includes(file.format.toLowerCase()),
+    );
+  }, [file?.format]);
+
+  const {
+    isLoading,
+    error,
+    data: presignedUrl,
+  } = useGeneratePresignedGet({
+    fileId: file?.id,
+    enabled: isPreviewable,
+  });
+
+  const ErrorPreview = useMemo(
+    () => (
+      <div className="text-center text-red-500">
+        Failed to load preview:{' '}
+        {error?.details?.[0]?.message || 'An error occurred'}
+      </div>
+    ),
+    [error],
+  );
+
+  const PreviewComponent = useMemo<JSX.Element>(() => {
+    if (isLoading) return LoadingPreview;
+    if (error && !presignedUrl) return ErrorPreview;
+    if (!isPreviewable || !presignedUrl || !file) return UnsupportedPreview;
+
+    const format = file.format.toLowerCase();
+
+    if (['jpg', 'jpeg', 'png', 'gif'].includes(format)) {
+      return <ImagePreview url={presignedUrl} file={file} />;
+    }
+
+    if (format === 'pdf') {
+      return <PDFPreview url={presignedUrl} />;
+    }
+
+    if (format === 'txt') {
+      return <TextPreview url={presignedUrl} />;
+    }
+
+    if (['doc', 'docx', 'xls', 'xlsx'].includes(format)) {
+      return <OfficePreview url={presignedUrl} />;
+    }
+
+    return UnsupportedPreview;
+  }, [isLoading, error, isPreviewable, presignedUrl, file, ErrorPreview]);
+
+  return {
+    PreviewComponent,
+    isLoading,
+    error,
+    isPreviewable,
+    presignedUrl,
+  };
+};

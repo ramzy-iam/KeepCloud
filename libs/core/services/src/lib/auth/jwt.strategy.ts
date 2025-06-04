@@ -1,5 +1,4 @@
 import { UnauthorizedException } from '@keepcloud/commons/backend';
-import { ErrorCode } from '@keepcloud/commons/constants';
 import { AccessTokenPayload } from '@keepcloud/commons/dtos';
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
@@ -17,7 +16,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 
   async validate(payload: AccessTokenPayload) {
     if (!payload) {
-      throw new UnauthorizedException(ErrorCode.UNAUTHORIZED, 'Invalid token');
+      throw new UnauthorizedException({ message: 'Invalid token' });
     }
     return payload;
   }

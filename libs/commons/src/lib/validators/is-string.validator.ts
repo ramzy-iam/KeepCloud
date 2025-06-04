@@ -27,7 +27,7 @@ export function IsString(
   errorCode: ErrorCode = ErrorCode.INVALID_STRING,
   validationOptions?: ValidationOptions,
 ) {
-  return function (object: Object, propertyName: string) {
+  return function (object: object, propertyName: string) {
     registerDecorator({
       name: '_isString',
       target: object.constructor,

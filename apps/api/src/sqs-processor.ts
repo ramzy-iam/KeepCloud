@@ -36,10 +36,9 @@ export async function processSQSEvent(event: SQSEvent) {
 
   if (errors.length > 0) {
     logger.error('ProcessSQSEvent: some messages failed', { errors });
-    throw new InternalServerErrorException(
-      undefined,
-      'ProcessSQSEvent: some messages failed',
-    );
+    throw new InternalServerErrorException({
+      message: 'ProcessSQSEvent: some messages failed',
+    });
   }
 
   return results;

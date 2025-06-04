@@ -19,6 +19,7 @@ import { Readable } from 'stream';
 import { FileHelper } from '@keepcloud/commons/helpers';
 import AwsServiceHelper from './base.helper';
 import { Logger } from '../logger.helper';
+import { DispositionType } from '@keepcloud/commons/types';
 
 interface UploadOptions {
   contentType?: string;
@@ -39,7 +40,7 @@ interface UploadResult {
 interface PresignedGetOptions {
   bucket: string;
   expiresIn?: number;
-  contentDisposition?: 'inline' | 'attachment';
+  contentDisposition?: DispositionType;
 }
 
 interface PresignedPostOptions {

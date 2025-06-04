@@ -30,7 +30,7 @@ export function IsNotEmpty(
   errorCode: ErrorCode = ErrorCode.INVALID_INPUT,
   validationOptions?: ValidationOptions,
 ) {
-  return function (object: Object, propertyName: string) {
+  return function (object: object, propertyName: string) {
     registerDecorator({
       name: '_isNotEmpty',
       target: object.constructor,

@@ -8,7 +8,7 @@ import {
 } from '@keepcloud/commons/dtos';
 import {
   BadRequestException,
-  NotFoundException,
+  FolderNotFoundException,
 } from '@keepcloud/commons/backend';
 import { ErrorCode, SYSTEM_FILE } from '@keepcloud/commons/constants';
 import { Prisma } from '@prisma/client';
@@ -24,24 +24,12 @@ export class FolderService extends BaseFileService {
         .getOne();
 
       if (!parent) {
-        throw new BadRequestException(
-          ErrorCode.INVALID_PARENT_FOLDER,
-          'Parent must be a valid folder',
-          'parentId',
-        );
+        throw new BadRequestException({
+          code: ErrorCode.PARENT_FOLDER_NOT_FOUND,
+          message: 'Parent must be a valid folder',
+          field: 'parentId',
+        });
       }
-    }
-
-    const existingFolder = await this.fileRepository.scoped
-      .filterByName(dto.name)
-      .filterByParentId(dto.parentId ?? null)
-      .getOne();
-    if (existingFolder) {
-      throw new BadRequestException(
-        ErrorCode.FOLDER_ALREADY_EXISTS,
-        `A folder named "${dto.name}" already exists in this folder`,
-        'name',
-      );
     }
 
     const folderData: Prisma.FileCreateInput = {
@@ -86,8 +74,7 @@ export class FolderService extends BaseFileService {
       .joinOwner()
       .getOne();
 
-    if (!file)
-      throw new NotFoundException(ErrorCode.NOT_FOUND, 'Resource not found');
+    if (!file) throw new FolderNotFoundException(id);
 
     await this.checkAndThrowIfTrashed(id);
 

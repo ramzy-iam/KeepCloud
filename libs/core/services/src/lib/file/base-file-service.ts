@@ -3,7 +3,6 @@ import {
   FolderTrashedException,
   ParentFolderTrashedException,
 } from '@keepcloud/commons/backend';
-import { ErrorCode } from '@keepcloud/commons/constants';
 import { FileRepository, File } from '@keepcloud/core/db';
 import { Injectable } from '@nestjs/common';
 
