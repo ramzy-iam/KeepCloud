@@ -74,7 +74,7 @@ export const GridView = ({
   return (
     <div
       className={cn(
-        'flex h-full flex-col flex-wrap gap-3 sm:flex-row md:gap-8',
+        'flex h-full flex-col flex-wrap gap-3',
         isFolderEmpty && 'flex-row items-center justify-center',
       )}
     >

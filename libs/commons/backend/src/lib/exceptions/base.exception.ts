@@ -4,26 +4,41 @@ interface ExceptionDetail {
   field?: string;
 }
 
+export interface AppExceptionOptions {
+  code?: string;
+  parentCode?: string;
+  message?: string;
+  status?: number;
+  field?: string;
+  params?: Record<string, unknown>;
+}
+
 export class AppException extends Error {
   public readonly code: string;
   public readonly status: number;
   public readonly details: ExceptionDetail[];
+  public readonly timestamp: string;
 
-  constructor(
-    code: string,
-    message: string,
-    status: number,
-    field?: string,
-    parentCode?: string,
-  ) {
+  constructor({
+    code = 'UNKNOWN_ERROR',
+    message = 'An unexpected error occurred.',
+    status = 500,
+    field,
+    parentCode,
+    params,
+  }: AppExceptionOptions) {
     super(message);
     this.code = parentCode ?? code;
     this.status = status;
+    this.code = code;
+    this.status = status;
+    this.timestamp = new Date().toISOString();
     this.details = [
       {
         code,
         message,
         ...(field ? { field } : {}),
+        ...(params ? { params } : {}),
       },
     ];
 
@@ -45,12 +60,7 @@ export class AppException extends Error {
     };
   }
 
-  static create(
-    code: string,
-    message: string,
-    status: number,
-    field?: string,
-  ): AppException {
-    return new AppException(code, message, status, field);
+  static create(options: AppExceptionOptions): AppException {
+    return new AppException(options);
   }
 }
