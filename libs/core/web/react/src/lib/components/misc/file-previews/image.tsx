@@ -21,7 +21,7 @@ export const ImagePreview = ({
     <img
       src={url}
       alt={file.name}
-      className="max-h-[70vh] max-w-full object-contain"
+      className="max-h-full max-w-full object-contain"
       onError={() => setError(true)}
     />
   );

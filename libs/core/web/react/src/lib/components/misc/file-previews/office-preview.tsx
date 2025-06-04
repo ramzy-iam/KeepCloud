@@ -7,7 +7,7 @@ export const OfficePreview = ({ url }: { url: string }) => {
     <iframe
       src={viewerUrl}
       title="DOC Preview"
-      className="h-[70vh] w-full rounded border"
+      className="h-full w-full rounded border"
       onError={() => toast.error('Failed to load document preview')}
     />
   );

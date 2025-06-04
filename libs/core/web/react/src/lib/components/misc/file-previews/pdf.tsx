@@ -7,7 +7,7 @@ export const PDFPreview = ({ url }: { url: string }) => {
     <iframe
       src={googleViewerUrl}
       title="PDF Preview"
-      className="h-[70vh] w-full rounded border"
+      className="h-full w-full rounded border"
       allow="fullscreen"
       onError={() => toast.error('Failed to load PDF preview')}
     />
