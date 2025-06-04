@@ -84,5 +84,6 @@ export const useFilePreviewer = ({ file }: UseFilePreviewerProps) => {
     isLoading,
     error,
     isPreviewable,
+    presignedUrl,
   };
 };
