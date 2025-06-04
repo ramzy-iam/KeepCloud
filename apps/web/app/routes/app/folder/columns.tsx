@@ -7,6 +7,7 @@ import {
   ROUTE_PATH,
   useFileIcon,
   useDialog,
+  TooltipProviderWrapper,
 } from '@keepcloud/web-core/react';
 import { OwnerIcon } from '../../../components';
 import { ColumnDef } from '@tanstack/react-table';
@@ -63,13 +64,17 @@ export const columns: ColumnDef<FileMinViewDto>[] = [
         }
       };
       return (
-        <div
-          className="flex cursor-pointer items-center gap-2 truncate text-14-medium text-secondary-foreground"
-          onClick={handleClick}
-        >
-          <Icon />
-          <div>{row.getValue('name')}</div>
-        </div>
+        <TooltipProviderWrapper content={file.name} sideOffset={0}>
+          <div
+            className="flex max-w-[200px] cursor-pointer items-center gap-2 overflow-hidden text-14-medium text-secondary-foreground sm:max-w-[400px] lg:max-w-[600px]"
+            onClick={handleClick}
+          >
+            <span className="flex-shrink-0">
+              <Icon />
+            </span>
+            <span className="truncate">{file.name}</span>
+          </div>
+        </TooltipProviderWrapper>
       );
     },
     enableHiding: false,
