@@ -68,15 +68,17 @@ function TooltipProviderWrapper({
   content,
   withArrow,
   sideOffset = 5,
+  defaultOpen,
 }: {
   children: React.ReactNode;
   content: React.ReactNode;
   withArrow?: boolean;
   sideOffset?: number;
+  defaultOpen?: boolean;
 }) {
   return (
     <TooltipProvider>
-      <Tooltip>
+      <Tooltip defaultOpen={defaultOpen}>
         <TooltipTrigger asChild>{children}</TooltipTrigger>
         <TooltipContent withArrow={withArrow} sideOffset={sideOffset}>
           {content}
