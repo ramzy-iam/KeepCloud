@@ -8,9 +8,9 @@ import {
 import { User } from '@keepcloud/core/db';
 import {
   CreateFileDto,
-  CreatePresignedGetBody,
   CreatePresignedPostBody,
   FilePreviewDto,
+  PresignedGetResultDto,
 } from '@keepcloud/commons/dtos';
 
 @Controller('files')
@@ -32,13 +32,9 @@ export class FileController {
     return this.fileService.getPresignedPost(user.id, filename);
   }
 
-  @Post('presigned-get')
-  getPresignedGet(@Body() payload: CreatePresignedGetBody) {
-    return this.fileService.getPresignedGet(payload.fileId);
-  }
-
   @Get(':fileId/presigned-get')
+  @Serialize(PresignedGetResultDto)
   presignedGet(@Param('fileId') fileId: string) {
-    return this.fileService.getPresignedGet(fileId);
+    return this.fileService.generatePresignedGet(fileId);
   }
 }

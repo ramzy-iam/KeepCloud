@@ -1,16 +1,11 @@
 import {
   IsNotEmpty,
   IsString,
-  IsPositive,
   IsEnum,
   IsOptional,
   IsBoolean,
 } from '../validators';
-import {
-  ContentType,
-  ErrorCode,
-  FileFormat,
-} from '@keepcloud/commons/constants';
+import { ErrorCode, FileFormat } from '@keepcloud/commons/constants';
 
 import { Expose, Transform, Type } from 'class-transformer';
 import { FileType } from '@prisma/client';
@@ -181,4 +176,12 @@ export class PresignedPostResultDto {
 
   @Expose()
   key: string;
+}
+
+export class PresignedGetResultDto {
+  @Expose()
+  previewUrl: string;
+
+  @Expose()
+  downloadUrl: string;
 }
