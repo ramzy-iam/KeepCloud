@@ -18,15 +18,15 @@ import {
 } from 'lucide-react';
 import {
   MenuItem,
-  cn,
   useDialog,
   useGetKeyToInvalidateBasedOnActiveFolder,
   useMoveToTrash,
   useRestoreResource,
-} from '@keepcloud/web-core/react';
+} from '../';
 import { iconClassName, itemClassName } from './config';
 import { FileMinViewDto } from '@keepcloud/commons/dtos';
 import { SYSTEM_FILE } from '@keepcloud/commons/constants';
+import { cn } from '../../helpers';
 
 export const useFileMenuItems = (file: FileMinViewDto): MenuItem[] => {
   const { openDialog } = useDialog();

@@ -65,6 +65,7 @@ export abstract class BaseScope<
           | undefined;
       }
     ).deletedAt = null;
+    return this;
   }
 
   getOne(): Promise<T | null> {

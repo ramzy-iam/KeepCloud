@@ -33,6 +33,7 @@ export class StorageService {
   async getTrashedItems(filters: FolderFilterDto) {
     const data = await this.fileRepository.scoped
       .filterByTrashed()
+      .filterByNotDeleted()
       .joinOwner()
       .getManyPaginated(filters.page, filters.pageSize);
 
