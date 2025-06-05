@@ -17,7 +17,9 @@ export const FilePreviewDialog = () => {
   const [dialogState, setDialogState] = useAtom(dialogAtom);
   const file = dialogState.context.item as FileMinViewDto;
 
-  const { PreviewComponent, error, presignedUrl } = useFilePreviewer({ file });
+  const { PreviewComponent, error, downloadUrl } = useFilePreviewer({
+    file,
+  });
 
   const handleClose = useCallback(() => {
     setDialogState({ isOpen: false, type: null, context: {} });
@@ -35,9 +37,9 @@ export const FilePreviewDialog = () => {
           <div className="mr-2 flex gap-6">
             <TooltipProviderWrapper content={'Download'} sideOffset={4}>
               <div>
-                {presignedUrl && (
+                {downloadUrl && (
                   <a
-                    href={presignedUrl}
+                    href={downloadUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     download

@@ -3,6 +3,7 @@ import { File, FileRepository, FileType } from '@keepcloud/core/db';
 import {
   CreateFileDto,
   FileAncestorDto,
+  PresignedGetResultDto,
   PresignedPostResultDto,
 } from '@keepcloud/commons/dtos';
 import {
@@ -99,7 +100,7 @@ export class FileService extends BaseFileService {
     return this.s3helper.createPresignedPost(this.bucket, key);
   }
 
-  async getPresignedGet(
+  private async getPresignedGet(
     fileId: string,
     disposition: DispositionType = 'inline',
     customFilename?: string,
@@ -133,6 +134,13 @@ export class FileService extends BaseFileService {
       bucket: this.bucket,
       contentDisposition,
     });
+  }
+
+  async generatePresignedGet(id: string): Promise<PresignedGetResultDto> {
+    return {
+      previewUrl: await this.getPresignedGet(id, 'inline'),
+      downloadUrl: await this.getPresignedGet(id, 'attachment'),
+    };
   }
 
   private async validateParentFolder(parentId?: string | null): Promise<void> {

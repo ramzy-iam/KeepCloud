@@ -34,14 +34,11 @@ export const useFilePreviewer = ({ file }: UseFilePreviewerProps) => {
     );
   }, [file?.format]);
 
-  const {
-    isLoading,
-    error,
-    data: presignedUrl,
-  } = useGeneratePresignedGet({
+  const { isLoading, error, data } = useGeneratePresignedGet({
     fileId: file?.id,
     enabled: isPreviewable,
   });
+  const { previewUrl, downloadUrl } = data ?? {};
 
   const ErrorPreview = useMemo(
     () => (
@@ -55,35 +52,35 @@ export const useFilePreviewer = ({ file }: UseFilePreviewerProps) => {
 
   const PreviewComponent = useMemo<JSX.Element>(() => {
     if (isLoading) return LoadingPreview;
-    if (error && !presignedUrl) return ErrorPreview;
-    if (!isPreviewable || !presignedUrl || !file) return UnsupportedPreview;
+    if (error && !previewUrl) return ErrorPreview;
+    if (!isPreviewable || !previewUrl || !file) return UnsupportedPreview;
 
     const format = file.format.toLowerCase();
 
     if (['jpg', 'jpeg', 'png', 'gif'].includes(format)) {
-      return <ImagePreview url={presignedUrl} file={file} />;
+      return <ImagePreview url={previewUrl} file={file} />;
     }
 
     if (format === 'pdf') {
-      return <PDFPreview url={presignedUrl} />;
+      return <PDFPreview url={previewUrl} />;
     }
 
     if (format === 'txt') {
-      return <TextPreview url={presignedUrl} />;
+      return <TextPreview url={previewUrl} />;
     }
 
     if (['doc', 'docx', 'xls', 'xlsx'].includes(format)) {
-      return <OfficePreview url={presignedUrl} />;
+      return <OfficePreview url={previewUrl} />;
     }
 
     return UnsupportedPreview;
-  }, [isLoading, error, isPreviewable, presignedUrl, file, ErrorPreview]);
+  }, [isLoading, error, isPreviewable, previewUrl, file, ErrorPreview]);
 
   return {
     PreviewComponent,
     isLoading,
     error,
     isPreviewable,
-    presignedUrl,
+    downloadUrl,
   };
 };
