@@ -1,4 +1,3 @@
-import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs';
 import { SQShelper } from '@keepcloud/commons/backend';
 import { Queue } from 'bullmq';
 
@@ -14,7 +13,7 @@ export abstract class AbstractQueueService {
   private get bullQueue(): Queue {
     if (!this._bullQueue) {
       this._bullQueue = new Queue(this.queueName, {
-        connection: { host: 'localhost', port: 6379 },
+        connection: { url: process.env.SQS_SYSTEM_QUEUE_URL },
       });
     }
     return this._bullQueue;
