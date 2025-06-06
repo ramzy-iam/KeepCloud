@@ -48,3 +48,7 @@ vitest.config.*.timestamp*
 logger.log
 .cursor/rules/nx-rules.mdc
 .github/instructions/nx.instructions.md
+
+event.json
+
+.serverless

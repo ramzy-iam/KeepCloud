@@ -7,7 +7,15 @@ export async function createApp(): Promise<INestApplication> {
 
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
-  app.enableCors({ origin: '*' });
+
+  const allowedOrigins = process.env.API_ALLOWED_ORIGIN_LIST.split(',').map(
+    (o) => o.trim(),
+  );
+
+  app.enableCors({
+    origin: allowedOrigins,
+    credentials: false,
+  });
 
   app.useGlobalPipes(
     new ValidationPipe({

@@ -12,7 +12,6 @@ declare global {
       TYPEORM_LOGGING: string;
       JWT_SECRET: string;
       JWT_REFRESH_SECRET: string;
-      GOOGLE_CLIENT_ID: string;
       VITE_GOOGLE_CLIENT_ID: string;
       API_BASE_URL: string;
 
@@ -25,6 +24,8 @@ declare global {
 
       FILE_BUCKET: string;
       LOG_LEVEL?: string;
+      API_ALLOWED_ORIGIN_LIST: string;
+      KEEPCLOUD_ALLOWED_ORIGIN;
 
       SQS_SYSTEM_QUEUE_URL: string;
     }

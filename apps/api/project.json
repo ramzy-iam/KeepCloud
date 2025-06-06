@@ -9,7 +9,9 @@
       "executor": "@nx/webpack:webpack",
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "development",
+
       "options": {
+        "optimization": false,
         "target": "node",
         "compiler": "tsc",
         "main": "apps/api/src/main.ts",
@@ -18,14 +20,9 @@
         "webpackConfig": "apps/api/webpack.config.js"
       },
       "configurations": {
-        "development": {
-          "optimization": false,
-          "mode": "development"
-        },
+        "development": {},
         "production": {
-          "main": "apps/api/src/main.prod.ts",
-          "optimization": true,
-          "mode": "production"
+          "main": "apps/api/src/main.prod.ts"
         }
       }
     },
@@ -49,6 +46,25 @@
       "options": {
         "jestConfig": "apps/api/jest.config.ts",
         "passWithNoTests": true
+      }
+    },
+    "package": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "serverless package",
+        "cwd": "apps/api"
+      }
+    },
+    "deploy": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        {
+          "target": "package"
+        }
+      ],
+      "options": {
+        "command": "serverless deploy --package .serverless",
+        "cwd": "apps/api"
       }
     }
   }
