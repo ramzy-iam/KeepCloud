@@ -1,8 +1,8 @@
-import { initAppAndExecuteProcessor } from './bootstrap';
 import {
   InternalServerErrorException,
   Logger,
 } from '@keepcloud/commons/backend';
+import { initAppAndExecuteProcessor } from './init-processor';
 
 export async function processDefaultEvent(event: {
   message: string;

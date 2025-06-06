@@ -1,5 +1,5 @@
 import { SQSEvent, SQSRecord } from 'aws-lambda';
-import { initAppAndExecuteProcessor } from './bootstrap';
+import { initAppAndExecuteProcessor } from './init-processor';
 import {
   InternalServerErrorException,
   Logger,
