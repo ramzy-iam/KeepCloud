@@ -214,11 +214,21 @@ export class FileService extends BaseFileService {
     filename: string,
     fileId?: string,
   ): string {
+    const sanitizedFilename = this.sanitizeFilename(filename);
+
     if (fileId) {
-      return `user-${userId}/${fileId}_${filename}`;
+      return `user-${userId}/${fileId}_${sanitizedFilename}`;
     }
     const timestamp = Date.now();
-    return `user-${userId}/tmp/${timestamp}_${filename}`;
+    return `user-${userId}/tmp/${timestamp}_${sanitizedFilename}`;
+  }
+
+  private sanitizeFilename(filename: string): string {
+    return filename
+      .replace(/[<>:"/\\|?*\x00-\x1F]/g, '') // Remove illegal characters
+      .replace(/\s+/g, '_') // Replace spaces with underscores
+      .replace(/\.+$/, '') // Remove trailing dots
+      .slice(0, 255); // Limit to 255 characters
   }
 
   async getOne(id: string): Promise<File & { ancestors: FileAncestorDto[] }> {
