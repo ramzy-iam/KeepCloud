@@ -2,9 +2,9 @@ org: rzlab
 service: keepcloud-api
 
 custom:
-  dotenv:
-    path: ../../.env
-    logging: false
+  # dotenv:
+  # path: ../../.env
+  # logging: false
   stage: ${env:STAGE}
   serverless-offline:
     httpPort: 3333
@@ -20,9 +20,6 @@ params:
 plugins:
   - serverless-dotenv-plugin
   - serverless-offline
-  - serverless-domain-manager
-
-useDotenv: true
 
 provider:
   name: aws
@@ -36,6 +33,7 @@ provider:
   deploymentBucket:
     name: keepcloud.api.deployment
   deploymentPrefix: ${env:STAGE}
+  environment:
     NODE_ENV: ${self:NODE_ENV, 'production'}
     APP_AWS_ACCESS_KEY_ID: ${env:AWS_ACCESS_KEY_ID}
     APP_AWS_SECRET_ACCESS_KEY: ${env:AWS_SECRET_ACCESS_KEY}
@@ -55,7 +53,7 @@ package:
 
 functions:
   main:
-    handler: ../../dist/apps/api/main.handler
+    handler: dist/apps/api/main.handler
     events:
       - http:
           path: /{any+}

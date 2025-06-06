@@ -1,28 +1,25 @@
-import { APIGatewayProxyEvent, SQSEvent, Context } from 'aws-lambda';
-import { Server } from 'http';
-import { createServer, proxy } from 'aws-serverless-express';
+import {
+  APIGatewayProxyEvent,
+  SQSEvent,
+  Context,
+  Handler,
+  Callback,
+} from 'aws-lambda';
+import serverlessExpress from '@codegenie/serverless-express';
 import { createApp } from './bootstrap';
 import { processSQSEvent } from './sqs-processor';
 import { processDefaultEvent } from './default-processor';
 
-let cachedServer: Server;
+let cachedServer: Handler;
 
-export async function bootstrapServer(): Promise<Server> {
+async function bootstrapServer(): Promise<Handler> {
   if (!cachedServer) {
     const app = await createApp();
     await app.init();
     const expressApp = app.getHttpAdapter().getInstance();
-    cachedServer = createServer(expressApp);
+    return serverlessExpress({ app: expressApp });
   }
   return cachedServer;
-}
-
-export function proxyServer(
-  server: Server,
-  event: APIGatewayProxyEvent,
-  context: Context,
-) {
-  return proxy(server, event, context, 'PROMISE').promise;
 }
 
 interface DefaultEvent {
@@ -32,10 +29,11 @@ interface DefaultEvent {
 export const handler = async (
   event: APIGatewayProxyEvent & SQSEvent & DefaultEvent,
   context: Context,
+  callback: Callback,
 ) => {
   if ('httpMethod' in event && event.httpMethod) {
     const server = await bootstrapServer();
-    return proxyServer(server, event, context);
+    return server(event, context, callback);
   }
 
   if ('Records' in event && event.Records.length > 0) {
