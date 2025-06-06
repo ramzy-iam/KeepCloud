@@ -1,0 +1,85 @@
+org: rzlab
+service: keepcloud-api
+
+custom:
+  dotenv:
+    path: ../../.env
+    logging: false
+  stage: ${env:STAGE}
+  serverless-offline:
+    httpPort: 3333
+    lambdaPort: 2333
+    noPrependStageInUrl: true
+
+params:
+  prod:
+    production: true
+  default:
+    production: false
+
+plugins:
+  - serverless-dotenv-plugin
+  - serverless-offline
+  - serverless-domain-manager
+
+useDotenv: true
+
+provider:
+  name: aws
+  stage: ${env:STAGE}
+  runtime: nodejs20.x
+  region: eu-west-3
+  timeout: 600 # in seconds
+  memorySize: 1024 # in MB
+  versionFunctions: false
+
+  deploymentBucket:
+    name: keepcloud.api.deployment
+  deploymentPrefix: ${env:STAGE}
+    NODE_ENV: ${self:NODE_ENV, 'production'}
+    APP_AWS_ACCESS_KEY_ID: ${env:AWS_ACCESS_KEY_ID}
+    APP_AWS_SECRET_ACCESS_KEY: ${env:AWS_SECRET_ACCESS_KEY}
+    APP_AWS_DEFAULT_REGION: ${env:AWS_DEFAULT_REGION}
+    JWT_SECRET: ${env:JWT_SECRET}
+    JWT_REFRESH_SECRET: ${env:JWT_REFRESH_SECRET}
+    VITE_GOOGLE_CLIENT_ID: ${env:VITE_GOOGLE_CLIENT_ID}
+    FILE_BUCKET: keepcloud.storage.${env:STAGE}
+    LOG_LEVEL: ${env:LOG_LEVEL, 'info'}
+    SQS_SYSTEM_QUEUE_URL: ${env:SQS_SYSTEM_QUEUE_URL}
+    API_ALLOWED_ORIGIN_LIST: ${env:API_ALLOWED_ORIGIN_LIST}
+package:
+  include:
+    - ../../dist/apps/api/**
+  exclude:
+    - ./**
+
+functions:
+  main:
+    handler: ../../dist/apps/api/main.handler
+    events:
+      - http:
+          path: /{any+}
+          method: ANY
+
+resources:
+  Resources:
+    FileStorageBucket:
+      Type: 'AWS::S3::Bucket'
+      Properties:
+        BucketName: keepcloud.storage.${env:STAGE}
+        CorsConfiguration:
+          CorsRules:
+            - AllowedHeaders:
+                - '*'
+              AllowedMethods:
+                - PUT
+                - POST
+                - GET
+              AllowedOrigins:
+                - ${env:KEEPCLOUD_ALLOWED_ORIGIN}
+        LifecycleConfiguration:
+          Rules:
+            - Id: 'DeleteTemporaryFiles'
+              Prefix: 'tmp/'
+              Status: 'Enabled'
+              ExpirationInDays: 3
