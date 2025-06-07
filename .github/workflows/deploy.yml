@@ -25,15 +25,15 @@ jobs:
         with:
           node-version: 20
 
-      - name: Cache Yarn dependencies
-        uses: actions/cache@v3
-        with:
-          path: |
-            **/node_modules
-            ~/.cache/yarn
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+      # - name: Cache Yarn dependencies
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: |
+      #       **/node_modules
+      #       ~/.cache/yarn
+      #     key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-yarn-
 
       - name: Install dependencies
         run: yarn
@@ -87,24 +87,21 @@ jobs:
         with:
           node-version: 20
 
-      - name: Cache Yarn dependencies
-        uses: actions/cache@v3
-        with:
-          path: |
-            **/node_modules
-            ~/.cache/yarn
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+      # - name: Cache Yarn dependencies
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: |
+      #       **/node_modules
+      #       ~/.cache/yarn
+      #     key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-yarn-
 
       - name: Install dependencies
         run: yarn
 
       - name: Generate Prisma client
         run: yarn prisma generate
-
-      - name: Install nX
-        run: npm i -g @nrwl/cli
 
       - name: Build API
         run: yarn nx run keepcloud-api:build:production
