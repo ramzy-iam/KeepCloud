@@ -103,11 +103,20 @@ jobs:
       - name: Generate Prisma client
         run: yarn prisma generate
 
-      - name: Install dependencies
-        run: yarn
+      - name: Show current directory
+        run: pwd
+
+      - name: List files here
+        run: ls -la
+
+      - name: Check nx binary location
+        run: ls -la node_modules/.bin/nx || echo "nx not found"
+
+      - name: Check nx version
+        run: npx nx --version || echo "nx command failed"
 
       - name: Build API
-        run: yarn nx run keepcloud-api:build:production
+        run: npx nx run keepcloud-api:build:production
 
       - name: Deploy API with Serverless
-        run: yarn nx run keepcloud-api:deploy
+        run: npx nx run keepcloud-api:deploy
