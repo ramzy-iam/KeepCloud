@@ -103,8 +103,29 @@ jobs:
       - name: Generate Prisma client
         run: yarn prisma generate
 
+      - name: Show package.json content (pretty print)
+        run: |
+          if command -v jq >/dev/null 2>&1; then
+            jq . package.json
+          else
+            cat package.json
+          fi
+
+      # Debug steps to verify directory and packages
+      - name: Show current working directory
+        run: pwd
+
+      - name: List files in current directory
+        run: ls -la
+
+      - name: List node_modules folder contents (root)
+        run: ls -la node_modules
+
+      - name: List package.json and yarn.lock
+        run: ls -la package.json yarn.lock
+
       - name: Build API
-        run: yarn nx build keepcloud-api --configuration=production
+        run: npx nx run api:build:production
 
       - name: Deploy API with Serverless
         run: yarn nx run keepcloud-api:deploy
