@@ -220,7 +220,7 @@ export class FileService extends BaseFileService {
       return `user-${userId}/${fileId}_${sanitizedFilename}`;
     }
     const timestamp = Date.now();
-    return `user-${userId}/tmp/${timestamp}_${sanitizedFilename}`;
+    return `tmp/user-${userId}/${timestamp}_${sanitizedFilename}`;
   }
 
   private sanitizeFilename(filename: string): string {

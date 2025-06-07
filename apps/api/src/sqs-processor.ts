@@ -16,15 +16,15 @@ export async function processSQSEvent(event: SQSEvent) {
 
   const results = await Promise.allSettled(
     uniqueMessages.map(async (record: SQSRecord) => {
-      const message = JSON.parse(record.body);
+      const payload = JSON.parse(record.body);
       try {
         const resultProcessor = await initAppAndExecuteProcessor(
-          message.messageType,
-          message.data,
+          payload.message,
+          payload.data,
         );
 
         sQShelper.deleteMessage(
-          process.env.SQS_SYSTEM_QUEUE_URL,
+          process.env.SYSTEM_QUEUE_URL,
           record.receiptHandle,
         );
         return resultProcessor;
