@@ -17,7 +17,7 @@ jobs:
       AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_REGION: ${{ vars.AWS_REGION }}
+      AWS_REGION: ${{ vars.AWS_DEFAULT_REGION }}
       DISTRIBUTION: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
     steps:
       - uses: actions/checkout@v4
@@ -43,17 +43,17 @@ jobs:
       - name: Build Web
         run: yarn nx run keepcloud-web:build
 
-      # - name: Deploy to S3
-      #   uses: jakejarvis/s3-sync-action@v0.5.1
-      #   with:
-      #     args: --delete
-      #   env:
-      #     SOURCE_DIR: 'dist/apps/web/client'
+      - name: Deploy to S3
+        uses: jakejarvis/s3-sync-action@v0.5.1
+        with:
+          args: --delete
+        env:
+          SOURCE_DIR: 'dist/apps/web/client'
 
-      # - name: Invalidate CloudFront Cache
-      #   uses: chetan/invalidate-cloudfront-action@v2
-      #   env:
-      #     PATHS: '/*'
+      - name: Invalidate CloudFront Cache
+        uses: chetan/invalidate-cloudfront-action@v2
+        env:
+          PATHS: '/*'
 
   deploy-api:
     if: github.ref == 'refs/heads/feat/add-github-actions'
@@ -63,7 +63,7 @@ jobs:
       STAGE: ${{ vars.STAGE }}
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_REGION: ${{ vars.AWS_REGION }}
+      AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
       VITE_GOOGLE_CLIENT_ID: ${{ vars.VITE_GOOGLE_CLIENT_ID }}
