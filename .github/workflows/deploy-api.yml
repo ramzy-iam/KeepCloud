@@ -1,3 +1,5 @@
+name: Deploy KeepCloud API
+
 on:
   workflow_call:
     inputs:
