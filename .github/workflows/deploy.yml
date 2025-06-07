@@ -115,17 +115,13 @@ jobs:
       - name: Show current working directory
         run: pwd
 
-      - name: List files in current directory
-        run: ls -la
-
       - name: List node_modules folder contents (root)
-        run: ls -la node_modules
-
-      - name: List package.json and yarn.lock
-        run: ls -la package.json yarn.lock
+        run: ls -la node_modules/.bin
 
       - name: Build API
-        run: npx nx run api:build:production
+        run: |
+          yarn install
+          npx nx run api:build:production
 
       - name: Deploy API with Serverless
         run: yarn nx run keepcloud-api:deploy
