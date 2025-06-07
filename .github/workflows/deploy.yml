@@ -108,4 +108,3 @@ jobs:
 
       - name: Deploy API with Serverless
         run: yarn nx run keepcloud-api:deploy
-        working-directory: apps/api
