@@ -115,13 +115,11 @@ jobs:
       - name: Show current working directory
         run: pwd
 
-      - name: List node_modules folder contents (root)
-        run: ls -la node_modules/.bin
+      - name: Vérifier si nx est installé
+        run: ls -la node_modules/.bin | grep nx || echo "nx not found"
 
       - name: Build API
-        run: |
-          yarn install
-          npx nx run api:build:production
+        run: yarn nx run api:build:production
 
       - name: Deploy API with Serverless
         run: yarn nx run keepcloud-api:deploy
