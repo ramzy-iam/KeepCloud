@@ -21,105 +21,15 @@ on:
           - production
 
 jobs:
-  deploy_keepCloud_web_dev:
+  deploy_web_dev:
     if: |
       (github.ref == 'refs/heads/develop' || github.event.pull_request.base.ref == 'develop') ||
       (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'dev')
-    runs-on: ubuntu-latest
-    environment: Dev
-    env:
-      VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
-      VITE_DOMAIN_NAME: ${{ vars.VITE_DOMAIN_NAME }}
-      VITE_GOOGLE_CLIENT_ID: ${{ vars.VITE_GOOGLE_CLIENT_ID }}
-      AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_REGION: ${{ vars.AWS_DEFAULT_REGION }}
-      DISTRIBUTION: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
-    steps:
-      - uses: actions/checkout@v4
+    uses: ./.github/workflows/deploy-web.yml
+    with:
+      environment: Dev
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Cache Yarn dependencies
-        uses: actions/cache@v3
-        with:
-          path: |
-            **/node_modules
-            ~/.cache/yarn
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-
-      - name: Install dependencies
-        run: yarn
-
-      - name: Build Web
-        run: yarn nx run keepcloud-web:build
-
-      - name: Deploy to S3
-        uses: jakejarvis/s3-sync-action@v0.5.1
-        with:
-          args: --delete
-        env:
-          SOURCE_DIR: 'dist/apps/web/client'
-
-      - name: Invalidate CloudFront Cache
-        uses: chetan/invalidate-cloudfront-action@v2
-        env:
-          PATHS: '/*'
-
-  deploy_keepCloud_api_dev:
-    if: |
-      (github.ref == 'refs/heads/develop' || github.event.pull_request.base.ref == 'develop') ||
-      (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'dev')
-    runs-on: ubuntu-latest
-    environment: Dev
-    env:
-      STAGE: ${{ vars.STAGE }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
-      JWT_SECRET: ${{ secrets.JWT_SECRET }}
-      JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
-      VITE_GOOGLE_CLIENT_ID: ${{ vars.VITE_GOOGLE_CLIENT_ID }}
-      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-      FILE_BUCKET: keepcloud.storage.${{ vars.STAGE }}
-      LOG_LEVEL: info
-      API_ALLOWED_ORIGIN_LIST: ${{ vars.API_ALLOWED_ORIGIN_LIST }}
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      SYSTEM_QUEUE_URL: ${{ vars.SYSTEM_QUEUE_URL }}
-      SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
-      KEEPCLOUD_ALLOWED_ORIGIN: ${{ vars.KEEPCLOUD_ALLOWED_ORIGIN }}
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Cache Yarn dependencies
-        uses: actions/cache@v3
-        with:
-          path: |
-            **/node_modules
-            ~/.cache/yarn
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-
-      - name: Install dependencies
-        run: yarn
-
-      - name: Generate Prisma client
-        run: yarn prisma generate
-
-      - name: Build API
-        run: yarn nx run keepcloud-api:build:production
-
-      - name: Deploy API with Serverless
-        run: NODE_ENV=production yarn nx run keepcloud-api:deploy
+  deploy_api_dev:
+    uses: ./.github/workflows/deploy-api.yml
+    with:
+      environment: Dev
