@@ -6,14 +6,17 @@ on:
       - feat/add-github-actions
 
 jobs:
-  deploy-dev:
-    if: github.ref == 'refs/heads/feat/add-github-actions' # only run on develop branch
+  deploy-web:
+    if: github.ref == 'refs/heads/feat/add-github-actions'
     runs-on: ubuntu-latest
     environment: Dev
     env:
       VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
       VITE_DOMAIN_NAME: ${{ vars.VITE_DOMAIN_NAME }}
       VITE_GOOGLE_CLIENT_ID: ${{ vars.VITE_GOOGLE_CLIENT_ID }}
+      AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      CLOUDFRONT_DISTRIBUTION_ID: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
     steps:
       - uses: actions/checkout@v3
 
@@ -43,10 +46,10 @@ jobs:
         with:
           args: --delete
         env:
-          AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
+          AWS_S3_BUCKET: ${{ env.AWS_S3_BUCKET }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ vars.AWS_REGION }}
+          AWS_REGION: ${{ env.AWS_REGION }}
           SOURCE_DIR: 'dist/apps/web/client'
 
       - name: Invalidate CloudFront Cache
@@ -54,6 +57,55 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          DISTRIBUTION: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
-          AWS_REGION: ${{ vars.AWS_REGION }}
+          DISTRIBUTION: ${{ env.CLOUDFRONT_DISTRIBUTION_ID }}
+          AWS_REGION: ${{ env.AWS_REGION }}
           PATHS: '/*'
+
+  deploy-api:
+    if: github.ref == 'refs/heads/feat/add-github-actions'
+    runs-on: ubuntu-latest
+    environment: Dev
+    env:
+      NODE_ENV: production
+      APP_AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      APP_AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      APP_AWS_DEFAULT_REGION: ${{ vars.AWS_REGION }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
+      VITE_GOOGLE_CLIENT_ID: ${{ vars.VITE_GOOGLE_CLIENT_ID }}
+      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+      FILE_BUCKET: keepcloud.storage.${{ vars.STAGE }}
+      LOG_LEVEL: info
+      API_ALLOWED_ORIGIN_LIST: ${{ vars.API_ALLOWED_ORIGIN_LIST }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      SYSTEM_QUEUE_URL: ${{ vars.SYSTEM_QUEUE_URL }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Cache Yarn dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            **/node_modules
+            ~/.cache/yarn
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install dependencies
+        run: yarn
+
+      - name: Generate Prisma client
+        run: yarn prisma generate
+
+      - name: Build API
+        run: yarn nx run keepcloud-api:build
+
+      - name: Deploy API with Serverless
+        run: yarn nx run keepcloud-api:deploy
+        working-directory: apps/api
