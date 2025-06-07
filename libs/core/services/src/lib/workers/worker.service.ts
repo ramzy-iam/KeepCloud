@@ -8,17 +8,32 @@ import { PrismaService, RLSContextService } from '@keepcloud/core/db';
 export abstract class QueueWorkerService
   implements OnModuleInit, OnModuleDestroy
 {
-  protected worker: Worker;
+  protected worker: Worker | null = null;
   protected abstract logger: Logger;
   protected abstract queueName: string;
-  protected connection: ConnectionOptions = { host: 'localhost', port: 6379 };
+  protected connection: ConnectionOptions = {
+    url: process.env.SYSTEM_QUEUE_URL,
+  };
 
   constructor(
     protected processorProvider: ProcessorProvider,
     protected prismaService: PrismaService,
   ) {}
 
+  protected isLocal(): boolean {
+    return process.env.NODE_ENV !== 'production';
+  }
+
   onModuleInit() {
+    if (!this.isLocal()) {
+      this.logger.debug('Skipping queue worker initialization in production.');
+      return;
+    }
+
+    this.logger.debug(
+      `Initializing local queue worker for "${this.queueName}"`,
+    );
+
     this.worker = new Worker(
       this.queueName,
       async (job: Job<{ message: string; data: unknown }>) => {
@@ -32,11 +47,10 @@ export abstract class QueueWorkerService
           return;
         }
 
-        RLSContextService.runWithContext(
+        await RLSContextService.runWithContext(
           { prisma: this.prismaService.getClient() },
           async () => {
             const { data, message } = job.data;
-
             const processor = this.processorProvider.getFromMessage(message);
             await processor.execute(data);
           },
@@ -58,7 +72,9 @@ export abstract class QueueWorkerService
   }
 
   async onModuleDestroy() {
-    this.logger.debug('Closing system queue worker...');
-    await this.worker.close();
+    if (this.worker) {
+      this.logger.debug('Closing local queue worker...');
+      await this.worker.close();
+    }
   }
 }
