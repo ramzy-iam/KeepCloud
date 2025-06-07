@@ -103,6 +103,9 @@ jobs:
       - name: Generate Prisma client
         run: yarn prisma generate
 
+      - name: Build Web
+        run: yarn nx run keepcloud-web:build
+
       - name: Show package.json content (pretty print)
         run: |
           if command -v jq >/dev/null 2>&1; then
