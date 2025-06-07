@@ -103,8 +103,8 @@ jobs:
       - name: Install dependencies
         run: yarn
 
-      - name: Generate Prisma client
-        run: yarn prisma generate
+      # - name: Generate Prisma client
+      #   run: yarn prisma generate
 
       - name: Build API
         run: yarn nx run keepcloud-api:build:production
