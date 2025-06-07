@@ -13,21 +13,21 @@ export abstract class AbstractQueueService {
   private get bullQueue(): Queue {
     if (!this._bullQueue) {
       this._bullQueue = new Queue(this.queueName, {
-        connection: { url: process.env.SQS_SYSTEM_QUEUE_URL },
+        connection: { url: process.env.SYSTEM_QUEUE_URL },
       });
     }
     return this._bullQueue;
   }
 
-  protected isCloud(): boolean {
-    return process.env.NODE_ENV === 'production';
+  protected isLocal(): boolean {
+    return process.env.NODE_ENV !== 'production';
   }
 
   async sendJob<T>(payload: { message: string; data: T }): Promise<void> {
-    if (this.isCloud()) {
-      await this.sqsHelper.sendMessage(this.queueUrl, JSON.stringify(payload));
-    } else {
+    if (this.isLocal()) {
       await this.bullQueue.add(this.jobName, payload);
+    } else {
+      await this.sqsHelper.sendMessage(this.queueUrl, JSON.stringify(payload));
     }
   }
 }

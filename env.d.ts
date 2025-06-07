@@ -27,7 +27,7 @@ declare global {
       API_ALLOWED_ORIGIN_LIST: string;
       KEEPCLOUD_ALLOWED_ORIGIN;
 
-      SQS_SYSTEM_QUEUE_URL: string;
+      SYSTEM_QUEUE_URL: string;
     }
   }
 }

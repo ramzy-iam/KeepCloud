@@ -32,7 +32,6 @@ provider:
 
   deploymentBucket:
     name: keepcloud.api.deployment
-  deploymentPrefix: ${env:STAGE}
   environment:
     NODE_ENV: ${self:NODE_ENV, 'production'}
     APP_AWS_ACCESS_KEY_ID: ${env:AWS_ACCESS_KEY_ID}
@@ -41,15 +40,40 @@ provider:
     JWT_SECRET: ${env:JWT_SECRET}
     JWT_REFRESH_SECRET: ${env:JWT_REFRESH_SECRET}
     VITE_GOOGLE_CLIENT_ID: ${env:VITE_GOOGLE_CLIENT_ID}
+    GOOGLE_CLIENT_SECRET: ${env:GOOGLE_CLIENT_SECRET}
     FILE_BUCKET: keepcloud.storage.${env:STAGE}
     LOG_LEVEL: ${env:LOG_LEVEL, 'info'}
-    SQS_SYSTEM_QUEUE_URL: ${env:SQS_SYSTEM_QUEUE_URL}
+    SYSTEM_QUEUE_URL:
+      Ref: SystemQueue
     API_ALLOWED_ORIGIN_LIST: ${env:API_ALLOWED_ORIGIN_LIST}
+    DATABASE_URL: ${env:DATABASE_URL}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - sqs:SendMessage
+            - sqs:ReceiveMessage
+            - sqs:DeleteMessage
+            - sqs:GetQueueAttributes
+          Resource:
+            Fn::GetAtt:
+              - SystemQueue
+              - Arn
 package:
   include:
     - ../../dist/apps/api/**
+    - ../../node_modules/.prisma/client/**
+    - ../../node_modules/@prisma/client/**
+    - ../../node_modules/prisma/**
+    - ../../node_modules/.cache/prisma/**
   exclude:
     - ./**
+  patterns:
+    - '!../../node_modules/.prisma/client/libquery_engine-*' # exclude all native engines...
+    - '../../node_modules/.prisma/client/libquery_engine-rhel-*' # ...except for Linux x64
+    - '!../../node_modules/@prisma/engines/**'
+    - '!../../node_modules/.cache/prisma/**'
 
 functions:
   main:
@@ -58,6 +82,11 @@ functions:
       - http:
           path: /{any+}
           method: ANY
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - SystemQueue
+              - Arn
 
 resources:
   Resources:
@@ -81,3 +110,9 @@ resources:
               Prefix: 'tmp/'
               Status: 'Enabled'
               ExpirationInDays: 3
+
+    SystemQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: keepcloud-system-queue-${env:STAGE}
+        VisibilityTimeout: 900 # 15 minutes
