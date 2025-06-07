@@ -73,6 +73,7 @@ jobs:
       API_ALLOWED_ORIGIN_LIST: ${{ vars.API_ALLOWED_ORIGIN_LIST }}
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       SYSTEM_QUEUE_URL: ${{ vars.SYSTEM_QUEUE_URL }}
+      SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
     steps:
       - uses: actions/checkout@v4
 
