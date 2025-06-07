@@ -21,7 +21,7 @@ on:
           - production
 
 jobs:
-  Deploy KeepCloud Web Dev:
+  deploy_keepCloud_web_dev:
     if: |
       (github.ref == 'refs/heads/develop' || github.event.pull_request.base.ref == 'develop') ||
       (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'dev')
@@ -72,7 +72,7 @@ jobs:
         env:
           PATHS: '/*'
 
-  Deploy KeepCloud API Dev:
+  deploy_keepCloud_api_dev:
     if: |
       (github.ref == 'refs/heads/develop' || github.event.pull_request.base.ref == 'develop') ||
       (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'dev')
