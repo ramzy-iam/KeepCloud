@@ -29,10 +29,10 @@ jobs:
         with:
           args: --delete
         env:
-          AWS_S3_BUCKET: ${{ variables.AWS_S3_BUCKET }}
+          AWS_S3_BUCKET: ${{ env.AWS_S3_BUCKET }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ variables.AWS_REGION }}
+          AWS_REGION: ${{ env.AWS_REGION }}
           SOURCE_DIR: 'dist/apps/web/client'
 
       - name: Invalidate CloudFront Cache
@@ -40,5 +40,5 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          DISTRIBUTION: ${{ variables.CLOUDFRONT_DISTRIBUTION_ID }}
+          DISTRIBUTION: ${{ env.CLOUDFRONT_DISTRIBUTION_ID }}
           PATHS: '/*'
