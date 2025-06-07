@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: Dev
     env:
-      NODE_ENV: production
+      # NODE_ENV: production
       VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
       VITE_DOMAIN_NAME: ${{ vars.VITE_DOMAIN_NAME }}
       VITE_GOOGLE_CLIENT_ID: ${{ vars.VITE_GOOGLE_CLIENT_ID }}
@@ -69,8 +69,8 @@ jobs:
       JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
       VITE_GOOGLE_CLIENT_ID: ${{ vars.VITE_GOOGLE_CLIENT_ID }}
       GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-      # FILE_BUCKET: keepcloud.storage.${{ vars.STAGE }}
-      # LOG_LEVEL: info
+      FILE_BUCKET: keepcloud.storage.${{ vars.STAGE }}
+      LOG_LEVEL: info
       API_ALLOWED_ORIGIN_LIST: ${{ vars.API_ALLOWED_ORIGIN_LIST }}
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       SYSTEM_QUEUE_URL: ${{ vars.SYSTEM_QUEUE_URL }}
