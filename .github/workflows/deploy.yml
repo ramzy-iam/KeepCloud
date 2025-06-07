@@ -104,7 +104,7 @@ jobs:
         run: yarn prisma generate
 
       - name: Build API
-        run: yarn nx run keepcloud-api:build
+        run: yarn nx run keepcloud-api:build:production
 
       - name: Deploy API with Serverless
         run: yarn nx run keepcloud-api:deploy
