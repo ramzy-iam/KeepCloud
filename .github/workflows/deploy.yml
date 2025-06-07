@@ -38,9 +38,6 @@ jobs:
       - name: Install dependencies
         run: yarn
 
-      - name: Build API
-        run: yarn nx run keepcloud-api:build:production
-
       - name: Build Web
         run: yarn nx run keepcloud-web:build
 
@@ -103,59 +100,14 @@ jobs:
       - name: Install dependencies
         run: yarn
 
-      # - name: Generate Prisma client
-      #   run: yarn prisma generate
+      - name: Generate Prisma client
+        run: yarn prisma generate
+
+      - name: Install nX
+        run: npm i -g @nrwl/cli
 
       - name: Build API
         run: yarn nx run keepcloud-api:build:production
 
       - name: Deploy API with Serverless
         run: yarn nx run keepcloud-api:deploy
-
-  # deploy-api:
-  #   if: github.ref == 'refs/heads/feat/add-github-actions'
-  #   runs-on: ubuntu-latest
-  #   environment: Dev
-  #   env:
-  #     NODE_ENV: production
-  #     APP_AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #     APP_AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #     APP_AWS_DEFAULT_REGION: ${{ vars.AWS_REGION }}
-  #     JWT_SECRET: ${{ secrets.JWT_SECRET }}
-  #     JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
-  #     VITE_GOOGLE_CLIENT_ID: ${{ vars.VITE_GOOGLE_CLIENT_ID }}
-  #     GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-  #     FILE_BUCKET: keepcloud.storage.${{ vars.STAGE }}
-  #     LOG_LEVEL: info
-  #     API_ALLOWED_ORIGIN_LIST: ${{ vars.API_ALLOWED_ORIGIN_LIST }}
-  #     DATABASE_URL: ${{ secrets.DATABASE_URL }}
-  #     SYSTEM_QUEUE_URL: ${{ vars.SYSTEM_QUEUE_URL }}
-  #   steps:
-  #     - uses: actions/checkout@v3
-
-  #     - name: Set up Node.js
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: 20
-
-  #     - name: Cache Yarn dependencies
-  #       uses: actions/cache@v3
-  #       with:
-  #         path: |
-  #           **/node_modules
-  #           ~/.cache/yarn
-  #         key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-yarn-
-
-  #     - name: Install dependencies
-  #       run: yarn
-
-  #     - name: Generate Prisma client
-  #       run: yarn prisma generate
-
-  #     - name: Build API
-  #       run: yarn nx run keepcloud-api:build:production
-
-  #     - name: Deploy API with Serverless
-  #       run: yarn nx run keepcloud-api:deploy
