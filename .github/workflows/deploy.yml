@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: Dev
     env:
+      NODE_ENV: production
       VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
       VITE_DOMAIN_NAME: ${{ vars.VITE_DOMAIN_NAME }}
       VITE_GOOGLE_CLIENT_ID: ${{ vars.VITE_GOOGLE_CLIENT_ID }}
@@ -97,26 +98,8 @@ jobs:
       - name: Generate Prisma client
         run: yarn prisma generate
 
-      - name: Build Web
-        run: yarn nx run keepcloud-web:build
-
-      - name: Show package.json content (pretty print)
-        run: |
-          if command -v jq >/dev/null 2>&1; then
-            jq . package.json
-          else
-            cat package.json
-          fi
-
-      # Debug steps to verify directory and packages
-      - name: Show current working directory
-        run: pwd
-
-      - name: Vérifier si nx est installé
-        run: ls -la node_modules/.bin | grep nx || echo "nx not found"
-
       - name: Build API
-        run: yarn nx run api:build:production
+        run: yarn nx run keepcloud-api:build:production
 
       - name: Deploy API with Serverless
         run: yarn nx run keepcloud-api:deploy
