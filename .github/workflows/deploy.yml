@@ -3,11 +3,28 @@ name: KeepCloud Deployment
 on:
   push:
     branches:
-      - feat/add-github-actions
+      - develop
+      - main
+  pull_request:
+    branches:
+      - develop
+      - main
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Select deployment environment'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - production
 
 jobs:
-  deploy-web:
-    if: github.ref == 'refs/heads/feat/add-github-actions'
+  Deploy KeepCloud Web Dev:
+    if: |
+      (github.ref == 'refs/heads/develop' || github.event.pull_request.base.ref == 'develop') ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'dev')
     runs-on: ubuntu-latest
     environment: Dev
     env:
@@ -55,8 +72,10 @@ jobs:
         env:
           PATHS: '/*'
 
-  deploy-api:
-    if: github.ref == 'refs/heads/feat/add-github-actions'
+  Deploy KeepCloud API Dev:
+    if: |
+      (github.ref == 'refs/heads/develop' || github.event.pull_request.base.ref == 'develop') ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'dev')
     runs-on: ubuntu-latest
     environment: Dev
     env:
