@@ -6,6 +6,21 @@ on:
       environment:
         required: true
         type: string
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+      JWT_SECRET:
+        required: true
+      JWT_REFRESH_SECRET:
+        required: true
+      GOOGLE_CLIENT_SECRET:
+        required: true
+      DATABASE_URL:
+        required: true
+      SERVERLESS_ACCESS_KEY:
+        required: true
 
 jobs:
   deploy:

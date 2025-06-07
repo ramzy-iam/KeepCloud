@@ -21,7 +21,7 @@ on:
           - production
 
 jobs:
-  deploy_web_dev:
+  web_dev:
     if: |
       (github.ref == 'refs/heads/develop' || github.event.pull_request.base.ref == 'develop') ||
       (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'dev')
@@ -29,7 +29,10 @@ jobs:
     with:
       environment: Dev
 
-  deploy_api_dev:
+  api_dev:
+    if: |
+      (github.ref == 'refs/heads/develop' || github.event.pull_request.base.ref == 'develop') ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'dev')
     uses: ./.github/workflows/deploy-api.yml
     with:
       environment: Dev
