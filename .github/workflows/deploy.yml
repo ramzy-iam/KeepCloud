@@ -74,6 +74,7 @@ jobs:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       SYSTEM_QUEUE_URL: ${{ vars.SYSTEM_QUEUE_URL }}
       SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
+      KEEPCLOUD_ALLOWED_ORIGIN: ${{ vars.KEEPCLOUD_ALLOWED_ORIGIN }}
     steps:
       - uses: actions/checkout@v4
 
