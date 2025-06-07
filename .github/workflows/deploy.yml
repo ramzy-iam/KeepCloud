@@ -11,7 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     environment: Dev
     env:
-      # NODE_ENV: production
       VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
       VITE_DOMAIN_NAME: ${{ vars.VITE_DOMAIN_NAME }}
       VITE_GOOGLE_CLIENT_ID: ${{ vars.VITE_GOOGLE_CLIENT_ID }}
@@ -61,7 +60,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: Dev
     env:
-      # NODE_ENV: production
+      STAGE: ${{ vars.STAGE }}
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_REGION: ${{ vars.AWS_REGION }}
@@ -102,4 +101,4 @@ jobs:
         run: yarn nx run keepcloud-api:build:production
 
       - name: Deploy API with Serverless
-        run: yarn nx run keepcloud-api:deploy
+        run: NODE_ENV=production yarn nx run keepcloud-api:deploy
