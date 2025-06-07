@@ -7,9 +7,9 @@ on:
 
 jobs:
   deploy-dev:
-    if: github.ref == 'refs/heads/feat/add-github-actions' # only run on develop branch
+    if: github.ref == 'refs/heads/feat/add-github-actions'
     runs-on: ubuntu-latest
-    environment: Dev # ← Here you specify the environment
+    environment: Dev
     steps:
       - uses: actions/checkout@v3
 
@@ -17,6 +17,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+
+      - name: Cache Yarn dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            **/node_modules
+            ~/.cache/yarn
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
 
       - name: Install dependencies
         run: yarn
