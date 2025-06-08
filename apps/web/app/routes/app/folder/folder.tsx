@@ -4,7 +4,7 @@ import { SYSTEM_FILE } from '@keepcloud/commons/constants';
 import { columns } from './columns';
 import { useEffect } from 'react';
 
-export default function FolderRootComponent({}) {
+export default function FolderRootComponent() {
   const { data: items, isLoading: isLoadingRootItems } = useGetRootItems();
   const { resetActiveFolder } = useGetActiveFolder();
   useEffect(() => {
@@ -18,6 +18,7 @@ export default function FolderRootComponent({}) {
         title={SYSTEM_FILE.MY_STORAGE.name}
         columns={columns}
         isLoading={isLoadingRootItems}
+        currentId={SYSTEM_FILE.MY_STORAGE.id}
       />
     </div>
   );

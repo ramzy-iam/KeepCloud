@@ -17,10 +17,11 @@ import {
   FormControl,
   FormMessage,
   useCreateFolder,
-  useGetKeyToInvalidateBasedOnActiveFolder,
+  useGetActiveFolder,
   dialogAtom,
 } from '@keepcloud/web-core/react';
 import { useAtom } from 'jotai';
+import { FileHelper } from '@keepcloud/commons/helpers';
 
 const schema = z.object({
   name: z.string().min(1, 'Folder name is required'),
@@ -30,8 +31,8 @@ type FormInput = z.infer<typeof schema>;
 
 export function CreateFolderDialog() {
   const [dialogState, setDialogState] = useAtom(dialogAtom);
+  const { activeFolder } = useGetActiveFolder();
   const { isOpen, type, context } = dialogState;
-  const keyToInvalidate = useGetKeyToInvalidateBasedOnActiveFolder();
   const form = useForm<FormInput>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -39,13 +40,11 @@ export function CreateFolderDialog() {
     },
   });
 
-  const createFolder = useCreateFolder({ keysToInvalidate: [keyToInvalidate] });
+  const createFolder = useCreateFolder({ parentId: activeFolder.id });
 
   const onSubmit = (data: FormInput) => {
-    const parentId =
-      context.folderId === 'null' || !context.folderId
-        ? undefined
-        : context.folderId;
+    const parentId = FileHelper.getValidParentId(context.folderId);
+
     createFolder.mutate(
       {
         name: data.name,

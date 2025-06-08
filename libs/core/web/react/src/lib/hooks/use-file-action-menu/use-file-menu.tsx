@@ -16,25 +16,17 @@ import {
   Eye as PreviewIcon,
   History,
 } from 'lucide-react';
-import {
-  MenuItem,
-  useDialog,
-  useGetKeyToInvalidateBasedOnActiveFolder,
-  useMoveToTrash,
-  useRestoreResource,
-} from '../';
+import { MenuItem, useDialog, useMoveToTrash, useRestoreResource } from '../';
 import { iconClassName, itemClassName } from './config';
 import { FileMinViewDto } from '@keepcloud/commons/dtos';
-import { SYSTEM_FILE } from '@keepcloud/commons/constants';
 import { cn } from '../../helpers';
+import { FileHelper } from '@keepcloud/commons/helpers';
 
 export const useFileMenuItems = (file: FileMinViewDto): MenuItem[] => {
   const { openDialog } = useDialog();
-  const keyToInvalidate = useGetKeyToInvalidateBasedOnActiveFolder();
 
   const moveToTrash = useMoveToTrash({
-    keysToInvalidate: [keyToInvalidate],
-    resourceName: 'Folder',
+    parentId: FileHelper.getValidParentId(file.parentId),
   });
   return [
     {
@@ -141,10 +133,7 @@ export const useFileMenuItems = (file: FileMinViewDto): MenuItem[] => {
 
 export const useTrashedFileMenuItems = (file: FileMinViewDto): MenuItem[] => {
   const { openDialog } = useDialog();
-  const restoreFile = useRestoreResource({
-    keysToInvalidate: [[SYSTEM_FILE.TRASH.invalidationKey]],
-    resourceName: 'File',
-  });
+  const restoreFile = useRestoreResource();
 
   return [
     {

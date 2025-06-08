@@ -113,6 +113,7 @@ export default function FolderDetailsComponent({
       title={folder.name}
       isLoading={isLoading || isLoadingChildren}
       onBreadcrumbClick={handleBreadcrumbClick}
+      currentId={params.folderId}
     />
   );
 }

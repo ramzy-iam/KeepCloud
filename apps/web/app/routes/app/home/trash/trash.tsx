@@ -23,6 +23,7 @@ export default function TrashComponent() {
           isLoading={isLoading}
           noDataComponent={<TrashEmpty />}
           CustomFileSystemItem={TrashedSystemItem}
+          currentId={SYSTEM_FILE.TRASH.id}
         />
       </div>
     </div>

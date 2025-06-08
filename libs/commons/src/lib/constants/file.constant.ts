@@ -343,24 +343,39 @@ export enum FileSortField {
 
 export const SYSTEM_FILE = {
   MY_STORAGE: {
-    id: 'null',
+    id: 'root',
     name: 'My Storage',
     code: 'MY_STORAGE',
     isSystem: true,
     invalidationKey: 'MY_STORAGE',
   },
   SHARED_WITH_ME: {
-    id: 'null',
+    id: 'shared_with_me',
     name: 'Shared with me',
     code: 'SHARED_WITH_ME',
     isSystem: true,
     invalidationKey: 'SHARED_WITH_ME',
   },
   TRASH: {
-    id: 'null',
+    id: 'trash',
     name: 'Trash',
     code: 'TRASH',
     system: true,
     invalidationKey: 'TRASH',
+  },
+
+  SUGGESTED_FILES: {
+    id: 'suggested_files',
+    name: 'Suggested Files',
+    code: 'SUGGESTED_FILES',
+    isSystem: true,
+    invalidationKey: 'SUGGESTED_FILES',
+  },
+  SUGGESTED_FOLDERS: {
+    id: 'suggested_folders',
+    name: 'Suggested Folders',
+    code: 'SUGGESTED_FOLDERS',
+    isSystem: true,
+    invalidationKey: 'SUGGESTED_FOLDERS',
   },
 } as const;
