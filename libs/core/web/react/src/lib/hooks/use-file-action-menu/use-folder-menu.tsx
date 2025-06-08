@@ -15,22 +15,19 @@ import {
   ROUTE_PATH,
   cn,
   useDialog,
-  useGetKeyToInvalidateBasedOnActiveFolder,
   useMoveToTrash,
   useRestoreResource,
 } from '@keepcloud/web-core/react';
 import { iconClassName, itemClassName } from './config';
 import { useNavigate } from 'react-router';
-import { SYSTEM_FILE } from '@keepcloud/commons/constants';
+import { FileHelper } from '@keepcloud/commons/helpers';
 
 export const useFolderMenuItems = (file: FileMinViewDto): MenuItem[] => {
   const navigate = useNavigate();
   const { openDialog } = useDialog();
-  const keyToInvalidate = useGetKeyToInvalidateBasedOnActiveFolder();
 
   const moveToTrash = useMoveToTrash({
-    keysToInvalidate: [keyToInvalidate],
-    resourceName: 'Folder',
+    parentId: FileHelper.getValidParentId(file.parentId),
   });
 
   return [
@@ -95,10 +92,7 @@ export const useFolderMenuItems = (file: FileMinViewDto): MenuItem[] => {
 export const useTrashedFolderMenuItems = (file: FileMinViewDto): MenuItem[] => {
   const { openDialog } = useDialog();
 
-  const restoreFolder = useRestoreResource({
-    keysToInvalidate: [[SYSTEM_FILE.TRASH.invalidationKey]],
-    resourceName: 'Folder',
-  });
+  const restoreFolder = useRestoreResource();
 
   return [
     {

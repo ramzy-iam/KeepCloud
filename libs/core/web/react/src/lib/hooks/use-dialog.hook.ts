@@ -1,6 +1,6 @@
 import { useAtom } from 'jotai';
 import { FileMinViewDto } from '@keepcloud/commons/dtos';
-import { DialogType, DialogContext, dialogAtom } from '../store';
+import { DialogType, DialogContext, dialogAtom } from '../atoms';
 
 interface OpenDialogOptions {
   type: DialogType;
