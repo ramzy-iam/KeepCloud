@@ -45,7 +45,9 @@ export class FolderService extends BaseFileService {
       children: { connect: [] },
     };
 
-    return this.fileRepository.create(folderData);
+    const { id } = await this.fileRepository.create(folderData);
+    const { file } = await this.getOne(id);
+    return file;
   }
 
   async getChildren(
@@ -67,7 +69,7 @@ export class FolderService extends BaseFileService {
   async getOne(
     id: string,
     withAncestors = false,
-  ): Promise<{ file: File; ancestors: FileAncestorDto[] }> {
+  ): Promise<{ file: File; ancestors?: FileAncestorDto[] }> {
     const file = await this.fileRepository.scoped
       .filterById(id)
       .filterByType(FileType.FOLDER)
