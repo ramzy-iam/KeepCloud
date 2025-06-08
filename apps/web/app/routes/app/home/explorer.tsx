@@ -1,3 +1,4 @@
+import { SYSTEM_FILE } from '@keepcloud/commons/constants';
 import { FolderView, SuggestionEmpty } from '../../../components';
 import { columns } from './columns';
 import {
@@ -16,19 +17,21 @@ export default function ExplorerComponent() {
       <FolderView
         columns={columns}
         items={suggestedFolders}
-        title="Suggested Folders"
+        title={SYSTEM_FILE.SUGGESTED_FOLDERS.name}
         fixedView="grid"
         className="mb-0"
         isLoading={isLoadingSuggestedFolders}
         noDataComponent={<SuggestionEmpty />}
+        currentId={SYSTEM_FILE.SUGGESTED_FOLDERS.id}
       />
 
       <FolderView
         columns={columns}
         items={suggestedFiles}
         isLoading={isLoadingSuggestedFiles}
-        title="Suggested Files"
+        title={SYSTEM_FILE.SUGGESTED_FILES.name}
         noDataComponent={<SuggestionEmpty />}
+        currentId={SYSTEM_FILE.SUGGESTED_FILES.id}
       />
     </div>
   );

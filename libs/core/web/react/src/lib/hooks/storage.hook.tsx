@@ -1,28 +1,32 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   PaginationDto,
   FolderFilterDto,
   FileMinViewDto,
 } from '@keepcloud/commons/dtos';
-import { StorageService, ApiError, KeyToInvalidate } from '../services';
+import { StorageService, ApiError } from '../services';
 import { SYSTEM_FILE } from '@keepcloud/commons/constants';
 import { useGetActiveFolder } from './folder.hook';
-import { toast } from 'sonner';
+import {
+  updateFileEverywhere,
+  useFileListUpdater,
+} from './use-file-list-updater.hook';
+import { useSyncedListFromQuery } from './use-sync-list-from-query.hook';
 
 interface StorageQueryProps {
   filters?: FolderFilterDto;
   enabled?: boolean;
 }
 
-interface RenameResourceProps extends KeyToInvalidate {
-  resourceName: string;
+interface RenameResourceProps {
+  parentId: string;
 }
 
 export const useGetRootItems = ({
   filters = {},
   enabled = true,
 }: StorageQueryProps = {}) => {
-  return useQuery<PaginationDto<FileMinViewDto>, ApiError>({
+  const query = useQuery<PaginationDto<FileMinViewDto>, ApiError>({
     queryKey: [SYSTEM_FILE.MY_STORAGE.invalidationKey],
     queryFn: () => {
       return StorageService.getRootItems(filters);
@@ -30,13 +34,14 @@ export const useGetRootItems = ({
     enabled,
     retry: false,
   });
+  return useSyncedListFromQuery(query, SYSTEM_FILE.MY_STORAGE.id);
 };
 
 export const useGetSharedWithMe = ({
   filters = {},
   enabled = true,
 }: StorageQueryProps = {}) => {
-  return useQuery<PaginationDto<FileMinViewDto>, ApiError>({
+  const query = useQuery<PaginationDto<FileMinViewDto>, ApiError>({
     queryKey: [SYSTEM_FILE.SHARED_WITH_ME.invalidationKey],
     queryFn: () => {
       return StorageService.getSharedWithMe(filters);
@@ -44,13 +49,15 @@ export const useGetSharedWithMe = ({
     enabled,
     retry: false,
   });
+
+  return useSyncedListFromQuery(query, SYSTEM_FILE.SHARED_WITH_ME.id);
 };
 
 export const useGetTrashedItems = ({
   filters = {},
   enabled = true,
 }: StorageQueryProps = {}) => {
-  return useQuery<PaginationDto<FileMinViewDto>, ApiError>({
+  const query = useQuery<PaginationDto<FileMinViewDto>, ApiError>({
     queryKey: [SYSTEM_FILE.TRASH.invalidationKey],
     queryFn: () => {
       return StorageService.getTrashedItems(filters);
@@ -58,6 +65,8 @@ export const useGetTrashedItems = ({
     enabled,
     retry: false,
   });
+
+  return useSyncedListFromQuery(query, SYSTEM_FILE.TRASH.id);
 };
 
 export const useGetKeyToInvalidateBasedOnActiveFolder = () => {
@@ -69,7 +78,7 @@ export const useGetKeyToInvalidateBasedOnActiveFolder = () => {
 };
 
 export const useGetSuggestedFolders = () => {
-  return useQuery<FileMinViewDto[], ApiError>({
+  const query = useQuery<FileMinViewDto[], ApiError>({
     queryKey: ['storage', 'suggested-folders'],
     queryFn: async () => {
       const data = await StorageService.getSuggestedFolders();
@@ -78,18 +87,21 @@ export const useGetSuggestedFolders = () => {
     enabled: true,
     retry: false,
   });
+  return useSyncedListFromQuery(query, SYSTEM_FILE.SUGGESTED_FOLDERS.id);
 };
 
 export const useGetSuggestedFiles = () => {
-  return useQuery<FileMinViewDto[], ApiError>({
+  const query = useQuery<FileMinViewDto[], ApiError>({
     queryKey: ['storage', 'suggested-files'],
     queryFn: async () => {
       const data = await StorageService.getSuggestedFiles();
-      return data.items;
+      const items = data.items;
+      return items;
     },
     enabled: true,
     retry: false,
   });
+  return useSyncedListFromQuery(query, SYSTEM_FILE.SUGGESTED_FILES.id);
 };
 
 export const useGetFoldersForTree = ({
@@ -101,77 +113,55 @@ export const useGetFoldersForTree = ({
     queryFn: () => {
       return StorageService.getFoldersForTree(filters);
     },
+
     enabled,
     retry: false,
   });
 };
 
-export const useRenameResource = ({
-  keysToInvalidate,
-  resourceName,
-}: RenameResourceProps) => {
-  const queryClient = useQueryClient();
+export const useRenameResource = ({ parentId }: RenameResourceProps) => {
+  const { updateItemName } = useFileListUpdater(parentId);
 
   return useMutation<FileMinViewDto, ApiError, { id: string; name: string }>({
     mutationFn: ({ id, name }) => StorageService.rename(id, name),
-    onSettled: () => {
-      keysToInvalidate.forEach((key) => {
-        queryClient.invalidateQueries({ queryKey: key });
-      });
+    onSuccess: (data) => {
+      updateItemName(data.id, data.name);
+      updateFileEverywhere(data.id, (file) => ({
+        ...file,
+        name: data.name,
+      }));
     },
   });
 };
 
-export const useMoveToTrash = ({
-  keysToInvalidate,
-  resourceName,
-}: RenameResourceProps) => {
-  const queryClient = useQueryClient();
+export const useMoveToTrash = ({ parentId }: { parentId: string }) => {
+  const { removeItem } = useFileListUpdater(parentId);
+
   return useMutation<FileMinViewDto, ApiError, string>({
     mutationFn: (id) => StorageService.moveToTrash(id),
-    onSuccess: () => {
-      toast.success(`${resourceName}  moved to trash`);
-    },
-    onSettled: () => {
-      keysToInvalidate.forEach((key) => {
-        queryClient.invalidateQueries({ queryKey: key });
-      });
+    onSuccess: (_, id) => {
+      removeItem(id);
     },
   });
 };
 
-export const useRestoreResource = ({
-  keysToInvalidate,
-  resourceName,
-}: RenameResourceProps) => {
-  const queryClient = useQueryClient();
+export const useRestoreResource = () => {
+  const { removeItem } = useFileListUpdater(SYSTEM_FILE.TRASH.id);
   return useMutation<FileMinViewDto, ApiError, string>({
     mutationFn: (id) => StorageService.restore(id),
-    onSuccess: () => {
-      toast.success(`${resourceName} restored successfully`);
-    },
-    onSettled: () => {
-      keysToInvalidate.forEach((key) => {
-        queryClient.invalidateQueries({ queryKey: key });
-      });
+    onSuccess: (_, id) => {
+      removeItem(id);
     },
   });
 };
 
-export const useDeletePermanently = ({
-  keysToInvalidate,
-  resourceName,
-}: RenameResourceProps) => {
-  const queryClient = useQueryClient();
+export const useDeletePermanently = () => {
+  const { removeItem } = useFileListUpdater(SYSTEM_FILE.TRASH.id);
   return useMutation<FileMinViewDto, ApiError, string>({
     mutationFn: (id) => StorageService.deletePermanently(id),
-    onSuccess: () => {
-      toast.success(`${resourceName} deleted permanently`);
-    },
-    onSettled: () => {
-      keysToInvalidate.forEach((key) => {
-        queryClient.invalidateQueries({ queryKey: key });
-      });
+    onSuccess: (_, id) => {
+      removeItem(id);
+      updateFileEverywhere(id, () => null);
     },
   });
 };

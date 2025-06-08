@@ -13,3 +13,5 @@ export * from './use-dialog.hook';
 export * from './upload-trigger.hook';
 export * from './use-file-icon.hook';
 export * from './use-file-preview.hook';
+export * from './use-file-list-updater.hook';
+export * from './use-sync-list-from-query.hook';

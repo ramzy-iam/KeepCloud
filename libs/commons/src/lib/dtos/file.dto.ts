@@ -55,6 +55,9 @@ export class FileMinViewDto {
   id: string;
 
   @Expose()
+  parentId: string;
+
+  @Expose()
   name: string;
 
   @Transform(({ obj }) => obj.size.toString())
@@ -84,9 +87,6 @@ export class FileMinViewDto {
 }
 
 export class FilePreviewDto extends FileMinViewDto {
-  @Expose()
-  parentId: string | null;
-
   @Expose()
   createdAt: Date;
 

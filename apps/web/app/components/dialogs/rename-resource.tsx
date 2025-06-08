@@ -16,12 +16,12 @@ import {
   FormItem,
   FormControl,
   FormMessage,
-  useGetKeyToInvalidateBasedOnActiveFolder,
   dialogAtom,
   useRenameResource,
 } from '@keepcloud/web-core/react';
 import { useAtom } from 'jotai';
 import { useEffect } from 'react';
+import { FileMinViewDto } from '@keepcloud/commons/dtos';
 
 const schema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -32,7 +32,7 @@ type FormInput = z.infer<typeof schema>;
 export const RenameResourceDialog = () => {
   const [dialogState, setDialogState] = useAtom(dialogAtom);
   const { isOpen, type, context } = dialogState;
-  const keyToInvalidate = useGetKeyToInvalidateBasedOnActiveFolder();
+  const file = context.item as FileMinViewDto;
 
   const form = useForm<FormInput>({
     resolver: zodResolver(schema),
@@ -42,8 +42,7 @@ export const RenameResourceDialog = () => {
   });
 
   const renameResource = useRenameResource({
-    keysToInvalidate: [keyToInvalidate],
-    resourceName: context.item?.isFolder ? 'Folder' : 'File',
+    parentId: file.parentId,
   });
 
   const onSubmit = (data: FormInput) => {
