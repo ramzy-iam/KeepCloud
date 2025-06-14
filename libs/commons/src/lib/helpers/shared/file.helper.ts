@@ -85,6 +85,13 @@ export class FileHelper {
 
     return parentId;
   }
+
+  getSystemFileName(fileCode: string): string {
+    const systemFile = Object.values(SYSTEM_FILE).find(
+      (file) => file.code === fileCode,
+    );
+    return systemFile ? systemFile.name : '';
+  }
 }
 
 export default new FileHelper();

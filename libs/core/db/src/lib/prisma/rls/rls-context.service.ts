@@ -23,7 +23,7 @@ export class RLSContextService {
     return context.prisma;
   }
 
-  static get prismaWithoutRLS(): PrismaClient | undefined {
+  static get prismaWithoutRLS(): PrismaClient {
     const context = this.getContext();
     if (!context.prismaWithoutRLS) {
       throw new Error('Prisma client without RLS is not set in the context');

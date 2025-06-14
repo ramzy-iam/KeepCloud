@@ -17,9 +17,13 @@ import { BaseFileService } from '../file/base-file-service';
 @Injectable()
 export class FolderService extends BaseFileService {
   async create(dto: CreateFolderDto): Promise<File> {
-    if (dto.parentId) {
+    let parentId = dto.parentId;
+    if (!parentId) {
+      const root = await this.fileRepository.getRootFolder();
+      parentId = root.id;
+
       const parent = await this.fileRepository.scoped
-        .filterById(dto.parentId)
+        .filterById(parentId)
         .filerByIsFolder()
         .getOne();
 
@@ -32,24 +36,35 @@ export class FolderService extends BaseFileService {
       }
     }
 
-    const folderData: Prisma.FileCreateInput = {
-      name: dto.name,
-      owner: { connect: { id: dto.ownerId } },
-      contentType: 'folder',
-      isFolder: true,
-      size: BigInt(0),
-      type: FileType.FOLDER,
-      storagePath: null,
-      isSystem: false,
-      parent: dto.parentId ? { connect: { id: dto.parentId } } : undefined,
-      children: { connect: [] },
-    };
+    const createdFolder = await this.fileRepository.prisma.$transaction(
+      async (tx) => {
+        const { left, right } =
+          await this.nestedSetService.allocateNestedSetPosition(parentId, tx);
 
-    const { id } = await this.fileRepository.create(folderData);
-    const { file } = await this.getOne(id);
+        const folderData: Prisma.FileCreateInput = {
+          name: dto.name,
+          owner: { connect: { id: dto.ownerId } },
+          createdBy: { connect: { id: dto.ownerId } },
+          contentType: 'folder',
+          isFolder: true,
+          size: BigInt(0),
+          type: FileType.FOLDER,
+          storagePath: null,
+          isSystem: false,
+          left,
+          right,
+          parent: { connect: { id: parentId } },
+          children: { connect: [] },
+        };
+
+        const folder = await tx.file.create({ data: folderData });
+        return folder;
+      },
+    );
+
+    const { file } = await this.getOne(createdFolder.id);
     return file;
   }
-
   async getChildren(
     parentId: string,
     filters: FolderFilterDto,

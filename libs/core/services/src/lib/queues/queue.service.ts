@@ -1,4 +1,5 @@
 import { SQShelper } from '@keepcloud/commons/backend';
+import { ProcessorAction } from '@keepcloud/commons/constants';
 import { Queue } from 'bullmq';
 
 export abstract class AbstractQueueService {
@@ -23,7 +24,10 @@ export abstract class AbstractQueueService {
     return process.env.NODE_ENV !== 'production';
   }
 
-  async sendJob<T>(payload: { message: string; data: T }): Promise<void> {
+  async sendJob<T>(payload: {
+    message: ProcessorAction;
+    data: T;
+  }): Promise<void> {
     if (this.isLocal()) {
       await this.bullQueue.add(this.jobName, payload);
     } else {

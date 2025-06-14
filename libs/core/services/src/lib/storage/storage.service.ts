@@ -5,15 +5,21 @@ import { SYSTEM_FILE } from '@keepcloud/commons/constants';
 import {
   FileNotFoundException,
   FolderNotFoundException,
+  NotFoundException,
 } from '@keepcloud/commons/backend';
+import { SystemQueueService } from '../queues';
 
 @Injectable()
 export class StorageService {
-  constructor(protected readonly fileRepository: FileRepository) {}
+  constructor(
+    private readonly fileRepository: FileRepository,
+    private readonly queueService: SystemQueueService,
+  ) {}
 
-  getRootItems(filters: FolderFilterDto): Promise<PaginationDto<File>> {
+  async getRootItems(filters: FolderFilterDto): Promise<PaginationDto<File>> {
+    const root = await this.fileRepository.getRootFolder();
     const scope = this.fileRepository.scoped
-      .filterByParentId(null)
+      .filterByParentId(root.id)
       .filterByNotTrashed()
       .joinOwner();
 
@@ -59,9 +65,11 @@ export class StorageService {
     };
   }
 
-  getSuggestedFolders(): Promise<PaginationDto<File>> {
+  async getSuggestedFolders(): Promise<PaginationDto<File>> {
+    const root = await this.fileRepository.getRootFolder();
+
     return this.fileRepository.scoped
-      .filterByParentId(null)
+      .filterByParentId(root.id)
       .filterByType(FileType.FOLDER)
       .filterByNotTrashed()
       .joinOwner()
@@ -69,9 +77,11 @@ export class StorageService {
       .getManyPaginated(1, 15);
   }
 
-  getSuggestedFiles(): Promise<PaginationDto<File>> {
+  async getSuggestedFiles(): Promise<PaginationDto<File>> {
+    const root = await this.fileRepository.getRootFolder();
+
     return this.fileRepository.scoped
-      .filterByParentId(null)
+      .filterByParentId(root.id)
       .filterByType(FileType.FILE)
       .filterByNotTrashed()
       .joinOwner()
@@ -79,9 +89,13 @@ export class StorageService {
       .getManyPaginated(1, 15);
   }
 
-  getFoldersForTree(filters: FolderFilterDto): Promise<PaginationDto<File>> {
+  async getFoldersForTree(
+    filters: FolderFilterDto,
+  ): Promise<PaginationDto<File>> {
+    const root = await this.fileRepository.getRootFolder();
+    const parentId = filters.parentId ?? root.id;
     return this.fileRepository.scoped
-      .filterByParentId(filters.parentId)
+      .filterByParentId(parentId)
       .filterByType(FileType.FOLDER)
       .filterByNotTrashed()
       .orderBy({ name: 'asc' })
@@ -92,13 +106,18 @@ export class StorageService {
     return this.fileRepository.update({ id }, { name });
   }
 
-  moveToTrash(id: string): Promise<File> {
-    return this.fileRepository.update({ id }, { trashedAt: new Date() });
+  async moveToTrash(id: string): Promise<File> {
+    const file = await this.fileRepository.update(
+      { id },
+      { trashedAt: new Date(), isSystem: false },
+    );
+    return file;
   }
 
   async delete(id: string): Promise<File> {
     const resource = await this.fileRepository.scoped
       .filterById(id)
+      .filterByIsSystem(false)
       .getOneOrFail();
 
     if (resource.deletedAt) {
@@ -107,10 +126,64 @@ export class StorageService {
       throw new FileNotFoundException(id);
     }
 
-    return this.fileRepository.update({ id }, { deletedAt: new Date() });
+    const deleted = await this.fileRepository.update(
+      { id },
+      { deletedAt: new Date() },
+    );
+
+    const filesToDelete = await this.getFilesUnderNode(id, deleted.ownerId);
+
+    for (const file of filesToDelete) {
+      await this.queueService.enqueueDeleteFileFromStorage({
+        ownerId: file.ownerId,
+        fileId: file.id,
+        storagePath: file.storagePath as string,
+      });
+    }
+
+    await this.queueService.enqueueNestedSetDeleteNode({
+      nodeId: id,
+      ownerId: deleted.ownerId,
+    });
+
+    await this.queueService.enqueueNestedSetRebuildTree(deleted.ownerId);
+
+    return deleted;
   }
 
   restore(id: string): Promise<File> {
-    return this.fileRepository.update({ id }, { trashedAt: null });
+    return this.fileRepository.update(
+      { id },
+      { trashedAt: null, isSystem: false },
+    );
+  }
+
+  private async getFilesUnderNode(nodeId: string, ownerId: string) {
+    const node = await this.fileRepository.prisma.file.findUnique({
+      where: { id: nodeId },
+      select: { left: true, right: true },
+    });
+
+    if (!node)
+      throw new NotFoundException({
+        message: `Node with ID ${nodeId} not found`,
+      });
+
+    const files = await this.fileRepository.prisma.file.findMany({
+      where: {
+        ownerId,
+        left: { gte: node.left },
+        right: { lte: node.right },
+        type: 'FILE',
+        storagePath: { not: null },
+      },
+      select: {
+        id: true,
+        ownerId: true,
+        storagePath: true,
+      },
+    });
+
+    return files;
   }
 }

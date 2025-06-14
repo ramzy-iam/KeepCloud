@@ -25,6 +25,7 @@ export const RootTree = () => {
       email: SYSTEM_FILE.MY_STORAGE.name,
       picture: SYSTEM_FILE.MY_STORAGE.name,
     },
+    parentId: 'null',
   };
 
   const { data, isLoading } = useGetFoldersForTree({
