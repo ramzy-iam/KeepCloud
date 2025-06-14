@@ -3,7 +3,11 @@ import { FileMinViewDto } from '@keepcloud/commons/dtos';
 import { ErrorCode } from '@keepcloud/commons/constants';
 
 type CommonDialogType = 'rename' | 'resourceTrashed' | 'deletePermanently';
-type FolderDialogType = 'createFolder' | 'folderTrashed' | 'folderDeleted';
+type FolderDialogType =
+  | 'createFolder'
+  | 'folderTrashed'
+  | 'folderDeleted'
+  | 'folderNotFound';
 type FileDialogType = 'fileTrashed' | 'fileDeleted' | 'previewFile';
 
 export type DialogType = CommonDialogType | FolderDialogType | FileDialogType;

@@ -23,7 +23,7 @@ export class EmailAlreadyExistsException extends ConflictException {
   }
 }
 
-export class FolderTrashedException extends ConflictException {
+export class FolderTrashedException extends NotFoundException {
   constructor() {
     super({
       code: ErrorCode.FOLDER_TRASHED,
@@ -33,7 +33,7 @@ export class FolderTrashedException extends ConflictException {
   }
 }
 
-export class FileTrashedException extends ConflictException {
+export class FileTrashedException extends NotFoundException {
   constructor() {
     super({
       code: ErrorCode.FILE_TRASHED,
@@ -43,7 +43,7 @@ export class FileTrashedException extends ConflictException {
   }
 }
 
-export class ParentFolderTrashedException extends ConflictException {
+export class ParentFolderTrashedException extends NotFoundException {
   constructor() {
     super({
       code: ErrorCode.PARENT_FOLDER_TRASHED,
