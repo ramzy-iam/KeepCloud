@@ -3,12 +3,17 @@ import {
   FolderTrashedException,
   ParentFolderTrashedException,
 } from '@keepcloud/commons/backend';
-import { FileRepository, File } from '@keepcloud/core/db';
+import { FileRepository, File, Prisma } from '@keepcloud/core/db';
 import { Injectable } from '@nestjs/common';
+import { NestedSetService } from '../storage';
 
 @Injectable()
 export abstract class BaseFileService {
-  constructor(protected readonly fileRepository: FileRepository) {}
+  constructor(
+    protected readonly fileRepository: FileRepository,
+
+    protected readonly nestedSetService: NestedSetService,
+  ) {}
 
   abstract create(...dto: unknown[]): Promise<File>;
 

@@ -8,3 +8,23 @@ export interface MoveFileInStorageData {
   fileId: string;
   filename: string;
 }
+
+export interface DeleteNodeData {
+  ownerId: string;
+  nodeId: string;
+}
+export interface MoveNodeData {
+  ownerId: string;
+  nodeId: string;
+  newParentId: string;
+}
+
+export interface DeleteFileFromStorageData {
+  ownerId: string;
+  fileId: string;
+  storagePath: string;
+}
+
+export interface RebuildTreeData {
+  userId: string;
+}

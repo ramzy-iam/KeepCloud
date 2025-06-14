@@ -13,4 +13,7 @@ export class UserProfileDto extends MinimalDto {
 
   @Expose()
   picture: string | null;
+
+  @Expose()
+  root: string | null;
 }
