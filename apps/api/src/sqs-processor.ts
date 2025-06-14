@@ -7,7 +7,7 @@ import {
 } from '@keepcloud/commons/backend';
 
 export async function processSQSEvent(event: SQSEvent) {
-  const logger = new Logger('SQSProcessor');
+  const logger = new Logger('ProcessSQSEvent');
   const sQShelper = SQShelper.getInstance();
   const errors = [];
   const uniqueMessages: SQSRecord[] = [
@@ -35,7 +35,7 @@ export async function processSQSEvent(event: SQSEvent) {
   );
 
   if (errors.length > 0) {
-    logger.error('ProcessSQSEvent: some messages failed', { errors });
+    logger.error('some messages failed', { errors });
     throw new InternalServerErrorException({
       message: 'ProcessSQSEvent: some messages failed',
     });
