@@ -8,10 +8,6 @@ import {
 import { FileNode } from './file-node';
 
 export const FileTreeNode = ({ file }: { file: FileMinViewDto }) => {
-  if (file.contentType !== 'folder') {
-    return null;
-  }
-
   const [shouldFetch, setShouldFetch] = useState(false);
 
   const {
@@ -22,6 +18,10 @@ export const FileTreeNode = ({ file }: { file: FileMinViewDto }) => {
     filters: { type: 'FOLDER', parentId: file.id },
     enabled: shouldFetch,
   });
+
+  if (file.contentType !== 'folder') {
+    return null;
+  }
 
   const sortedChildren = data?.items
     ? [...data.items].sort((a, b) => a.name.localeCompare(b.name))
