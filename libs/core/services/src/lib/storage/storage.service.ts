@@ -43,9 +43,9 @@ export class StorageService {
         ...item,
         ancestors: [
           {
-            id: SYSTEM_FILE.TRASH.id,
-            name: SYSTEM_FILE.TRASH.name,
-            code: SYSTEM_FILE.TRASH.code,
+            id: SYSTEM_FILE.MY_STORAGE.id,
+            name: SYSTEM_FILE.MY_STORAGE.name,
+            code: SYSTEM_FILE.MY_STORAGE.code,
             isSystem: true,
           },
           ...ancestors,

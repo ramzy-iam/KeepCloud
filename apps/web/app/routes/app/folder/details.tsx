@@ -12,6 +12,7 @@ import { FileAncestorDto } from '@keepcloud/commons/dtos';
 import { useNavigate } from 'react-router';
 import { useEffect, useRef } from 'react';
 import { columns } from './columns';
+import { ErrorCode } from '@keepcloud/commons/constants';
 
 export default function FolderDetailsComponent({
   params,
@@ -45,21 +46,26 @@ export default function FolderDetailsComponent({
   }, [folder]);
 
   useEffect(() => {
-    if (
-      !hasOpenedRef.current &&
-      error?.code === 'RESOURCE_TRASHED' &&
-      error.details?.length
-    ) {
+    if (!hasOpenedRef.current && error) {
       const detail = error.details[0];
 
       if (
-        detail.code === 'FOLDER_TRASHED' ||
-        detail.code === 'PARENT_FOLDER_TRASHED'
+        detail.code === ErrorCode.FOLDER_TRASHED ||
+        detail.code === ErrorCode.PARENT_FOLDER_TRASHED
       ) {
         openDialog({
           type: 'resourceTrashed',
           context: {
             isFolder: true,
+            code: detail.code,
+          },
+        });
+        hasOpenedRef.current = true;
+      } else if (detail.code === ErrorCode.FOLDER_NOT_FOUND) {
+        openDialog({
+          type: 'folderNotFound',
+          context: {
+            isFolder: false,
             code: detail.code,
           },
         });
@@ -69,21 +75,10 @@ export default function FolderDetailsComponent({
   }, [error, openDialog]);
 
   if (error || !folder) {
-    return isLoading ? null : (
-      <div>
-        <h3 className="sticky top-0 z-[1] bg-background p-1.5 text-18-medium text-heading">
-          Folder not found
-        </h3>
-        <div className="flex h-full items-center justify-center">
-          <p className="text-secondary-foreground">
-            This folder does not exist.
-          </p>
-        </div>
-      </div>
-    );
+    return null;
   }
 
-  const enhancedAncestors: FileAncestorDto[] = folder.ancestors || [];
+  const enhancedAncestors: FileAncestorDto[] = folder?.ancestors || [];
 
   const handleBreadcrumbClick = (ancestor: FileAncestorDto) => {
     const activeFolder =
@@ -111,7 +106,7 @@ export default function FolderDetailsComponent({
       }}
       columns={columns}
       title={folder.name}
-      isLoading={isLoading || isLoadingChildren}
+      isLoading={isLoading || isLoadingChildren || !!error}
       onBreadcrumbClick={handleBreadcrumbClick}
       currentId={params.folderId}
     />
