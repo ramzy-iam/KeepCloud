@@ -23,7 +23,7 @@ export async function processSQSEvent(event: SQSEvent) {
           payload.data,
         );
 
-        sQShelper.deleteMessage(
+        await sQShelper.deleteMessage(
           process.env.SYSTEM_QUEUE_URL,
           record.receiptHandle,
         );
