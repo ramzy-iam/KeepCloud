@@ -224,11 +224,20 @@ export class FileService extends BaseFileService {
   }
 
   private sanitizeFilename(filename: string): string {
-    return filename
-      .replace(/[<>:"/\\|?*\x00-\x1F]/g, '') // Remove illegal characters
-      .replace(/\s+/g, '_') // Replace spaces with underscores
-      .replace(/\.+$/, '') // Remove trailing dots
-      .slice(0, 255); // Limit to 255 characters
+    const parts = filename.split('.');
+    const hasExtension = parts.length > 1;
+
+    const baseName = hasExtension ? parts.slice(0, -1).join('.') : filename;
+    const extension = hasExtension ? '.' + parts.at(-1) : '';
+
+    const slugified = baseName
+      .normalize('NFKD') // Normalize accents
+      .replace(/[^\w\s-]/g, '') // Remove special characters
+      .trim()
+      .replace(/[\s_-]+/g, '_') // Replace spaces/dashes with _
+      .toLowerCase();
+
+    return (slugified + extension).slice(0, 255);
   }
 
   async getOne(id: string): Promise<File & { ancestors: FileAncestorDto[] }> {
