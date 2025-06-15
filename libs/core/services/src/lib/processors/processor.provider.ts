@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { MoveFileInAfterCreateProcessor } from './move-file-after-create.processor';
+import { UpdateFileTagInAfterCreateProcessor } from './update-file-tag-after-create.processor';
 import { ErrorCode, ProcessorAction } from '@keepcloud/commons/constants';
 import { AppException } from '@keepcloud/commons/backend';
 import { Processor } from '@keepcloud/commons/types';
@@ -10,7 +10,7 @@ import { RebuildTreeProcessor } from './rebuild-tree.processor';
 @Injectable()
 export class ProcessorProvider {
   constructor(
-    private readonly moveFileInAfterCreateProcessor: MoveFileInAfterCreateProcessor,
+    private readonly updateFileTagInAfterCreateProcessor: UpdateFileTagInAfterCreateProcessor,
     private readonly deleteNodeProcessor: DeleteNodeProcessor,
     private readonly deleteFileFromStorageProcessor: DeleteFileFromStorageProcessor,
     private readonly rebuildTreeProcessor: RebuildTreeProcessor,
@@ -19,8 +19,8 @@ export class ProcessorProvider {
   getFromMessage(message: string): Processor {
     const processorMap = new Map<string, Processor>([
       [
-        ProcessorAction.MOVE_FILE_AFTER_CREATE,
-        this.moveFileInAfterCreateProcessor,
+        ProcessorAction.UPDATE_FILE_TAG_IN_STORAGE,
+        this.updateFileTagInAfterCreateProcessor,
       ],
       [ProcessorAction.NESTED_SET_DELETE_NODE, this.deleteNodeProcessor],
       [
