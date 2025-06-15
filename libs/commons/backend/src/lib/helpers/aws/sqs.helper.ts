@@ -11,6 +11,11 @@ import {
 import AwsServiceHelper from './base.helper';
 import { Logger } from '../logger.helper';
 
+interface SendMessageInput {
+  queueUrl: string;
+  MessageBody: string;
+  MessageGroupId?: string; // Optional, only for FIFO queues
+}
 export class SQShelper extends AwsServiceHelper<SQSClient> {
   protected client: SQSClient;
   protected static instanceMap = new Map<string, SQShelper>();
@@ -38,14 +43,16 @@ export class SQShelper extends AwsServiceHelper<SQSClient> {
     );
   }
 
-  async sendMessage(
-    queueUrl: string,
-    MessageBody: string,
-  ): Promise<SendMessageCommandOutput | undefined> {
+  async sendMessage({
+    queueUrl,
+    MessageBody,
+    MessageGroupId,
+  }: SendMessageInput): Promise<SendMessageCommandOutput | undefined> {
     try {
       const command = new SendMessageCommand({
         QueueUrl: queueUrl,
         MessageBody,
+        MessageGroupId,
       });
 
       const data = await this.client.send(command);

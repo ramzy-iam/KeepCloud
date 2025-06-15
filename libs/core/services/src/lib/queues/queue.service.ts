@@ -31,7 +31,11 @@ export abstract class AbstractQueueService {
     if (this.isLocal()) {
       await this.bullQueue.add(this.jobName, payload);
     } else {
-      await this.sqsHelper.sendMessage(this.queueUrl, JSON.stringify(payload));
+      await this.sqsHelper.sendMessage({
+        queueUrl: this.queueUrl,
+        MessageBody: JSON.stringify(payload),
+        MessageGroupId: this.jobName, // Use jobName as group ID for FIFO queues
+      });
     }
   }
 }
