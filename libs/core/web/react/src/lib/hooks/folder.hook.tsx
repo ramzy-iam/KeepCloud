@@ -1,5 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import {
   CreateFolderDto,
   FolderFilterDto,
@@ -7,19 +6,21 @@ import {
   FileDetailsDto,
   GetOneFolderQueryDto,
 } from '@keepcloud/commons/dtos';
-import { toast } from 'sonner';
-import { FolderService, ApiError, KeyToInvalidate } from '../services';
+import { FolderService, ApiError, ApiErrorData } from '../services';
 import {
   ActiveFolder,
   DEFAULT_ACTIVE_FOLDER,
   activeFolderAtom,
   folderViewAtom,
-} from '../store';
+} from '../atoms';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { StorageHelper } from '../helpers';
 import { FOLDER_VIEW_KEY } from '@keepcloud/commons/constants';
 import { useEffect } from 'react';
 import { FolderViewMode } from '@keepcloud/commons/types';
+import { useFileListUpdater } from './use-file-list-updater.hook';
+import { useSyncedListFromQuery } from './use-sync-list-from-query.hook';
+import { FileHelper } from '@keepcloud/commons/helpers';
 
 interface GetFolderProps {
   id: string;
@@ -33,7 +34,9 @@ interface GetChildrenProps {
   enabled?: boolean;
 }
 
-interface CreateFolderProps extends KeyToInvalidate {}
+interface CreateFolderProps {
+  parentId: string;
+}
 
 export const useGetActiveFolder = () => {
   const setFolder = useSetAtom(activeFolderAtom);
@@ -72,21 +75,19 @@ export const useInitializeFolderViewMode = () => {
   }, [setView]);
 };
 
-export const useCreateFolder = ({ keysToInvalidate }: CreateFolderProps) => {
-  const queryClient = useQueryClient();
+export const useCreateFolder = ({ parentId }: CreateFolderProps) => {
+  const finalParentId = FileHelper.getValidParentId(parentId);
+
+  const { insertItem } = useFileListUpdater(finalParentId);
+
   return useMutation<FileMinViewDto, ApiError, CreateFolderDto>({
     mutationFn: async (dto) => {
+      if (FileHelper.isSystemFile(dto.parentId)) dto.parentId = undefined;
       return FolderService.create(dto);
     },
 
-    onSuccess: () => {
-      toast.success('Folder created successfully');
-    },
-
-    onSettled: () => {
-      keysToInvalidate.forEach((key) => {
-        queryClient.invalidateQueries({ queryKey: key });
-      });
+    onSuccess: (data: FileMinViewDto) => {
+      insertItem(data, 'start');
     },
   });
 };
@@ -96,7 +97,7 @@ export const useGetFolderChildren = ({
   filters = {},
   enabled = true,
 }: GetChildrenProps) => {
-  return useQuery<FileMinViewDto[], AxiosError>({
+  const query = useQuery<FileMinViewDto[], ApiErrorData>({
     queryKey: ['folder', id, 'children'],
     queryFn: async () => {
       const { items } = await FolderService.getChildren(id, filters);
@@ -105,6 +106,7 @@ export const useGetFolderChildren = ({
     enabled: enabled && !!id,
     retry: false,
   });
+  return useSyncedListFromQuery(query, id);
 };
 
 export const useGetFolder = ({

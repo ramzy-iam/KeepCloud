@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import { bypassRLS, forUser } from './extensions';
 
 @Injectable()
-export class PrismaService implements OnModuleInit, OnModuleDestroy {
+export class PrismaService implements OnModuleInit {
   private readonly baseClient: PrismaClient;
 
   constructor() {
@@ -12,10 +12,6 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
 
   onModuleInit() {
     return this.baseClient.$connect();
-  }
-
-  onModuleDestroy() {
-    return this.baseClient.$disconnect();
   }
 
   /**

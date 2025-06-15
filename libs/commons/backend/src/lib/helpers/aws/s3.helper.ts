@@ -12,9 +12,11 @@ import {
   ListObjectsCommand,
   CopyObjectCommand,
   CopyObjectCommandOutput,
+  PutObjectTaggingCommand,
+  GetObjectTaggingCommand,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { createPresignedPost, PresignedPost } from '@aws-sdk/s3-presigned-post';
+import { PresignedPost, createPresignedPost } from '@aws-sdk/s3-presigned-post';
 import { Readable } from 'stream';
 import { FileHelper } from '@keepcloud/commons/helpers';
 import AwsServiceHelper from './base.helper';
@@ -27,6 +29,7 @@ interface UploadOptions {
   acl?: string;
   encryption?: string;
   additionalParams?: Partial<PutObjectCommandInput>;
+  tags?: Record<string, string>;
 }
 
 interface UploadResult {
@@ -50,13 +53,14 @@ interface PresignedPostOptions {
   expiresIn?: number;
   conditions?: any[];
   fields?: Record<string, string>;
+  tags?: Record<string, string>;
 }
 
 export interface PresignedPostResult {
   url: string;
   fields: Record<string, string>;
-  bucket: string;
   key: string;
+  headers?: Record<string, string>;
 }
 
 interface DeleteResult {
@@ -120,9 +124,18 @@ export class S3Helper extends AwsServiceHelper<S3Client> {
       key,
       contentType: options.contentType,
       metadata: options.metadata ? Object.keys(options.metadata) : undefined,
+      tags: options.tags,
     });
 
     try {
+      const tagString = options.tags
+        ? Object.entries(options.tags)
+            .map(
+              ([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`,
+            )
+            .join('&')
+        : undefined;
+
       const command = new PutObjectCommand({
         Bucket: bucket,
         Key: key,
@@ -130,6 +143,7 @@ export class S3Helper extends AwsServiceHelper<S3Client> {
         ContentType: options.contentType || FileHelper.getContentType(key),
         Metadata: options.metadata || {},
         ACL: (options.acl as ObjectCannedACL) ?? 'private',
+        Tagging: tagString, // ← Include tags here
         ...options.additionalParams,
       });
 
@@ -241,6 +255,73 @@ export class S3Helper extends AwsServiceHelper<S3Client> {
     bucket: string,
     key: string,
     options: PresignedPostOptions = {},
+  ): Promise<Omit<PresignedPostResult, 'fields'>> {
+    this.logger.debug('Creating presigned POST', {
+      bucket,
+      key,
+      options: {
+        ...options,
+        maxFileSize: options.maxFileSize,
+      },
+    });
+
+    try {
+      let tagString = '';
+      if (options.tags) {
+        tagString = Object.entries(options.tags)
+          .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
+          .join('&');
+      }
+
+      const putObjectCommandParams: PutObjectCommandInput = {
+        Bucket: bucket,
+        Key: key,
+
+        ...(tagString ? { Tagging: tagString } : {}),
+      };
+
+      const putObjectCommand = new PutObjectCommand(putObjectCommandParams);
+      const url = await getSignedUrl(this.client, putObjectCommand, {
+        unhoistableHeaders: new Set(['x-amz-tagging']),
+        expiresIn: options.expiresIn || 3600,
+      });
+
+      this.logger.debug('Presigned POST created', {
+        bucket,
+        key,
+        url,
+      });
+
+      const headers: Record<string, string> = {
+        'x-amz-tagging': tagString,
+      };
+      return {
+        url,
+        key,
+        headers,
+      };
+    } catch (error) {
+      this.logger.error('Failed to create presigned POST', {
+        bucket,
+        key,
+        error: (error as Error).message,
+      });
+      throw new Error(
+        `Failed to create presigned POST: ${(error as Error).message}`,
+      );
+    }
+  }
+
+  /**
+   * Create a presigned POST for browser uploads
+   * @param key - The S3 key
+   * @param options - POST options
+   * @returns Presigned POST data
+   */
+  async _createPresignedPost(
+    bucket: string,
+    key: string,
+    options: PresignedPostOptions = {},
   ): Promise<PresignedPostResult> {
     this.logger.debug('Creating presigned POST', {
       bucket,
@@ -288,7 +369,6 @@ export class S3Helper extends AwsServiceHelper<S3Client> {
       return {
         url: presignedPost.url,
         fields: presignedPost.fields,
-        bucket,
         key,
       };
     } catch (error) {
@@ -513,6 +593,185 @@ export class S3Helper extends AwsServiceHelper<S3Client> {
         `We faced this error while copying the object ${error}}`,
       );
       throw error;
+    }
+  }
+
+  /**
+   * Add or update tags on an existing S3 object
+   * @param bucket - The bucket name
+   * @param key - The object key
+   * @param tags - Key-value pairs of tags
+   */
+  public async putObjectTagging(
+    bucket: string,
+    key: string,
+    tags: Record<string, string>,
+  ): Promise<void> {
+    this.logger.debug('Setting object tags', {
+      bucket,
+      key,
+      tags,
+    });
+
+    try {
+      const tagSet = Object.entries(tags).map(([Key, Value]) => ({
+        Key,
+        Value,
+      }));
+
+      const command = new PutObjectTaggingCommand({
+        Bucket: bucket,
+        Key: key,
+        Tagging: {
+          TagSet: tagSet,
+        },
+      });
+
+      await this.client.send(command);
+
+      this.logger.debug('Object tags set successfully', {
+        bucket,
+        key,
+        tagCount: tagSet.length,
+      });
+    } catch (error) {
+      this.logger.error('Failed to set object tags', {
+        bucket,
+        key,
+        error: (error as Error).message,
+      });
+      throw new Error(`Tagging failed: ${(error as Error).message}`);
+    }
+  }
+
+  /**
+   * Remove all tags from an S3 object
+   * @param bucket - The bucket name
+   * @param key - The object key
+   */
+  public async removeAllObjectTags(bucket: string, key: string): Promise<void> {
+    this.logger.debug('Removing all object tags', {
+      bucket,
+      key,
+    });
+
+    try {
+      const command = new PutObjectTaggingCommand({
+        Bucket: bucket,
+        Key: key,
+        Tagging: {
+          TagSet: [],
+        },
+      });
+
+      await this.client.send(command);
+      this.logger.debug('All object tags removed successfully', {
+        bucket,
+        key,
+      });
+    } catch (error) {
+      this.logger.error('Failed to remove all object tags', {
+        bucket,
+        key,
+        error: (error as Error).message,
+      });
+      throw new Error(`Remove tags failed: ${(error as Error).message}`);
+    }
+  }
+
+  /**
+   * Remove specific tags from an S3 object
+   * @param bucket - The bucket name
+   * @param key - The object key
+   * @param tagKeys - Array of tag keys to remove
+   */
+  public async removeObjectTags(
+    bucket: string,
+    key: string,
+    tagKeys: string[],
+  ): Promise<void> {
+    this.logger.debug('Removing specific object tags', {
+      bucket,
+      key,
+      tagKeys,
+    });
+
+    try {
+      // First get existing tags
+      const existingTags = await this.getObjectTags(bucket, key);
+
+      // Filter out the tags we want to remove
+      const updatedTags = Object.entries(existingTags || {})
+        .filter(([key]) => !tagKeys.includes(key))
+        .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
+
+      // Update the object with remaining tags
+      await this.putObjectTagging(bucket, key, updatedTags);
+
+      this.logger.debug('Specific object tags removed successfully', {
+        bucket,
+        key,
+        removedTags: tagKeys,
+        remainingTags: Object.keys(updatedTags),
+      });
+    } catch (error) {
+      this.logger.error('Failed to remove specific object tags', {
+        bucket,
+        key,
+        tagKeys,
+        error: (error as Error).message,
+      });
+      throw new Error(
+        `Remove specific tags failed: ${(error as Error).message}`,
+      );
+    }
+  }
+
+  /**
+   * Get all tags for an S3 object
+   * @param bucket - The bucket name
+   * @param key - The object key
+   * @returns Object with tag key-value pairs
+   */
+  public async getObjectTags(
+    bucket: string,
+    key: string,
+  ): Promise<Record<string, string> | undefined> {
+    this.logger.debug('Getting object tags', {
+      bucket,
+      key,
+    });
+
+    try {
+      const command = new GetObjectTaggingCommand({
+        Bucket: bucket,
+        Key: key,
+      });
+
+      const response = await this.client.send(command);
+      const tags = response.TagSet?.reduce(
+        (acc, tag) => {
+          const key = tag.Key as string;
+          acc[key] = tag.Value as string;
+          return acc;
+        },
+        {} as Record<string, string>,
+      );
+
+      this.logger.debug('Retrieved object tags', {
+        bucket,
+        key,
+        tagCount: response.TagSet?.length,
+      });
+
+      return tags;
+    } catch (error) {
+      this.logger.error('Failed to get object tags', {
+        bucket,
+        key,
+        error: (error as Error).message,
+      });
+      throw new Error(`Get tags failed: ${(error as Error).message}`);
     }
   }
 }

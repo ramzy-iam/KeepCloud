@@ -5,10 +5,10 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
-import { User } from '@keepcloud/core/db';
+import { FileRepository, User } from '@keepcloud/core/db';
 import { TokenPayload } from 'google-auth-library';
 import { OAuthService } from './oauth.service';
-import { AccessTokenPayload } from '@keepcloud/commons/dtos';
+import { AccessTokenPayload, UserProfileDto } from '@keepcloud/commons/dtos';
 import {
   BadRequestException,
   InternalServerErrorException,
@@ -24,6 +24,7 @@ export class AuthService {
 
   constructor(
     private readonly userService: UserService,
+    private readonly fileRepository: FileRepository,
     private readonly jwtService: JwtService,
   ) {
     this.logger = new Logger(AuthService.name);
@@ -116,11 +117,26 @@ export class AuthService {
     }
   }
 
-  async getUserProfile({ email, id }: { email: string; id: string }) {
+  async getUserProfile({
+    email,
+    id,
+  }: {
+    email: string;
+    id: string;
+  }): Promise<UserProfileDto> {
     const user = await this.userService.findOne({ email, id });
     if (!user) {
       throw new UnauthorizedException({ message: 'Invalid token' });
     }
-    return user;
+    const rootFolder = await this.fileRepository.getRootFolder(user.id);
+
+    return {
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      picture: user.picture,
+      root: rootFolder.id,
+    };
   }
 }
