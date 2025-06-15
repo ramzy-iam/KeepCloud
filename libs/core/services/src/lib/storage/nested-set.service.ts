@@ -55,24 +55,40 @@ export class NestedSetService {
 
     const { left, right } = node;
     const width = right - left + 1;
-
+    console.log(this.prisma);
     try {
-      await this.prisma.$transaction([
-        this.prisma.file.updateMany({
-          data: {
-            deletedAt: new Date(),
-          },
+      await this.prisma.$transaction(async (tx) => {
+        this.logger.info(`Marking node subtree for deletion`);
+        await tx.file.updateMany({
           where: { ownerId, left: { gte: left }, right: { lte: right } },
-        }),
-        this.prisma.file.updateMany({
+          data: { deletedAt: new Date() },
+        });
+        this.logger.info(`Closing gap after node removal`);
+        await tx.file.updateMany({
           where: { ownerId, left: { gt: right } },
           data: { left: { decrement: width } },
-        }),
-        this.prisma.file.updateMany({
+        });
+        await tx.file.updateMany({
           where: { ownerId, right: { gt: right } },
           data: { right: { decrement: width } },
-        }),
-      ]);
+        });
+      });
+      //   [
+      //   this.prisma.file.updateMany({
+      //     data: {
+      //       deletedAt: new Date(),
+      //     },
+      //     where: { ownerId, left: { gte: left }, right: { lte: right } },
+      //   }),
+      //   this.prisma.file.updateMany({
+      //     where: { ownerId, left: { gt: right } },
+      //     data: { left: { decrement: width } },
+      //   }),
+      //   this.prisma.file.updateMany({
+      //     where: { ownerId, right: { gt: right },  },
+      //     data: { right: { decrement: width } },
+      //   }),
+      // ]);
       this.logger.info(`Node deleted successfully`);
     } catch (err: any) {
       this.logger.error(
