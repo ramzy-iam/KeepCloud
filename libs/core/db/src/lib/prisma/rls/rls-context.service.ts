@@ -23,7 +23,7 @@ export class RLSContextService {
     return context.prisma;
   }
 
-  static get prismaWithoutRLS(): PrismaClient | undefined {
+  static get prismaWithoutRLS(): PrismaClient {
     const context = this.getContext();
     if (!context.prismaWithoutRLS) {
       throw new Error('Prisma client without RLS is not set in the context');
@@ -50,8 +50,15 @@ export class RLSContextService {
   }
 
   // Set context for the current async operation
-  static runWithContext<T>(context: RLSContext, callback: () => T): T {
-    return this.asyncLocalStorage.run(context, callback);
+  static async runWithContext<T>(
+    context: RLSContext,
+    callback: () => Promise<T>, // Explicitly expects a Promise
+  ): Promise<T> {
+    return new Promise((resolve, reject) => {
+      this.asyncLocalStorage.run(context, () => {
+        callback().then(resolve).catch(reject);
+      });
+    });
   }
 
   static updateContext(updates: Partial<RLSContext>): void {

@@ -35,7 +35,7 @@ export abstract class BaseRepository<
     >;
   }
 
-  protected get prisma(): PrismaClient {
+  get prisma(): PrismaClient {
     return RLSContextService.prisma;
   }
 

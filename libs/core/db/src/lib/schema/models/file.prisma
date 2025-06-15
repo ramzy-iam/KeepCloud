@@ -25,12 +25,21 @@ model File {
   parent   File?   @relation("FileHierarchy", fields: [parentId], references: [id])
   children File[]  @relation("FileHierarchy")
 
-  ownerId    String
-  owner      User            @relation("UserFiles", fields: [ownerId], references: [id])
+  ownerId String
+  owner   User   @relation("FileOwner", fields: [ownerId], references: [id])
+
+  createdById String?
+  createdBy   User?   @relation("FileCreator", fields: [createdById], references: [id])
+
   accessLogs FileAccessLog[] @relation("FileToAccessLog")
 
   sharedWith SharedFile[]
+  left       Int
+  right      Int
 
+  @@index([left])
+  @@index([right])
+  @@index([createdById])
   @@index([ownerId])
   @@index([parentId])
   @@index([trashedAt])

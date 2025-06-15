@@ -3,6 +3,7 @@ import { SubscriptionPlanRepository, UserRepository } from '@keepcloud/core/db';
 import { TokenPayload } from 'google-auth-library';
 import { User } from '@prisma/client';
 import { UserNotFoundException } from '@keepcloud/commons/backend';
+import { SYSTEM_FILE } from '@keepcloud/commons/constants';
 
 @Injectable()
 export class UserService {
@@ -12,7 +13,10 @@ export class UserService {
   ) {}
 
   async createOrUpdateGoogleUser(profile: TokenPayload): Promise<User> {
-    const email = profile.email as string;
+    if (!profile.email) {
+      throw new UserNotFoundException('Email not provided in profile');
+    }
+    const email = profile.email;
 
     let user = await this.userRepository.scoped.filterByEmail(email).getOne();
 
@@ -21,18 +25,40 @@ export class UserService {
       .getOneOrFail();
 
     if (!user) {
-      user = await this.userRepository.create({
-        email,
-        firstName: profile.given_name,
-        lastName: profile.family_name,
-        picture: profile.picture,
-        plan: {
-          connect: {
-            id: plan.id,
-          },
+      const [newUser, _] = await this.userRepository.prisma.$transaction(
+        async (tx) => {
+          const newUser = await tx.user.create({
+            data: {
+              email,
+              firstName: profile.given_name,
+              lastName: profile.family_name,
+              picture: profile.picture,
+              planId: plan.id,
+            },
+          });
+
+          const myStorage = await tx.file.create({
+            data: {
+              name: SYSTEM_FILE.MY_STORAGE.code,
+              owner: {
+                connect: { email },
+              },
+              contentType: 'folder',
+              isFolder: true,
+              size: BigInt(0),
+              type: 'FOLDER',
+              isSystem: true,
+              left: 1,
+              right: 2,
+            },
+          });
+
+          return [newUser, myStorage];
         },
-      });
+      );
+      user = newUser;
     }
+
     return user;
   }
 
