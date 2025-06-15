@@ -1,10 +1,19 @@
 import { Global, Module } from '@nestjs/common';
 import {
-  MoveFileInAfterCreateProcessor,
+  DeleteFileFromStorageProcessor,
+  DeleteNodeProcessor,
+  UpdateFileTagInAfterCreateProcessor,
   ProcessorProvider,
+  RebuildTreeProcessor,
 } from '@keepcloud/core/services';
 
-const services = [ProcessorProvider, MoveFileInAfterCreateProcessor];
+const services = [
+  ProcessorProvider,
+  UpdateFileTagInAfterCreateProcessor,
+  DeleteNodeProcessor,
+  DeleteFileFromStorageProcessor,
+  RebuildTreeProcessor,
+];
 
 @Global()
 @Module({

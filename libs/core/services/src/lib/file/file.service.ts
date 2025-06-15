@@ -19,9 +19,10 @@ import { Prisma } from '@prisma/client';
 import { BaseFileService } from './base-file-service';
 import { FileHelper } from '@keepcloud/commons/helpers';
 import { UserService } from '../user';
-import { SYSTEM_FILE } from '@keepcloud/commons/constants';
+import { FileUploadStatus, SYSTEM_FILE } from '@keepcloud/commons/constants';
 import { SystemQueueService } from '../queues';
 import { DispositionType } from '@keepcloud/commons/types';
+import { NestedSetService } from '../storage';
 
 @Injectable()
 export class FileService extends BaseFileService {
@@ -33,8 +34,9 @@ export class FileService extends BaseFileService {
     protected override readonly fileRepository: FileRepository,
     private readonly userService: UserService,
     private readonly systemQueueService: SystemQueueService,
+    protected override readonly nestedSetService: NestedSetService,
   ) {
-    super(fileRepository);
+    super(fileRepository, nestedSetService);
     this.s3helper = S3Helper.getInstance();
     this.bucket = process.env.FILE_BUCKET;
     this.logger = new Logger(FileService.name);
@@ -44,6 +46,12 @@ export class FileService extends BaseFileService {
     ownerId: string,
     dto: CreateFileDto,
   ): Promise<File & { ancestors: FileAncestorDto[] }> {
+    let parentId = dto.parentId || null;
+    if (!parentId) {
+      const root = await this.fileRepository.getRootFolder();
+      parentId = root.id;
+    }
+
     await this.validateParentFolder(dto.parentId);
     await this.validateFileExistsInStorage(dto.storagePath);
 
@@ -53,25 +61,37 @@ export class FileService extends BaseFileService {
 
     await this.checkUserStorageLimit(ownerId, size);
 
-    const fileData = this.buildFileCreateInput(
-      ownerId,
-      filename,
-      format,
-      dto,
-      size,
+    const createdFile = await this.fileRepository.prisma.$transaction(
+      async (tx) => {
+        const { left, right } =
+          await this.nestedSetService.allocateNestedSetPosition(parentId, tx);
+
+        const fileData: Prisma.FileCreateInput = {
+          name: filename,
+          owner: { connect: { id: ownerId } },
+          contentType: FileHelper.getContentType(dto.storagePath),
+          size,
+          type: FileType.FILE,
+          storagePath: dto.storagePath,
+          format,
+          isSystem: false,
+          left,
+          right,
+          parent: { connect: { id: parentId } },
+          children: { connect: [] },
+        };
+
+        const file = await tx.file.create({ data: fileData });
+
+        return file;
+      },
     );
-    const createdFile = await this.fileRepository.create({
-      ...fileData,
-      storagePath: dto.storagePath,
-    });
 
     await this.userService.updateStorageUsed(ownerId, size);
-
-    await this.systemQueueService.moveFileInStorageAfterCreate({
+    await this.systemQueueService.enqueueUpdateFileTagInStorage({
       ownerId,
       sourcePath: dto.storagePath,
       fileId: createdFile.id,
-      filename,
     });
 
     return this.getOne(createdFile.id);
@@ -92,12 +112,13 @@ export class FileService extends BaseFileService {
     }
   }
 
-  async getPresignedPost(
-    userId: string,
-    filename: string,
-  ): Promise<PresignedPostResultDto> {
+  async getPresignedPost(userId: string, filename: string) {
     const key = this.generateStorageKey(userId, filename);
-    return this.s3helper.createPresignedPost(this.bucket, key);
+    return this.s3helper.createPresignedPost(this.bucket, key, {
+      tags: {
+        upload: FileUploadStatus.PENDING,
+      },
+    });
   }
 
   private async getPresignedGet(
@@ -188,27 +209,6 @@ export class FileService extends BaseFileService {
     }
   }
 
-  private buildFileCreateInput(
-    ownerId: string,
-    name: string,
-    format: string,
-    dto: CreateFileDto,
-    size: number,
-  ): Prisma.FileCreateInput {
-    return {
-      name,
-      owner: { connect: { id: ownerId } },
-      contentType: FileHelper.getContentType(dto.storagePath),
-      size,
-      type: FileType.FILE,
-      storagePath: null,
-      format,
-      isSystem: false,
-      parent: dto.parentId ? { connect: { id: dto.parentId } } : undefined,
-      children: { connect: [] },
-    };
-  }
-
   protected generateStorageKey(
     userId: string,
     filename: string,
@@ -219,8 +219,10 @@ export class FileService extends BaseFileService {
     if (fileId) {
       return `user-${userId}/${fileId}_${sanitizedFilename}`;
     }
+
     const timestamp = Date.now();
-    return `tmp/user-${userId}/${timestamp}_${sanitizedFilename}`;
+
+    return `user-${userId}/${timestamp}_${sanitizedFilename}`;
   }
 
   private sanitizeFilename(filename: string): string {
@@ -264,5 +266,31 @@ export class FileService extends BaseFileService {
         ...ancestors,
       ],
     };
+  }
+
+  async deleteFileOnStorage(
+    ownerId: string,
+    left: number,
+    right: number,
+  ): Promise<void> {
+    const filesToDelete = await this.fileRepository.prisma.file.findMany({
+      where: {
+        ownerId,
+        left: { gte: left },
+        right: { lte: right },
+        // assuming you have a 'type' or 'isFolder' flag
+        isFolder: false, // or type: FileType.FILE
+        deletedAt: { not: null }, // optionally ensure they're marked deleted
+      },
+      select: { id: true, storagePath: true },
+    });
+
+    for (const file of filesToDelete) {
+      await this.systemQueueService.enqueueDeleteFileFromStorage({
+        ownerId,
+        fileId: file.id,
+        storagePath: file.storagePath as string,
+      });
+    }
   }
 }

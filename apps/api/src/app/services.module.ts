@@ -9,6 +9,7 @@ import {
   SystemQueueService,
   SystemQueueWorkerService,
   UserService,
+  NestedSetService,
 } from '@keepcloud/core/services';
 import { Global, Module } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -18,6 +19,7 @@ const services = [
   UserService,
   AuthService,
   JwtService,
+  NestedSetService,
 
   // Repositories
   UserRepository,
