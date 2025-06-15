@@ -153,8 +153,8 @@ export class StorageService {
 
   restore(id: string): Promise<File> {
     return this.fileRepository.update(
-      { id },
-      { trashedAt: null, isSystem: false },
+      { id, isSystem: false },
+      { trashedAt: null },
     );
   }
 
