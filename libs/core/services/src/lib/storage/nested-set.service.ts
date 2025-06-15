@@ -43,56 +43,36 @@ export class NestedSetService {
 
   async deleteNode(id: string, ownerId: string): Promise<void> {
     this.logger.info(`Deleting node id=${id}, ownerId=${ownerId}`);
-    const first = await this.fileRepository.findOne();
-    console.log(`Prisma instance: before`, first);
-    // const second = await this.prisma.file.findFirst();
-    // console.log(`Prisma instance: after`, second);
-    // const node = await this.prisma.file.findUnique({
-    //   where: { id },
-    //   select: { left: true, right: true },
-    // });
-    // console.log(node);
+    const node = await this.prisma.file.findUnique({
+      where: { id },
+      select: { left: true, right: true },
+    });
 
-    // if (!node) {
-    //   this.logger.warn(`Node with ID ${id} not found`);
-    //   throw new NotFoundException({ message: `Node with ID ${id} not found` });
-    // }
+    if (!node) {
+      this.logger.warn(`Node with ID ${id} not found`);
+      throw new NotFoundException({ message: `Node with ID ${id} not found` });
+    }
 
-    // const { left, right } = node;
-    // const width = right - left + 1;
+    const { left, right } = node;
+    const width = right - left + 1;
+
     try {
-      // await this.prisma.$transaction(async (tx) => {
-      //   this.logger.info(`Marking node subtree for deletion`);
-      //   await tx.file.updateMany({
-      //     where: { ownerId, left: { gte: left }, right: { lte: right } },
-      //     data: { deletedAt: new Date() },
-      //   });
-      //   this.logger.info(`Closing gap after node removal`);
-      //   await tx.file.updateMany({
-      //     where: { ownerId, left: { gt: right } },
-      //     data: { left: { decrement: width } },
-      //   });
-      //   await tx.file.updateMany({
-      //     where: { ownerId, right: { gt: right } },
-      //     data: { right: { decrement: width } },
-      //   });
-      // });
-      //   [
-      //   this.prisma.file.updateMany({
-      //     data: {
-      //       deletedAt: new Date(),
-      //     },
-      //     where: { ownerId, left: { gte: left }, right: { lte: right } },
-      //   }),
-      //   this.prisma.file.updateMany({
-      //     where: { ownerId, left: { gt: right } },
-      //     data: { left: { decrement: width } },
-      //   }),
-      //   this.prisma.file.updateMany({
-      //     where: { ownerId, right: { gt: right },  },
-      //     data: { right: { decrement: width } },
-      //   }),
-      // ]);
+      await this.prisma.$transaction([
+        this.prisma.file.updateMany({
+          data: {
+            deletedAt: new Date(),
+          },
+          where: { ownerId, left: { gte: left }, right: { lte: right } },
+        }),
+        this.prisma.file.updateMany({
+          where: { ownerId, left: { gt: right } },
+          data: { left: { decrement: width } },
+        }),
+        this.prisma.file.updateMany({
+          where: { ownerId, right: { gt: right } },
+          data: { right: { decrement: width } },
+        }),
+      ]);
       this.logger.info(`Node deleted successfully`);
     } catch (err: any) {
       this.logger.error(
