@@ -43,9 +43,10 @@ export class NestedSetService {
 
   async deleteNode(id: string, ownerId: string): Promise<void> {
     this.logger.info(`Deleting node id=${id}, ownerId=${ownerId}`);
-    this.logger.info(`Prisma instance:`);
-    console.log(this.prisma.$transaction);
-    this.logger.info(`Prisma instance: after`);
+    const first = await this.fileRepository.findOne();
+    console.log(`Prisma instance: before`, first);
+    const second = await this.prisma.file.findFirst();
+    console.log(`Prisma instance: after`, second);
     const node = await this.prisma.file.findUnique({
       where: { id },
       select: { left: true, right: true },
