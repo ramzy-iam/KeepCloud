@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   CreateFileDto,
   CreatePresignedPostBody,
@@ -6,22 +6,24 @@ import {
   PresignedGetResultDto,
   PresignedPostResultDto,
 } from '@keepcloud/commons/dtos';
-import { ApiError, FileService, KeyToInvalidate } from '../services';
+import { ApiError, FileService } from '../services';
 import { toast } from 'sonner';
 import { useGetActiveFolder } from './folder.hook';
+import { useFileListUpdater } from './use-file-list-updater.hook';
+import { FileHelper } from '@keepcloud/commons/helpers';
 
-interface UploadFileProps extends KeyToInvalidate {
+interface UploadFileProps {
   onProgress?: (progress: number, file: File) => void;
 }
 
-export const useUploadFile = ({
-  keysToInvalidate,
-  onProgress,
-}: UploadFileProps) => {
+export const useUploadFile = ({ onProgress }: UploadFileProps) => {
   const { mutateAsync: getPresignedPost } = useGetPresignedPost();
   const { mutateAsync: createFile } = useCreateFile();
-  const queryClient = useQueryClient();
   const { activeFolder } = useGetActiveFolder();
+  const parentId = activeFolder.id;
+
+  const finalParentId = FileHelper.getValidParentId(parentId);
+  const { insertItem } = useFileListUpdater(finalParentId);
 
   return useMutation<
     FileMinViewDto,
@@ -35,14 +37,16 @@ export const useUploadFile = ({
 
       // Step 2: Upload to S3 with progress tracking
       const formData = new FormData();
-      Object.entries(presignedPost.fields).forEach(([key, value]) => {
-        formData.append(key, value);
-      });
+
       formData.append('file', file);
 
       return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
-        xhr.open('POST', presignedPost.url, true);
+
+        xhr.open('PUT', presignedPost.url, true);
+        Object.entries(presignedPost.headers).forEach(([key, value]) => {
+          xhr.setRequestHeader(key, value);
+        });
 
         xhr.upload.onprogress = (event) => {
           if (event.lengthComputable) {
@@ -78,7 +82,7 @@ export const useUploadFile = ({
               // Wait for backend createFile call
               const result = await createFile({
                 storagePath: presignedPost.key,
-                parentId: activeFolder.isSystem ? null : activeFolder.id,
+                parentId: activeFolder.id,
                 filename: file.name,
               });
 
@@ -106,17 +110,12 @@ export const useUploadFile = ({
       });
     },
     onSuccess: (data, variables) => {
-      keysToInvalidate.forEach((key) =>
-        queryClient.invalidateQueries({ queryKey: key }),
-      );
+      insertItem(data, 'start');
     },
 
     onError: (error, variables) => {
       const message = error.details?.[0]?.message || 'An error occurred';
       toast.error(`Upload failed for "${variables.file.name}": ${message}`);
-      keysToInvalidate.forEach((key) =>
-        queryClient.invalidateQueries({ queryKey: key }),
-      );
     },
   });
 };

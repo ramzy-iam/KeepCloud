@@ -2,7 +2,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { ApiError, AuthService } from '../services';
 import { AuthHelper } from '../helpers';
 import { AuthGoogleResponseDto, UserProfileDto } from '@keepcloud/commons/dtos';
-import { authAtom } from '../store';
+import { authAtom } from '../atoms';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router';
 import { useEffect, useRef, useState } from 'react';

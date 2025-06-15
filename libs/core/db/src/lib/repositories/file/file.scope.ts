@@ -77,4 +77,9 @@ export class FileScope extends BaseScope<
     this._include.owner = true;
     return this;
   }
+
+  filterByIsSystem(isSystem: boolean) {
+    this._where.isSystem = isSystem;
+    return this;
+  }
 }

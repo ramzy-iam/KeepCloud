@@ -24,8 +24,7 @@ export class CreateFileDto {
 
   @IsNotEmpty(ErrorCode.PARENT_ID_REQUIRED)
   @IsString(ErrorCode.PARENT_ID_REQUIRED)
-  @IsOptional()
-  parentId?: string | null;
+  parentId: string;
 }
 
 export class CreateFolderDto {
@@ -53,6 +52,9 @@ export class RenameFolderDto {
 export class FileMinViewDto {
   @Expose()
   id: string;
+
+  @Expose()
+  parentId: string;
 
   @Expose()
   name: string;
@@ -84,9 +86,6 @@ export class FileMinViewDto {
 }
 
 export class FilePreviewDto extends FileMinViewDto {
-  @Expose()
-  parentId: string | null;
-
   @Expose()
   createdAt: Date;
 
@@ -169,10 +168,7 @@ export class PresignedPostResultDto {
   url: string;
 
   @Expose()
-  fields: Record<string, string>;
-
-  @Expose()
-  bucket: string;
+  headers: Record<string, string>;
 
   @Expose()
   key: string;

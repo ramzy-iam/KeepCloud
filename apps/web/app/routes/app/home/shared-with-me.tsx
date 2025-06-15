@@ -11,6 +11,7 @@ export default function SharedWithMeComponent() {
           title={SYSTEM_FILE.SHARED_WITH_ME.name}
           columns={columns}
           defaultViewMode="table"
+          currentId={SYSTEM_FILE.SHARED_WITH_ME.id}
         />
       </div>
     </div>

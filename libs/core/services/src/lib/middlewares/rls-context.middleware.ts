@@ -6,7 +6,7 @@ export class RLSContextMiddleware implements NestMiddleware {
   use(req: any, res: any, next: () => void) {
     const initialContext: RLSContext = {};
 
-    RLSContextService.runWithContext(initialContext, () => {
+    RLSContextService.runWithContext(initialContext, async () => {
       next();
     });
   }

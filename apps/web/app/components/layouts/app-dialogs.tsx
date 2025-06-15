@@ -4,6 +4,7 @@ import {
   CreateFolderDialog,
   DeletePermanentlyDialog,
   FilePreviewDialog,
+  FolderNotFoundDialog,
   RenameResourceDialog,
   ResourceTrashedDialog,
 } from '../dialogs';
@@ -24,7 +25,7 @@ export function GlobalPointerEventsHandler() {
 
 export const AppDialogs = () => {
   const [dialogState] = useAtom(dialogAtom);
-
+  const dialogs = {};
   if (!dialogState.isOpen || !dialogState.type) return null;
 
   switch (dialogState.type) {
@@ -41,6 +42,8 @@ export const AppDialogs = () => {
 
     case 'previewFile':
       return <FilePreviewDialog />;
+    case 'folderNotFound':
+      return <FolderNotFoundDialog />;
 
     default:
       return null;
