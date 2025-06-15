@@ -133,20 +133,23 @@ export class StorageService {
 
     const filesToDelete = await this.getFilesUnderNode(id, deleted.ownerId);
 
-    for (const file of filesToDelete) {
-      await this.queueService.enqueueDeleteFileFromStorage({
-        ownerId: file.ownerId,
-        fileId: file.id,
-        storagePath: file.storagePath as string,
-      });
-    }
+    await Promise.all(
+      filesToDelete.map((file) =>
+        this.queueService.enqueueDeleteFileFromStorage({
+          ownerId: file.ownerId,
+          fileId: file.id,
+          storagePath: file.storagePath as string,
+        }),
+      ),
+    );
 
-    await this.queueService.enqueueNestedSetDeleteNode({
-      nodeId: id,
-      ownerId: deleted.ownerId,
-    });
-
-    await this.queueService.enqueueNestedSetRebuildTree(deleted.ownerId);
+    await Promise.all([
+      this.queueService.enqueueNestedSetDeleteNode({
+        nodeId: id,
+        ownerId: deleted.ownerId,
+      }),
+      this.queueService.enqueueNestedSetRebuildTree(deleted.ownerId),
+    ]);
 
     return deleted;
   }
