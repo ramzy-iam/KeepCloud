@@ -143,13 +143,10 @@ export class StorageService {
       ),
     );
 
-    await Promise.all([
-      this.queueService.enqueueNestedSetDeleteNode({
-        nodeId: id,
-        ownerId: deleted.ownerId,
-      }),
-      this.queueService.enqueueNestedSetRebuildTree(deleted.ownerId),
-    ]);
+    await this.queueService.enqueueNestedSetDeleteNode({
+      nodeId: id,
+      ownerId: deleted.ownerId,
+    });
 
     return deleted;
   }
