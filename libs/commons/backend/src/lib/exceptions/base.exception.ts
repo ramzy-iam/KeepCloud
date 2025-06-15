@@ -1,3 +1,5 @@
+import { HttpStatus } from '@nestjs/common';
+
 interface ExceptionDetail {
   code: string;
   message: string;
@@ -22,15 +24,13 @@ export class AppException extends Error {
   constructor({
     code = 'UNKNOWN_ERROR',
     message = 'An unexpected error occurred.',
-    status = 500,
+    status = HttpStatus.INTERNAL_SERVER_ERROR,
     field,
     parentCode,
     params,
-  }: AppExceptionOptions) {
+  }: AppExceptionOptions = {}) {
     super(message);
     this.code = parentCode ?? code;
-    this.status = status;
-    this.code = code;
     this.status = status;
     this.timestamp = new Date().toISOString();
     this.details = [
@@ -43,7 +43,7 @@ export class AppException extends Error {
     ];
 
     Object.setPrototypeOf(this, new.target.prototype);
-    this.name = this.constructor.name;
+    this.name = new.target.name;
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, this.constructor);
     }

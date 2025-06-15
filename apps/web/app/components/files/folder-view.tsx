@@ -15,7 +15,6 @@ import { GridView } from './grid-view';
 import { TableView } from './table-view';
 import { FolderBreadcrumb } from './folder-breadcrumb';
 import { FolderEmpty } from '../ui';
-
 interface FolderViewProps {
   folder?: FileMinViewDto;
   items?: FileMinViewDto[];
@@ -29,9 +28,11 @@ interface FolderViewProps {
   isLoading?: boolean;
   onBreadcrumbClick?: (ancestor: FileAncestorDto) => void;
   noDataComponent?: React.ReactNode;
-  CustomFileSystemItem?: React.FC<{
-    file: FileMinViewDto;
-  }>;
+  CustomFileSystemItem?: React.FC<{ file: FileMinViewDto }>;
+  /**
+   * Current folder id to subscribe to atom.
+   */
+  currentId: string;
 }
 
 export const FolderView = ({
@@ -47,12 +48,14 @@ export const FolderView = ({
   columns,
   noDataComponent = <FolderEmpty />,
   CustomFileSystemItem,
+  currentId,
 }: FolderViewProps) => {
   const { view: preferredViewMode, setFolderViewMode } = useFolderViewMode();
   const [viewMode, setViewMode] = useState<FolderViewMode>(
     fixedView ?? preferredViewMode,
   );
   const [internalLoading, setInternalLoading] = useState(isLoading);
+
   const data = folder?.children ?? items;
 
   const displayOnlyFolders = categoryToDisplay === 'folder';

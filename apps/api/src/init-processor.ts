@@ -8,8 +8,11 @@ export async function initAppAndExecuteProcessor(
 ) {
   const app = await createApp();
   const prismaService = app.get(PrismaService);
-  RLSContextService.runWithContext(
-    { prisma: prismaService.getClient() },
+  return RLSContextService.runWithContext(
+    {
+      prisma: prismaService.getClient(),
+      prismaWithoutRLS: prismaService.getClient(),
+    },
     async () => {
       const processorProvider = app.get(ProcessorProvider);
       const processor = processorProvider.getFromMessage(message);

@@ -4,6 +4,7 @@ import { BaseRepository } from '../base';
 import { PrismaService, Prisma } from '../../prisma';
 import { FileAncestorDto } from '@keepcloud/commons/dtos';
 import { FileScope } from './file.scope';
+import { SYSTEM_FILE } from '@keepcloud/commons/constants';
 
 @Injectable()
 export class FileRepository extends BaseRepository<
@@ -34,7 +35,7 @@ export class FileRepository extends BaseRepository<
 
     while (currentId) {
       const parent = await this.prisma.file.findFirst({
-        where: { id: currentId },
+        where: { id: currentId, parentId: { not: null } },
         select: { id: true, name: true, parentId: true },
       });
 
@@ -96,5 +97,17 @@ export class FileRepository extends BaseRepository<
 
   isFolder(file: File): boolean {
     return file.isFolder;
+  }
+
+  getRootFolder(userId?: string): Promise<File> {
+    const scope = this.scoped;
+    if (userId) {
+      scope.filterByOwnerId(userId);
+    }
+    return scope
+      .filterByParentId(null)
+      .filterByExactName(SYSTEM_FILE.MY_STORAGE.code)
+      .filterByIsSystem(true)
+      .getOneOrFail();
   }
 }

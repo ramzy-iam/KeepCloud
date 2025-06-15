@@ -1,4 +1,4 @@
-import { MimeTypes } from '../../constants/file.constant';
+import { MimeTypes, SYSTEM_FILE } from '../../constants/file.constant';
 
 export class FileHelper {
   getContentType(fileName: string): string {
@@ -63,6 +63,34 @@ export class FileHelper {
 
   isUploadComplete(progress: number): boolean {
     return progress === 100;
+  }
+
+  isSystemFile(fileId?: string) {
+    const systemFileIds = Object.values(SYSTEM_FILE).map((file) => file.id);
+
+    return systemFileIds.some((id) => id === fileId);
+  }
+
+  isRootFolder(fileId: string) {
+    return (
+      fileId === SYSTEM_FILE.MY_STORAGE.id ||
+      fileId === SYSTEM_FILE.MY_STORAGE.code
+    );
+  }
+
+  getValidParentId(parentId: string | undefined | null): string {
+    if (!parentId || this.isSystemFile(parentId)) {
+      return SYSTEM_FILE.MY_STORAGE.id;
+    }
+
+    return parentId;
+  }
+
+  getSystemFileName(fileCode: string): string {
+    const systemFile = Object.values(SYSTEM_FILE).find(
+      (file) => file.code === fileCode,
+    );
+    return systemFile ? systemFile.name : '';
   }
 }
 
