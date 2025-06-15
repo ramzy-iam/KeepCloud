@@ -5,7 +5,7 @@ import {
   ProcessorAction,
 } from '@keepcloud/commons/constants';
 import {
-  MoveFileInStorageData,
+  UpdateFileTagInStorageData,
   DeleteNodeData,
   DeleteFileFromStorageData,
 } from '@keepcloud/commons/types';
@@ -16,9 +16,9 @@ export class SystemQueueService extends AbstractQueueService {
   protected readonly jobName = APP_LOCAL_QUEUES.system.jobName;
   protected readonly queueUrl = process.env.SYSTEM_QUEUE_URL;
 
-  enqueueMoveFileInStorageAfterCreate(data: MoveFileInStorageData) {
+  enqueueUpdateFileTagInStorage(data: UpdateFileTagInStorageData) {
     return this.sendJob({
-      message: ProcessorAction.MOVE_FILE_AFTER_CREATE,
+      message: ProcessorAction.UPDATE_FILE_TAG_IN_STORAGE,
       data,
     });
   }

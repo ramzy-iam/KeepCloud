@@ -2,11 +2,10 @@ export interface Processor {
   execute(data?: unknown): Promise<unknown>;
 }
 
-export interface MoveFileInStorageData {
+export interface UpdateFileTagInStorageData {
   ownerId: string;
   sourcePath: string;
   fileId: string;
-  filename: string;
 }
 
 export interface DeleteNodeData {

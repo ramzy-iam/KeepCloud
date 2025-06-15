@@ -106,10 +106,12 @@ resources:
                 - ${env:KEEPCLOUD_ALLOWED_ORIGIN}
         LifecycleConfiguration:
           Rules:
-            - Id: 'DeleteTemporaryFiles'
-              Prefix: 'tmp/'
-              Status: 'Enabled'
-              ExpirationInDays: 3
+            - Id: DeletePendingUploads
+              Status: Enabled
+              ExpirationInDays: 2
+              TagFilters:
+                - Key: upload
+                  Value: pending
 
     SystemQueue:
       Type: AWS::SQS::Queue
