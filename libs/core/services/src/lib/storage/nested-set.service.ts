@@ -58,16 +58,19 @@ export class NestedSetService {
 
     try {
       await this.prisma.$transaction([
+        // 1. Mark the node and all its descendants as deleted
         this.prisma.file.updateMany({
           data: {
             deletedAt: new Date(),
           },
           where: { ownerId, left: { gte: left }, right: { lte: right } },
         }),
+        // 2. Shift left values of remaining nodes to the left
         this.prisma.file.updateMany({
           where: { ownerId, left: { gt: right } },
           data: { left: { decrement: width } },
         }),
+        // 3. Shift right values of remaining nodes to the left
         this.prisma.file.updateMany({
           where: { ownerId, right: { gt: right } },
           data: { right: { decrement: width } },
