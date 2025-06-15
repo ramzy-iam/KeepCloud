@@ -148,7 +148,7 @@ export class StorageService {
         nodeId: id,
         ownerId: deleted.ownerId,
       }),
-      this.queueService.enqueueNestedSetRebuildTree(deleted.ownerId),
+      // this.queueService.enqueueNestedSetRebuildTree(deleted.ownerId),
     ]);
 
     return deleted;
