@@ -19,7 +19,7 @@ import { Prisma } from '@prisma/client';
 import { BaseFileService } from './base-file-service';
 import { FileHelper } from '@keepcloud/commons/helpers';
 import { UserService } from '../user';
-import { SYSTEM_FILE } from '@keepcloud/commons/constants';
+import { FileUploadStatus, SYSTEM_FILE } from '@keepcloud/commons/constants';
 import { SystemQueueService } from '../queues';
 import { DispositionType } from '@keepcloud/commons/types';
 import { NestedSetService } from '../storage';
@@ -88,11 +88,10 @@ export class FileService extends BaseFileService {
     );
 
     await this.userService.updateStorageUsed(ownerId, size);
-    await this.systemQueueService.enqueueMoveFileInStorageAfterCreate({
+    await this.systemQueueService.enqueueUpdateFileTagInStorage({
       ownerId,
       sourcePath: dto.storagePath,
       fileId: createdFile.id,
-      filename,
     });
 
     return this.getOne(createdFile.id);
@@ -113,12 +112,13 @@ export class FileService extends BaseFileService {
     }
   }
 
-  async getPresignedPost(
-    userId: string,
-    filename: string,
-  ): Promise<PresignedPostResultDto> {
+  async getPresignedPost(userId: string, filename: string) {
     const key = this.generateStorageKey(userId, filename);
-    return this.s3helper.createPresignedPost(this.bucket, key);
+    return this.s3helper.createPresignedPost(this.bucket, key, {
+      tags: {
+        upload: FileUploadStatus.PENDING,
+      },
+    });
   }
 
   private async getPresignedGet(
@@ -219,8 +219,10 @@ export class FileService extends BaseFileService {
     if (fileId) {
       return `user-${userId}/${fileId}_${sanitizedFilename}`;
     }
+
     const timestamp = Date.now();
-    return `tmp/user-${userId}/${timestamp}_${sanitizedFilename}`;
+
+    return `user-${userId}/${timestamp}_${sanitizedFilename}`;
   }
 
   private sanitizeFilename(filename: string): string {

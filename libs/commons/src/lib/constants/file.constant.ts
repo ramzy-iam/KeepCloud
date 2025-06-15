@@ -379,3 +379,8 @@ export const SYSTEM_FILE = {
     invalidationKey: 'SUGGESTED_FOLDERS',
   },
 } as const;
+
+export const FileUploadStatus = {
+  PENDING: 'pending',
+  COMPETED: 'completed',
+};

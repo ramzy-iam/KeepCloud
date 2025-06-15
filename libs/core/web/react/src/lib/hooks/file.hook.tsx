@@ -37,14 +37,16 @@ export const useUploadFile = ({ onProgress }: UploadFileProps) => {
 
       // Step 2: Upload to S3 with progress tracking
       const formData = new FormData();
-      Object.entries(presignedPost.fields).forEach(([key, value]) => {
-        formData.append(key, value);
-      });
+
       formData.append('file', file);
 
       return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
-        xhr.open('POST', presignedPost.url, true);
+
+        xhr.open('PUT', presignedPost.url, true);
+        Object.entries(presignedPost.headers).forEach(([key, value]) => {
+          xhr.setRequestHeader(key, value);
+        });
 
         xhr.upload.onprogress = (event) => {
           if (event.lengthComputable) {
@@ -80,7 +82,7 @@ export const useUploadFile = ({ onProgress }: UploadFileProps) => {
               // Wait for backend createFile call
               const result = await createFile({
                 storagePath: presignedPost.key,
-                parentId: activeFolder.isSystem ? null : activeFolder.id,
+                parentId: activeFolder.id,
                 filename: file.name,
               });
 

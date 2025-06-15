@@ -168,10 +168,7 @@ export class PresignedPostResultDto {
   url: string;
 
   @Expose()
-  fields: Record<string, string>;
-
-  @Expose()
-  bucket: string;
+  headers: Record<string, string>;
 
   @Expose()
   key: string;
