@@ -7,11 +7,9 @@ import {
 
 export async function processSQSEvent(event: SQSEvent) {
   const logger = new Logger('ProcessSQSEvent');
-  logger.info('Processing SQS event', { records: event.Records });
   const uniqueMessages: SQSRecord[] = [
     ...new Map(event.Records.map((item) => [item.body, item])).values(),
   ];
-  logger.warn('Unique messages', { uniqueMessages });
 
   const results = await Promise.allSettled(
     uniqueMessages.map(async (record) => {
