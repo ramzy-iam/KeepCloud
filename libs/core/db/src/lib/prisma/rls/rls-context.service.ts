@@ -50,8 +50,15 @@ export class RLSContextService {
   }
 
   // Set context for the current async operation
-  static runWithContext<T>(context: RLSContext, callback: () => T): T {
-    return this.asyncLocalStorage.run(context, callback);
+  static async runWithContext<T>(
+    context: RLSContext,
+    callback: () => Promise<T>, // Explicitly expects a Promise
+  ): Promise<T> {
+    return new Promise((resolve, reject) => {
+      this.asyncLocalStorage.run(context, () => {
+        callback().then(resolve).catch(reject);
+      });
+    });
   }
 
   static updateContext(updates: Partial<RLSContext>): void {

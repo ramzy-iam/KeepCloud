@@ -18,17 +18,19 @@ export class UpdateFileTagInAfterCreateProcessor
 
   async execute(data: UpdateFileTagInStorageData) {
     const { ownerId, sourcePath, fileId } = data;
-    this.logger.info(`Start moving fileId=${fileId} for ownerId=${ownerId}`);
+    this.logger.info(
+      `Start changing the upload tag fileId=${fileId} for ownerId=${ownerId}`,
+    );
 
     try {
-      this.logger.info(`Remove status=pending tag on file object`);
+      this.logger.info(`Remove upload=pending tag on file object`);
 
       await this.s3helper.putObjectTagging(this.bucket, sourcePath, {
         upload: FileUploadStatus.COMPETED,
       });
 
       this.logger.info(
-        `Successfully removed status tag from file object for fileId=${fileId}`,
+        `Successfully removed upload tag from file object for fileId=${fileId}`,
       );
     } catch (error: any) {
       this.logger.error(
