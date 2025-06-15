@@ -43,6 +43,7 @@ export class NestedSetService {
 
   async deleteNode(id: string, ownerId: string): Promise<void> {
     this.logger.info(`Deleting node id=${id}, ownerId=${ownerId}`);
+    this.logger.debug(`Prisma instance:`, this.prisma);
     const node = await this.prisma.file.findUnique({
       where: { id },
       select: { left: true, right: true },
@@ -55,7 +56,6 @@ export class NestedSetService {
 
     const { left, right } = node;
     const width = right - left + 1;
-    console.log(this.prisma);
     try {
       await this.prisma.$transaction(async (tx) => {
         this.logger.info(`Marking node subtree for deletion`);
