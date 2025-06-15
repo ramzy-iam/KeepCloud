@@ -12,6 +12,8 @@ import {
   useFileListUpdater,
 } from './use-file-list-updater.hook';
 import { useSyncedListFromQuery } from './use-sync-list-from-query.hook';
+import { useAtomValue } from 'jotai';
+import { authAtom } from '../atoms';
 
 interface StorageQueryProps {
   filters?: FolderFilterDto;
@@ -26,6 +28,10 @@ export const useGetRootItems = ({
   filters = {},
   enabled = true,
 }: StorageQueryProps = {}) => {
+  const authState = useAtomValue(authAtom);
+  if (!authState?.user?.root) {
+    throw new Error('User root folder is not available');
+  }
   const query = useQuery<PaginationDto<FileMinViewDto>, ApiError>({
     queryKey: [SYSTEM_FILE.MY_STORAGE.invalidationKey],
     queryFn: () => {
@@ -34,7 +40,7 @@ export const useGetRootItems = ({
     enabled,
     retry: false,
   });
-  return useSyncedListFromQuery(query, SYSTEM_FILE.MY_STORAGE.id);
+  return useSyncedListFromQuery(query, authState.user.root);
 };
 
 export const useGetSharedWithMe = ({
