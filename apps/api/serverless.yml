@@ -116,7 +116,7 @@ resources:
     SystemQueue:
       Type: AWS::SQS::Queue
       Properties:
-        QueueName: keepcloud-system-queue-${env:STAGE}
+        QueueName: keepcloud-system-queue-${env:STAGE}.fifo
         FifoQueue: true
         ContentBasedDeduplication: true
         VisibilityTimeout: 900 # 15 minutes
