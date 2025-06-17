@@ -20,7 +20,7 @@ import { useEffect } from 'react';
 import { FolderViewMode } from '@keepcloud/commons/types';
 import { useFileListUpdater } from './use-file-list-updater.hook';
 import { FileHelper } from '@keepcloud/commons/helpers';
-import { useInfiniteListQuery } from './use-infinite-list-query';
+import { useInfiniteListQuery } from './use-infinite-list-query.hook';
 
 interface GetFolderProps {
   id: string;

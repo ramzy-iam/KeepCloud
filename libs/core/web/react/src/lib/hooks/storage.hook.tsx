@@ -9,20 +9,16 @@ import {
 } from './use-file-list-updater.hook';
 import { useAtomValue } from 'jotai';
 import { authAtom } from '../atoms';
-import { useInfiniteListQuery } from './use-infinite-list-query';
+import { useInfiniteListQuery } from './use-infinite-list-query.hook';
 
 interface StorageQueryProps {
   filters?: FolderFilterDto;
   enabled?: boolean;
+  staleTime?: number;
 }
 
 interface RenameResourceProps {
   parentId: string;
-}
-
-interface StorageQueryProps {
-  filters?: FolderFilterDto;
-  enabled?: boolean;
 }
 
 export const useGetRootItems = ({
@@ -100,13 +96,15 @@ export const useGetKeyToInvalidateBasedOnActiveFolder = () => {
 export const useGetFoldersForTree = ({
   filters = {},
   enabled = true,
+  staleTime,
 }: StorageQueryProps = {}) => {
   return useInfiniteListQuery<FileMinViewDto>({
     queryKey: ['storage', 'tree', filters],
-    listKey: 'tree',
+    listKey: `tree-${filters.parentId}`,
     enabled,
     fetchFn: async (page) =>
       StorageService.getFoldersForTree({ ...filters, page }),
+    staleTime,
   });
 };
 
