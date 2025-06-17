@@ -480,6 +480,22 @@
   --text-72-semibold--line-height: 1.5;
   --text-72-semibold--letter-spacing: -0.135rem;
   --text-72-semibold--font-weight: 600;
+
+  --animate-indefinite-slide: indefinite-slide 1.2s linear infinite;
+  --background-image-primary-gradient: linear-gradient(
+    to top,
+    #4c3cc6,
+    #7e60f8
+  );
+
+  @keyframes indefinite-slide {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
 }
 
 @layer base {
