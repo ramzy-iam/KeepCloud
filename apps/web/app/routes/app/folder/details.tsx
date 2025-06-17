@@ -8,7 +8,11 @@ import {
 } from '@keepcloud/web-core/react';
 import { FolderView } from '../../../components';
 import type { Route } from './+types/details';
-import { FileAncestorDto } from '@keepcloud/commons/dtos';
+import {
+  FileAncestorDto,
+  FileMinViewDto,
+  PaginationDto,
+} from '@keepcloud/commons/dtos';
 import { useNavigate } from 'react-router';
 import { useEffect, useRef } from 'react';
 import { columns } from './columns';
@@ -31,7 +35,7 @@ export default function FolderDetailsComponent({
     query: { withAncestors: true },
   });
 
-  const { data: folderChildren = [], isLoading: isLoadingChildren } =
+  const { allPageItems: folderChildren = [], isLoading: isLoadingChildren } =
     useGetFolderChildren({
       id: params.folderId,
       enabled: !!folder,
