@@ -35,11 +35,14 @@ export default function FolderDetailsComponent({
     query: { withAncestors: true },
   });
 
-  const { allPageItems: folderChildren = [], isLoading: isLoadingChildren } =
-    useGetFolderChildren({
-      id: params.folderId,
-      enabled: !!folder,
-    });
+  const {
+    allPageItems: folderChildren = [],
+    isLoading: isLoadingChildren,
+    paginationProps,
+  } = useGetFolderChildren({
+    id: params.folderId,
+    enabled: !!folder,
+  });
 
   useEffect(() => {
     if (!folder) return;
@@ -113,6 +116,7 @@ export default function FolderDetailsComponent({
       isLoading={isLoading || isLoadingChildren || !!error}
       onBreadcrumbClick={handleBreadcrumbClick}
       currentId={params.folderId}
+      {...paginationProps}
     />
   );
 }

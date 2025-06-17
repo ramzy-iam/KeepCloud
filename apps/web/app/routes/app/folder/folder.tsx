@@ -10,8 +10,11 @@ import { useEffect } from 'react';
 import { useAtomValue } from 'jotai';
 
 export default function FolderRootComponent() {
-  const { allPageItems: items, isLoading: isLoadingRootItems } =
-    useGetRootItems({});
+  const {
+    allPageItems: items,
+    isLoading: isLoadingRootItems,
+    paginationProps,
+  } = useGetRootItems({});
   const authState = useAtomValue(authAtom);
   const { setActiveFolder, activeFolder } = useGetActiveFolder();
 
@@ -32,6 +35,7 @@ export default function FolderRootComponent() {
         columns={columns}
         isLoading={isLoadingRootItems}
         currentId={SYSTEM_FILE.MY_STORAGE.id}
+        {...paginationProps}
       />
     </div>
   );

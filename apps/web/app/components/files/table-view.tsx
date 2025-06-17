@@ -21,6 +21,9 @@ interface TableViewProps {
   columns: ColumnDef<FileMinViewDto>[];
   isLoading?: boolean;
   noDataComponent?: React.ReactNode;
+  hasNextPage?: boolean;
+  fetchNextPage?: () => void;
+  isFetchingNextPage?: boolean;
 }
 
 interface BeforeTableProps {
@@ -70,37 +73,32 @@ export function TableView({
   noDataComponent = <FolderEmpty />,
   onlyFolders = false,
   isLoading = false,
+  hasNextPage,
+  fetchNextPage,
+  isFetchingNextPage,
 }: TableViewProps) {
   const { table, TableComponent } = useFileTable({
-    data: isLoading ? [] : data, // Pass empty array during loading to avoid table rendering
+    data: isLoading ? [] : data,
     columns,
     noRowsComponent: noDataComponent,
   });
 
   const footer = (
-    <div className="flex items-center justify-end space-x-2 py-4">
+    <div className="flex flex-col items-center justify-end space-y-2 py-4">
       <div className="flex-1 text-sm text-muted-foreground">
-        {table.getFilteredSelectedRowModel().rows.length} of{' '}
-        {table.getFilteredRowModel().rows.length} item(s) selected.
+        {/* {table.getFilteredSelectedRowModel().rows.length} of{' '} */}
+        {/* {table.getFilteredRowModel().rows.length} item(s) selected. */}
       </div>
-      <div className="space-x-2">
+      {hasNextPage && (
         <Button
           variant="secondary"
           size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
+          onClick={() => fetchNextPage?.()}
+          disabled={isFetchingNextPage}
         >
-          Previous
+          {isFetchingNextPage ? 'Loading...' : 'Load More'}
         </Button>
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          Next
-        </Button>
-      </div>
+      )}
     </div>
   );
 
