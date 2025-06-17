@@ -7,10 +7,15 @@ import {
 } from '@keepcloud/web-core/react';
 
 export default function ExplorerComponent() {
-  const { data: suggestedFolders, isLoading: isLoadingSuggestedFolders } =
-    useGetSuggestedFolders();
-  const { data: suggestedFiles, isLoading: isLoadingSuggestedFiles } =
-    useGetSuggestedFiles();
+  const {
+    allPageItems: suggestedFolders,
+    isLoading: isLoadingSuggestedFolders,
+  } = useGetSuggestedFolders();
+  const {
+    allPageItems: suggestedFiles,
+    isLoading: isLoadingSuggestedFiles,
+    paginationProps,
+  } = useGetSuggestedFiles();
 
   return (
     <div className="flex flex-col gap-6">
@@ -32,6 +37,7 @@ export default function ExplorerComponent() {
         title={SYSTEM_FILE.SUGGESTED_FILES.name}
         noDataComponent={<SuggestionEmpty />}
         currentId={SYSTEM_FILE.SUGGESTED_FILES.id}
+        {...paginationProps}
       />
     </div>
   );

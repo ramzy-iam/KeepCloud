@@ -1,9 +1,5 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
-import {
-  PaginationDto,
-  FolderFilterDto,
-  FileMinViewDto,
-} from '@keepcloud/commons/dtos';
+import { useMutation } from '@tanstack/react-query';
+import { FolderFilterDto, FileMinViewDto } from '@keepcloud/commons/dtos';
 import { StorageService, ApiError } from '../services';
 import { SYSTEM_FILE } from '@keepcloud/commons/constants';
 import { useGetActiveFolder } from './folder.hook';
@@ -11,9 +7,9 @@ import {
   updateFileEverywhere,
   useFileListUpdater,
 } from './use-file-list-updater.hook';
-import { useSyncedListFromQuery } from './use-sync-list-from-query.hook';
 import { useAtomValue } from 'jotai';
 import { authAtom } from '../atoms';
+import { useInfiniteListQuery } from './use-infinite-list-query';
 
 interface StorageQueryProps {
   filters?: FolderFilterDto;
@@ -24,6 +20,11 @@ interface RenameResourceProps {
   parentId: string;
 }
 
+interface StorageQueryProps {
+  filters?: FolderFilterDto;
+  enabled?: boolean;
+}
+
 export const useGetRootItems = ({
   filters = {},
   enabled = true,
@@ -32,47 +33,60 @@ export const useGetRootItems = ({
   if (!authState?.user?.root) {
     throw new Error('User root folder is not available');
   }
-  const query = useQuery<PaginationDto<FileMinViewDto>, ApiError>({
+  return useInfiniteListQuery<FileMinViewDto>({
     queryKey: [SYSTEM_FILE.MY_STORAGE.invalidationKey],
-    queryFn: () => {
-      return StorageService.getRootItems(filters);
+    listKey: authState.user.root,
+    enabled: enabled && !!authState.user.root,
+    fetchFn: async (page) => {
+      return StorageService.getRootItems({ ...filters, page });
     },
-    enabled,
-    retry: false,
   });
-  return useSyncedListFromQuery(query, authState.user.root);
 };
 
 export const useGetSharedWithMe = ({
   filters = {},
   enabled = true,
 }: StorageQueryProps = {}) => {
-  const query = useQuery<PaginationDto<FileMinViewDto>, ApiError>({
+  return useInfiniteListQuery<FileMinViewDto>({
     queryKey: [SYSTEM_FILE.SHARED_WITH_ME.invalidationKey],
-    queryFn: () => {
-      return StorageService.getSharedWithMe(filters);
-    },
+    listKey: SYSTEM_FILE.SHARED_WITH_ME.id,
     enabled,
-    retry: false,
+    fetchFn: async (page) => {
+      return StorageService.getSharedWithMe({ ...filters, page });
+    },
   });
-
-  return useSyncedListFromQuery(query, SYSTEM_FILE.SHARED_WITH_ME.id);
 };
 
 export const useGetTrashedItems = ({
   filters = {},
   enabled = true,
 }: StorageQueryProps = {}) => {
-  const query = useQuery<PaginationDto<FileMinViewDto>, ApiError>({
+  return useInfiniteListQuery<FileMinViewDto>({
     queryKey: [SYSTEM_FILE.TRASH.invalidationKey],
-    queryFn: () => {
-      return StorageService.getTrashedItems(filters);
-    },
+    listKey: SYSTEM_FILE.TRASH.id,
     enabled,
-    retry: false,
+    fetchFn: async (page) => {
+      return StorageService.getTrashedItems({ ...filters, page });
+    },
   });
+};
 
-  return useSyncedListFromQuery(query, SYSTEM_FILE.TRASH.id);
+export const useGetSuggestedFolders = () => {
+  return useInfiniteListQuery<FileMinViewDto>({
+    queryKey: ['storage', 'suggested-folders'],
+    listKey: SYSTEM_FILE.SUGGESTED_FOLDERS.id,
+    enabled: true,
+    fetchFn: async (page) => StorageService.getSuggestedFolders({ page }),
+  });
+};
+
+export const useGetSuggestedFiles = () => {
+  return useInfiniteListQuery<FileMinViewDto>({
+    queryKey: ['storage', 'suggested-files'],
+    listKey: SYSTEM_FILE.SUGGESTED_FILES.id,
+    enabled: true,
+    fetchFn: async (page) => StorageService.getSuggestedFiles({ page }),
+  });
 };
 
 export const useGetKeyToInvalidateBasedOnActiveFolder = () => {
@@ -83,45 +97,16 @@ export const useGetKeyToInvalidateBasedOnActiveFolder = () => {
   return ['folder', activeFolder.id, 'children'];
 };
 
-export const useGetSuggestedFolders = () => {
-  const query = useQuery<FileMinViewDto[], ApiError>({
-    queryKey: ['storage', 'suggested-folders'],
-    queryFn: async () => {
-      const data = await StorageService.getSuggestedFolders();
-      return data.items;
-    },
-    enabled: true,
-    retry: false,
-  });
-  return useSyncedListFromQuery(query, SYSTEM_FILE.SUGGESTED_FOLDERS.id);
-};
-
-export const useGetSuggestedFiles = () => {
-  const query = useQuery<FileMinViewDto[], ApiError>({
-    queryKey: ['storage', 'suggested-files'],
-    queryFn: async () => {
-      const data = await StorageService.getSuggestedFiles();
-      const items = data.items;
-      return items;
-    },
-    enabled: true,
-    retry: false,
-  });
-  return useSyncedListFromQuery(query, SYSTEM_FILE.SUGGESTED_FILES.id);
-};
-
 export const useGetFoldersForTree = ({
   filters = {},
   enabled = true,
 }: StorageQueryProps = {}) => {
-  return useQuery<PaginationDto<FileMinViewDto>, ApiError>({
+  return useInfiniteListQuery<FileMinViewDto>({
     queryKey: ['storage', 'tree', filters],
-    queryFn: () => {
-      return StorageService.getFoldersForTree(filters);
-    },
-
+    listKey: 'tree',
     enabled,
-    retry: false,
+    fetchFn: async (page) =>
+      StorageService.getFoldersForTree({ ...filters, page }),
   });
 };
 
