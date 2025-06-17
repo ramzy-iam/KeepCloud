@@ -10,7 +10,8 @@ import { useEffect } from 'react';
 import { useAtomValue } from 'jotai';
 
 export default function FolderRootComponent() {
-  const { data: items, isLoading: isLoadingRootItems } = useGetRootItems({});
+  const { allPageItems: items, isLoading: isLoadingRootItems } =
+    useGetRootItems({});
   const authState = useAtomValue(authAtom);
   const { setActiveFolder, activeFolder } = useGetActiveFolder();
 
@@ -26,7 +27,7 @@ export default function FolderRootComponent() {
   return (
     <div className="flex flex-col gap-6">
       <FolderView
-        items={items?.items}
+        items={items}
         title={SYSTEM_FILE.MY_STORAGE.name}
         columns={columns}
         isLoading={isLoadingRootItems}

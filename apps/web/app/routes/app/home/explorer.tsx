@@ -7,9 +7,11 @@ import {
 } from '@keepcloud/web-core/react';
 
 export default function ExplorerComponent() {
-  const { data: suggestedFolders, isLoading: isLoadingSuggestedFolders } =
-    useGetSuggestedFolders();
-  const { data: suggestedFiles, isLoading: isLoadingSuggestedFiles } =
+  const {
+    allPageItems: suggestedFolders,
+    isLoading: isLoadingSuggestedFolders,
+  } = useGetSuggestedFolders();
+  const { allPageItems: suggestedFiles, isLoading: isLoadingSuggestedFiles } =
     useGetSuggestedFiles();
 
   return (
