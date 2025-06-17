@@ -10,7 +10,11 @@ import { ColumnDef } from '@tanstack/react-table';
 import { FileMinViewDto } from '@keepcloud/commons/dtos';
 
 export default function TrashComponent() {
-  const { allPageItems: items, isLoading } = useGetTrashedItems();
+  const {
+    allPageItems: items,
+    isLoading,
+    paginationProps,
+  } = useGetTrashedItems();
 
   return (
     <div className="flex flex-col gap-6">
@@ -24,6 +28,7 @@ export default function TrashComponent() {
           noDataComponent={<TrashEmpty />}
           CustomFileSystemItem={TrashedSystemItem}
           currentId={SYSTEM_FILE.TRASH.id}
+          {...paginationProps}
         />
       </div>
     </div>

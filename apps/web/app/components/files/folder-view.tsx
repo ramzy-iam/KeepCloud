@@ -33,6 +33,10 @@ interface FolderViewProps {
    * Current folder id to subscribe to atom.
    */
   currentId: string;
+
+  hasNextPage?: boolean;
+  fetchNextPage?: () => void;
+  isFetchingNextPage?: boolean;
 }
 
 export const FolderView = ({
@@ -49,12 +53,21 @@ export const FolderView = ({
   noDataComponent = <FolderEmpty />,
   CustomFileSystemItem,
   currentId,
+  hasNextPage,
+  fetchNextPage,
+  isFetchingNextPage,
 }: FolderViewProps) => {
   const { view: preferredViewMode, setFolderViewMode } = useFolderViewMode();
   const [viewMode, setViewMode] = useState<FolderViewMode>(
     fixedView ?? preferredViewMode,
   );
   const [internalLoading, setInternalLoading] = useState(isLoading);
+
+  const paginationOptions = {
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  };
 
   const data = folder?.children ?? items;
 
@@ -134,6 +147,7 @@ export const FolderView = ({
           isLoading={internalLoading}
           noDataComponent={noDataComponent}
           CustomFileSystemItem={CustomFileSystemItem}
+          {...paginationOptions}
         />
       ) : (
         <TableView
@@ -141,7 +155,7 @@ export const FolderView = ({
           onlyFolders={displayOnlyFolders}
           columns={columns}
           isLoading={internalLoading}
-          noDataComponent={noDataComponent}
+          {...paginationOptions}
         />
       )}
     </div>
