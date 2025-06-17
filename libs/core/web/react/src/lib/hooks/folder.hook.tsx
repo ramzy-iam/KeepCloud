@@ -6,7 +6,7 @@ import {
   FileDetailsDto,
   GetOneFolderQueryDto,
 } from '@keepcloud/commons/dtos';
-import { FolderService, ApiError, ApiErrorData } from '../services';
+import { FolderService, ApiError } from '../services';
 import {
   ActiveFolder,
   DEFAULT_ACTIVE_FOLDER,
@@ -19,8 +19,8 @@ import { FOLDER_VIEW_KEY } from '@keepcloud/commons/constants';
 import { useEffect } from 'react';
 import { FolderViewMode } from '@keepcloud/commons/types';
 import { useFileListUpdater } from './use-file-list-updater.hook';
-import { useSyncedListFromQuery } from './use-sync-list-from-query.hook';
 import { FileHelper } from '@keepcloud/commons/helpers';
+import { useInfiniteListQuery } from './use-infinite-list-query';
 
 interface GetFolderProps {
   id: string;
@@ -97,16 +97,13 @@ export const useGetFolderChildren = ({
   filters = {},
   enabled = true,
 }: GetChildrenProps) => {
-  const query = useQuery<FileMinViewDto[], ApiErrorData>({
+  return useInfiniteListQuery<FileMinViewDto>({
     queryKey: ['folder', id, 'children'],
-    queryFn: async () => {
-      const { items } = await FolderService.getChildren(id, filters);
-      return items;
-    },
+    listKey: id,
     enabled: enabled && !!id,
-    retry: false,
+    fetchFn: async (page) =>
+      FolderService.getChildren(id, { ...filters, page }),
   });
-  return useSyncedListFromQuery(query, id);
 };
 
 export const useGetFolder = ({
