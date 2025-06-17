@@ -1,7 +1,4 @@
-import {
-  UseInfiniteQueryResult,
-  useInfiniteQuery,
-} from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useAtom } from 'jotai';
 import { getFileListAtom } from '../atoms';
@@ -14,6 +11,7 @@ interface UseInfiniteListQueryOptions<T extends FileMinViewDto> {
   fetchFn: (page: number, pageSize?: number) => Promise<PaginationDto<T>>;
   listKey: string;
   pageSize?: number;
+  staleTime?: number;
 }
 
 export function useInfiniteListQuery<T extends FileMinViewDto>({
@@ -21,6 +19,7 @@ export function useInfiniteListQuery<T extends FileMinViewDto>({
   fetchFn,
   enabled = true,
   listKey,
+  staleTime,
 }: UseInfiniteListQueryOptions<T>) {
   const atom = getFileListAtom(listKey);
   const [list, setList] = useAtom(atom);
@@ -35,6 +34,7 @@ export function useInfiniteListQuery<T extends FileMinViewDto>({
     getNextPageParam: (lastPage) =>
       lastPage.meta.hasNextPage ? lastPage.meta.nextPage : undefined,
     retry: false,
+    staleTime,
   });
 
   useEffect(() => {

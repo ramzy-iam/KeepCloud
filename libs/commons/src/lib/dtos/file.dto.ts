@@ -54,7 +54,7 @@ export class FileMinViewDto {
   id: string;
 
   @Expose()
-  parentId: string;
+  parentId: string | null;
 
   @Expose()
   name: string;
