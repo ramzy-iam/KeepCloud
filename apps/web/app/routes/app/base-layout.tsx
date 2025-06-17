@@ -40,6 +40,8 @@ const ProfileIcon = ({ user }: { user: UserProfileDto }) => {
 
 export function ErrorBoundary({ error }: { error: unknown }) {
   const navigate = useNavigate();
+  const isDev = import.meta.env.DEV;
+
   console.error('ErrorBoundary:', error);
 
   if (isRouteErrorResponse(error)) {
@@ -49,6 +51,14 @@ export function ErrorBoundary({ error }: { error: unknown }) {
           {error.status}
         </h1>
         <p className="text-xl font-semibold">{error.statusText}</p>
+        {isDev && (
+          <details className="max-w-xl rounded bg-muted p-4 text-left text-xs text-muted-foreground">
+            <summary className="cursor-pointer font-semibold">Details</summary>
+            <pre className="mt-2 break-all whitespace-pre-wrap">
+              {JSON.stringify(error, null, 2)}
+            </pre>
+          </details>
+        )}
         <Button variant="primary" onClick={() => navigate('/')}>
           Go Home
         </Button>
@@ -64,6 +74,16 @@ export function ErrorBoundary({ error }: { error: unknown }) {
         </h1>
         <p className="text-xl font-semibold">Something went wrong</p>
         <p className="text-sm">An unexpected error has occurred.</p>
+        {isDev && (
+          <details className="max-w-xl rounded bg-muted p-4 text-left text-xs text-muted-foreground">
+            <summary className="cursor-pointer font-semibold">Details</summary>
+            <pre className="mt-2 break-all whitespace-pre-wrap">
+              {error.message}
+              {'\n'}
+              {error.stack}
+            </pre>
+          </details>
+        )}
         <Button variant="primary" onClick={() => window.location.reload()}>
           Try Again
         </Button>
@@ -77,6 +97,14 @@ export function ErrorBoundary({ error }: { error: unknown }) {
         Unknown Error
       </h1>
       <p className="text-sm">An unexpected error has occurred.</p>
+      {isDev && (
+        <details className="max-w-xl rounded bg-muted p-4 text-left text-xs text-muted-foreground">
+          <summary className="cursor-pointer font-semibold">Details</summary>
+          <pre className="mt-2 break-all whitespace-pre-wrap">
+            {JSON.stringify(error, null, 2)}
+          </pre>
+        </details>
+      )}
       <Button variant="primary" onClick={() => window.location.reload()}>
         Reload
       </Button>
