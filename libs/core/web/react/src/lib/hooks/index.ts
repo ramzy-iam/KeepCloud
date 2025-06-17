@@ -15,4 +15,5 @@ export * from './use-file-icon.hook';
 export * from './use-file-preview.hook';
 export * from './use-file-list-updater.hook';
 export * from './use-sync-list-from-query.hook';
-export * from './use-infinite-list-query';
+export * from './use-infinite-list-query.hook';
+export * from './use-infinite-scroll-observer.hook';

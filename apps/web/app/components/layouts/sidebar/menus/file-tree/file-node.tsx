@@ -6,6 +6,8 @@ import {
   TreeFolderIcon,
   SidebarMenuButton,
   useGetActiveFolder,
+  useGetFoldersForTree,
+  useInfiniteScrollObserver,
 } from '@keepcloud/web-core/react';
 import { ChevronRightIcon, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -16,17 +18,14 @@ interface FileNodeProps {
   file: FileMinViewDto;
   icon?: React.ReactNode;
   noIcon?: boolean;
-  children?: React.ReactNode;
-  fetchChildren?: () => Promise<FileMinViewDto[]>;
   isRoot?: boolean;
   url: string;
 }
+
 export const FileNode = ({
   file,
   icon,
   noIcon = false,
-  children,
-  fetchChildren,
   isRoot = false,
   url,
 }: FileNodeProps) => {
@@ -34,35 +33,43 @@ export const FileNode = ({
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { setActiveFolder } = useGetActiveFolder();
+
   const [open, setOpen] = useState(false);
   const [isActive, setIsActive] = useState(false);
-  const [loadedChildren, setLoadedChildren] = useState<FileMinViewDto[]>(
-    file.children || [],
-  );
-  const [isChildrenLoading, setIsChildrenLoading] = useState(false);
+
+  const {
+    allPageItems: children,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useGetFoldersForTree({
+    filters: {
+      type: 'FOLDER',
+      parentId: isRoot ? null : id,
+    },
+    enabled: open,
+    staleTime: 2 * 60 * 1000, //   2 minutes to avoid frequent refetching
+  });
+
+  // Hook for intersection observer to load more
+  const loadMoreRef = useInfiniteScrollObserver(
+    () => {
+      if (hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+      }
+    },
+    Boolean(hasNextPage),
+    '100px',
+  ); // load before reaching bottom
 
   useEffect(() => {
     setIsActive(pathname === url);
   }, [pathname, url]);
 
-  const handleFetchChildren = async () => {
-    if (fetchChildren && !loadedChildren.length) {
-      setIsChildrenLoading(true);
-      try {
-        const children = await fetchChildren();
-        setLoadedChildren(children);
-      } finally {
-        setIsChildrenLoading(false);
-      }
-    }
-  };
-
-  const handleToggle = async (e: React.MouseEvent) => {
+  const handleToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
     setOpen((prev) => !prev);
-    if (!open && fetchChildren) {
-      await handleFetchChildren();
-    }
   };
 
   const handleNavigate = () => {
@@ -111,14 +118,34 @@ export const FileNode = ({
       </SidebarMenuButton>
 
       <CollapsibleContent className="-pl-3 relative before:absolute before:top-0 before:bottom-0 before:left-2 before:w-px before:bg-border">
-        <div className="ml-2">
-          {isChildrenLoading ? (
+        <div className="ml-2 max-h-[300px] overflow-x-hidden overflow-y-auto">
+          {isLoading && !children?.length ? (
             <div className="ml-6 flex items-center gap-2">
               <Loader2 className="animate-spin" size={16} />
-              <span className="">Loading</span>
+              <span>Loading</span>
             </div>
           ) : (
-            children
+            <>
+              {children?.map((child) => (
+                <FileNode
+                  key={child.id}
+                  file={child}
+                  url={`${url}/${child.id}`}
+                />
+              ))}
+
+              {/* Sentinel div to detect scroll near bottom */}
+              {hasNextPage && (
+                <div
+                  ref={loadMoreRef}
+                  className="flex h-6 items-center justify-center"
+                >
+                  {isFetchingNextPage ? (
+                    <Loader2 className="animate-spin" size={16} />
+                  ) : null}
+                </div>
+              )}
+            </>
           )}
         </div>
       </CollapsibleContent>
