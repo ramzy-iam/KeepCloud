@@ -25,4 +25,5 @@ export default [
       ...prefix('home', [route('/trash', './routes/app/home/trash/trash.tsx')]),
     ]),
   ]),
+  route('*', './routes/app/not-found.tsx'),
 ] satisfies RouteConfig;

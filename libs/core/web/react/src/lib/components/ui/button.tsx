@@ -11,7 +11,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          ' text-primary-foreground   bg-linear-to-t from-[#4C3CC6] to-[#7E60F8] border-[#5749BF]  ',
+          ' text-primary-foreground bg-primary-gradient border-[#5749BF]  ',
         danger:
           'border-error text-white  bg-linear-to-t from-[#B63542] to-[#E95858]  hover:bg-error/90 focus-visible:ring-error/20 dark:focus-visible:ring-error/40 dark:bg-destructive/60',
         secondary:
