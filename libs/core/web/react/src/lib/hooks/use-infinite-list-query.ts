@@ -58,5 +58,10 @@ export function useInfiniteListQuery<T extends FileMinViewDto>({
     pagination: updatedData?.meta,
     allPageItems: updatedData?.items,
     currentPageItems: lastPageData?.items,
+    paginationProps: {
+      fetchNextPage: query.fetchNextPage,
+      hasNextPage: query.hasNextPage,
+      isFetchingNextPage: query.isFetchingNextPage,
+    },
   };
 }

@@ -11,8 +11,11 @@ export default function ExplorerComponent() {
     allPageItems: suggestedFolders,
     isLoading: isLoadingSuggestedFolders,
   } = useGetSuggestedFolders();
-  const { allPageItems: suggestedFiles, isLoading: isLoadingSuggestedFiles } =
-    useGetSuggestedFiles();
+  const {
+    allPageItems: suggestedFiles,
+    isLoading: isLoadingSuggestedFiles,
+    paginationProps,
+  } = useGetSuggestedFiles();
 
   return (
     <div className="flex flex-col gap-6">
@@ -34,6 +37,7 @@ export default function ExplorerComponent() {
         title={SYSTEM_FILE.SUGGESTED_FILES.name}
         noDataComponent={<SuggestionEmpty />}
         currentId={SYSTEM_FILE.SUGGESTED_FILES.id}
+        {...paginationProps}
       />
     </div>
   );
