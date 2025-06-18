@@ -8,6 +8,7 @@ import {
   useGetActiveFolder,
   useGetFoldersForTree,
   useInfiniteScrollObserver,
+  ROUTE_PATH,
 } from '@keepcloud/web-core/react';
 import { ChevronRightIcon, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -130,7 +131,7 @@ export const FileNode = ({
                 <FileNode
                   key={child.id}
                   file={child}
-                  url={`${url}/${child.id}`}
+                  url={`${ROUTE_PATH.folderDetails(child.id)}`}
                 />
               ))}
 
