@@ -7,7 +7,8 @@ type FolderDialogType =
   | 'createFolder'
   | 'folderTrashed'
   | 'folderDeleted'
-  | 'folderNotFound';
+  | 'folderNotFound'
+  | 'fileInfo';
 type FileDialogType = 'fileTrashed' | 'fileDeleted' | 'previewFile';
 
 export type DialogType = CommonDialogType | FolderDialogType | FileDialogType;
