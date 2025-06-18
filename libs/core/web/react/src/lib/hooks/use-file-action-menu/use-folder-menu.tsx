@@ -1,26 +1,17 @@
 import {
   Info,
-  Share2,
-  Copy,
-  Move,
   Trash2,
-  Activity,
   TextCursorInput as RenameIcon,
   FolderOpen,
   History,
 } from 'lucide-react';
 import { FileMinViewDto } from '@keepcloud/commons/dtos';
-import {
-  MenuItem,
-  ROUTE_PATH,
-  cn,
-  useDialog,
-  useMoveToTrash,
-  useRestoreResource,
-} from '@keepcloud/web-core/react';
+import { MenuItem, useDialog, useMoveToTrash, useRestoreResource } from '../';
 import { iconClassName, itemClassName } from './config';
 import { useNavigate } from 'react-router';
 import { FileHelper } from '@keepcloud/commons/helpers';
+import { ROUTE_PATH } from '../../constants';
+import { cn } from '../../helpers';
 
 export const useFolderMenuItems = (file: FileMinViewDto): MenuItem[] => {
   const navigate = useNavigate();
@@ -44,12 +35,6 @@ export const useFolderMenuItems = (file: FileMinViewDto): MenuItem[] => {
       className: itemClassName,
     },
     {
-      label: 'Share',
-      icon: <Share2 className={iconClassName} />,
-      onClick: () => console.log(`Share ${file.name}`),
-      className: itemClassName,
-    },
-    {
       label: 'Rename',
       icon: <RenameIcon className={iconClassName} />,
       onClick: () =>
@@ -59,18 +44,7 @@ export const useFolderMenuItems = (file: FileMinViewDto): MenuItem[] => {
         }),
       className: itemClassName,
     },
-    {
-      label: 'Copy',
-      icon: <Copy className={iconClassName} />,
-      onClick: () => console.log(`Copy ${file.name}`),
-      className: itemClassName,
-    },
-    {
-      label: 'Move',
-      icon: <Move className={iconClassName} />,
-      onClick: () => console.log(`Move ${file.name}`),
-      className: itemClassName,
-    },
+
     {
       label: 'Move to trash',
       icon: <Trash2 className={iconClassName} />,
@@ -79,12 +53,6 @@ export const useFolderMenuItems = (file: FileMinViewDto): MenuItem[] => {
       },
       className: itemClassName,
       separatorAfter: true,
-    },
-    {
-      label: 'Activity',
-      icon: <Activity className={iconClassName} />,
-      onClick: () => console.log(`View activity for ${file.name}`),
-      className: itemClassName,
     },
   ];
 };
