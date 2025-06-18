@@ -1,4 +1,4 @@
-import { BOOLEAN_ENUM } from '@keepcloud/commons/constants';
+import { BOOLEAN_ENUM } from '../../constants';
 import { DayjsHelper } from './dayjs.helper';
 import { SortOrder } from '../../types';
 
@@ -63,9 +63,9 @@ const toNumber = (
 const toOrder = (value?: string): SortOrder | undefined => {
   if (!value) return;
 
-  value = value.trim().toUpperCase();
+  value = value.trim();
 
-  return ['ASC', 'DESC'].includes(value) ? (value as SortOrder) : undefined;
+  return ['asc', 'desc'].includes(value) ? (value as SortOrder) : undefined;
 };
 
 const toArray = (value?: string, sep = ','): string[] | undefined => {
