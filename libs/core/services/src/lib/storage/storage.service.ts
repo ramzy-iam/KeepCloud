@@ -35,7 +35,8 @@ export class StorageService {
   getSharedWithMe(filters: FolderFilterDto): Promise<PaginationDto<File>> {
     return this.fileRepository.scoped
       .filterByParentId('null')
-      .orderBy({ isFolder: 'desc', name: filters.order })
+      .orderBy({ isFolder: 'desc' })
+      .orderBy({ name: filters.order })
       .getManyPaginated(filters.page, filters.pageSize);
   }
 
@@ -44,7 +45,8 @@ export class StorageService {
       .filterByTrashed()
       .filterByNotDeleted()
       .joinOwner()
-      .orderBy({ isFolder: 'desc', name: filters.order })
+      .orderBy({ isFolder: 'desc' })
+      .orderBy({ name: filters.order })
       .getManyPaginated(filters.page, filters.pageSize);
 
     const items = data.items.map(async (item) => {
