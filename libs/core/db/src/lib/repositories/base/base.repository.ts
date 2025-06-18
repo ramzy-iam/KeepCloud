@@ -22,7 +22,7 @@ export abstract class BaseRepository<
   abstract get scoped(): unknown;
 
   get model() {
-    return RLSContextService.prisma![
+    return RLSContextService.prisma[
       this.modelName
     ] as unknown as GenericPrismaModel<
       T,
