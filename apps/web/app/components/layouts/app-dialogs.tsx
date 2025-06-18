@@ -3,6 +3,7 @@ import { dialogAtom } from '@keepcloud/web-core/react';
 import {
   CreateFolderDialog,
   DeletePermanentlyDialog,
+  FileInfoDialog,
   FilePreviewDialog,
   FolderNotFoundDialog,
   RenameResourceDialog,
@@ -25,7 +26,6 @@ export function GlobalPointerEventsHandler() {
 
 export const AppDialogs = () => {
   const [dialogState] = useAtom(dialogAtom);
-  const dialogs = {};
   if (!dialogState.isOpen || !dialogState.type) return null;
 
   switch (dialogState.type) {
@@ -44,6 +44,9 @@ export const AppDialogs = () => {
       return <FilePreviewDialog />;
     case 'folderNotFound':
       return <FolderNotFoundDialog />;
+
+    case 'fileInfo':
+      return <FileInfoDialog />;
 
     default:
       return null;

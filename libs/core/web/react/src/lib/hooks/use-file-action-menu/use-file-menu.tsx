@@ -33,7 +33,12 @@ export const useFileMenuItems = (file: FileMinViewDto): MenuItem[] => {
     {
       label: 'Info',
       icon: <Info className={iconClassName} />,
-      onClick: () => console.log(`View info for ${file.name}`),
+      onClick: () => {
+        openDialog({
+          type: 'fileInfo',
+          item: file,
+        });
+      },
       className: itemClassName,
     },
 
