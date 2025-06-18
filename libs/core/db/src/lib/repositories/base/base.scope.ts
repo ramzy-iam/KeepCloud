@@ -2,7 +2,6 @@ import { PaginationDto } from '@keepcloud/commons/dtos';
 import { Prisma, PrismaService } from '../../prisma';
 import { BaseRepository } from './base.repository';
 import { PAGINATION } from '@keepcloud/commons/constants';
-import { GenericPrismaModel } from './model';
 
 export abstract class BaseScope<
   T extends object,
