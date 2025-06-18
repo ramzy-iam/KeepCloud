@@ -54,7 +54,7 @@ export class BaseFilterDto {
 
   @Transform(({ value }) => CastHelper.toOrder(value))
   @IsOptional()
-  order?: SortOrder;
+  order: SortOrder = 'asc';
 
   @Transform(({ value }) => CastHelper.toBoolean(value))
   @IsOptional()

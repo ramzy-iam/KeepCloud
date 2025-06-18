@@ -79,13 +79,6 @@ export const FolderView = ({
     return true;
   });
 
-  const sortedItems = [...filteredItems].sort((a, b) => {
-    if (a.isFolder && b.isFolder) {
-      return a.name.localeCompare(b.name);
-    }
-    return a.isFolder ? -1 : 1;
-  });
-
   const tabClassName =
     'data-[state=active]:bg-primary! data-[state=active]:text-white-light!';
 
@@ -141,7 +134,7 @@ export const FolderView = ({
       </div>
       {viewMode === 'grid' ? (
         <GridView
-          data={sortedItems}
+          data={filteredItems}
           onlyFolders={displayOnlyFolders}
           group={group}
           isLoading={internalLoading}
@@ -151,7 +144,7 @@ export const FolderView = ({
         />
       ) : (
         <TableView
-          data={sortedItems}
+          data={filteredItems}
           onlyFolders={displayOnlyFolders}
           columns={columns}
           isLoading={internalLoading}
