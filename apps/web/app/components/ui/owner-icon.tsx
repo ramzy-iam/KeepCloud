@@ -20,7 +20,6 @@ export const OwnerIcon = ({ user }: OwnerIconProps) => {
   const name = ownerIsCurrentUser
     ? 'me'
     : title(`${user.firstName} ${user.lastName}`);
-  title;
   return (
     <div className="flex items-center gap-2">
       <Avatar className={cn('h-[24px] w-[24px]')}>

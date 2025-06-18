@@ -5,7 +5,7 @@ import {
   IsOptional,
   IsBoolean,
 } from '../validators';
-import { ErrorCode, FileFormat } from '@keepcloud/commons/constants';
+import { ErrorCode, FileFormat } from '../constants';
 
 import { Expose, Transform, Type } from 'class-transformer';
 import { FileType } from '@prisma/client';

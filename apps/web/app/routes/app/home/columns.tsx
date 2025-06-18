@@ -10,10 +10,42 @@ import {
   TooltipProviderWrapper,
 } from '@keepcloud/web-core/react';
 import { OwnerIcon } from '../../../components';
-import { ColumnDef } from '@tanstack/react-table';
+import { ColumnDef, Row } from '@tanstack/react-table';
 import { useNavigate } from 'react-router';
 import { FileMinViewDto, UserProfileDto } from '@keepcloud/commons/dtos';
 import { FileHelper } from '@keepcloud/commons/helpers';
+
+const NameColumn = ({ row }: { row: Row<FileMinViewDto> }) => {
+  const file = row.original;
+  const isFolder = file.isFolder;
+  const navigate = useNavigate();
+  const url = ROUTE_PATH.folderDetails(row.original.id);
+  const Icon = useFileIcon(row.original);
+  const { openDialog } = useDialog();
+
+  const handleClick = () => {
+    if (isFolder) {
+      navigate(url);
+    }
+    openDialog({
+      type: 'previewFile',
+      item: file,
+    });
+  };
+  return (
+    <TooltipProviderWrapper content={file.name} sideOffset={0}>
+      <div
+        className="max- flex max-w-[200px] cursor-pointer items-center gap-2 overflow-hidden text-14-medium text-secondary-foreground sm:max-w-[400px] lg:max-w-[600px]"
+        onClick={handleClick}
+      >
+        <span className="flex-shrink-0">
+          <Icon />
+        </span>
+        <span className="truncate">{file.name}</span>
+      </div>
+    </TooltipProviderWrapper>
+  );
+};
 
 export const columns: ColumnDef<FileMinViewDto>[] = [
   {
@@ -45,37 +77,7 @@ export const columns: ColumnDef<FileMinViewDto>[] = [
     meta: {
       name: 'Name',
     },
-    cell: ({ row }) => {
-      const file = row.original;
-      const isFolder = file.isFolder;
-      const navigate = useNavigate();
-      const url = ROUTE_PATH.folderDetails(row.original.id);
-      const Icon = useFileIcon(row.original);
-      const { openDialog } = useDialog();
-
-      const handleClick = () => {
-        if (isFolder) {
-          navigate(url);
-        }
-        openDialog({
-          type: 'previewFile',
-          item: file,
-        });
-      };
-      return (
-        <TooltipProviderWrapper content={file.name} sideOffset={0}>
-          <div
-            className="max- flex max-w-[200px] cursor-pointer items-center gap-2 overflow-hidden text-14-medium text-secondary-foreground sm:max-w-[400px] lg:max-w-[600px]"
-            onClick={handleClick}
-          >
-            <span className="flex-shrink-0">
-              <Icon />
-            </span>
-            <span className="truncate">{file.name}</span>
-          </div>
-        </TooltipProviderWrapper>
-      );
-    },
+    cell: NameColumn,
     enableHiding: false,
   },
   {
