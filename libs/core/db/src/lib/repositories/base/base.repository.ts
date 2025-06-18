@@ -56,7 +56,7 @@ export abstract class BaseRepository<
   }: {
     where?: WhereInput;
     include?: Include;
-    orderBy?: OrderByWithRelationInput;
+    orderBy?: OrderByWithRelationInput[];
   } = {}) {
     return this.model.findMany({
       where,
@@ -75,7 +75,7 @@ export abstract class BaseRepository<
     }: {
       where?: WhereInput;
       include?: Include;
-      orderBy?: OrderByWithRelationInput;
+      orderBy?: OrderByWithRelationInput[];
     } = {},
   ): Promise<PaginationDto<T>> {
     const safePage = Math.max(1, page);

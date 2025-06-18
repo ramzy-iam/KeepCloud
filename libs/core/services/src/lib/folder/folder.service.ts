@@ -72,6 +72,7 @@ export class FolderService extends BaseFileService {
     const scope = this.fileRepository.scoped
       .filterByParentId(parentId)
       .filterByNotTrashed()
+      .orderBy({ isFolder: 'desc', name: filters.order })
       .joinOwner();
 
     if (filters.type) scope.filterByType(filters.type);
