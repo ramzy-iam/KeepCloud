@@ -9,6 +9,47 @@ import { CheckIcon, FolderIcon } from './index';
 import { UploadEntry } from '../../hooks/upload-manager.hook';
 import { useFileIcon } from '../../hooks';
 
+const UploadTrayItem = ({
+  upload,
+  onCancel,
+}: {
+  upload: UploadEntry;
+  onCancel: (file: File) => void;
+}) => {
+  const isCompleted = FileHelper.isUploadComplete(upload.progress);
+
+  const FileIconComponent = useFileIcon(upload.uploadFile);
+
+  return (
+    <div className="flex items-center justify-between gap-3">
+      {FileIconComponent ? (
+        <FileIconComponent />
+      ) : (
+        <CircularProgress size={16} value={upload.progress} />
+      )}
+      <div className="flex-1 overflow-hidden">
+        <TooltipProviderWrapper content={upload.file.name}>
+          <p className="truncate text-sm">{upload.file.name}</p>
+        </TooltipProviderWrapper>
+      </div>
+
+      {upload.uploadFile ? (
+        <UploadFileStatus uploadFile={upload.uploadFile} />
+      ) : (
+        !isCompleted && (
+          <Button
+            variant="text"
+            className="h-0 p-0 text-xs text-primary-foreground"
+            onClick={() => onCancel(upload.file)}
+          >
+            Cancel
+          </Button>
+        )
+      )}
+    </div>
+  );
+};
+
 export const UploadFileStatus = ({
   uploadFile,
 }: {
@@ -107,44 +148,13 @@ export const UploadTray = ({
       </h4>
       {expanded && (
         <div className="mt-2 flex-1 space-y-3 overflow-y-auto px-4 pb-4">
-          {uploads.map((upload) => {
-            const isCompleted = FileHelper.isUploadComplete(upload.progress);
-            const FileIconComponent = upload.uploadFile
-              ? useFileIcon(upload.uploadFile)
-              : null;
-
-            return (
-              <div
-                key={upload.id}
-                className="flex items-center justify-between gap-3"
-              >
-                {FileIconComponent ? (
-                  <FileIconComponent />
-                ) : (
-                  <CircularProgress size={16} value={upload.progress} />
-                )}
-                <div className="flex-1 overflow-hidden">
-                  <TooltipProviderWrapper content={upload.file.name}>
-                    <p className="truncate text-sm">{upload.file.name}</p>
-                  </TooltipProviderWrapper>
-                </div>
-
-                {upload.uploadFile ? (
-                  <UploadFileStatus uploadFile={upload.uploadFile} />
-                ) : (
-                  !isCompleted && (
-                    <Button
-                      variant="text"
-                      className="h-0 p-0 text-xs text-primary-foreground"
-                      onClick={() => onCancel(upload.file)}
-                    >
-                      Cancel
-                    </Button>
-                  )
-                )}
-              </div>
-            );
-          })}
+          {uploads.map((upload) => (
+            <UploadTrayItem
+              key={upload.id}
+              upload={upload}
+              onCancel={onCancel}
+            />
+          ))}
         </div>
       )}
     </div>
