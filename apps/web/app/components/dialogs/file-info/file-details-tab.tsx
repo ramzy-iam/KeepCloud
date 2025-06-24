@@ -34,7 +34,6 @@ export function FileDetailsTab({ item, closeDialog }: FileDetailsTabProps) {
   useEffect(() => {
     const isSystemFile = authState?.user.root === item?.parentId;
     if (isSystemFile) {
-      console.log(parentFolder);
       setParentUrl(ROUTE_PATH.system(parentFolder?.name ?? ''));
       setParentName(
         Object.values(SYSTEM_FILE).find(
