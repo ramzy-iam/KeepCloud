@@ -24,6 +24,8 @@ export function FileInfoDialog() {
   const { isOpen, context } = dialogState;
   const item = context?.item as FileMinViewDto | undefined;
   const FileIconComponent = useFileIcon(item);
+  const closeDialog = () =>
+    setDialogState({ isOpen: false, type: null, context: {} });
 
   if (!item) return null;
 
@@ -31,7 +33,7 @@ export function FileInfoDialog() {
     <Dialog
       open={isOpen}
       onOpenChange={(open) => {
-        if (!open) setDialogState({ isOpen: false, type: null, context: {} });
+        if (!open) closeDialog();
       }}
     >
       <DialogHeader>
@@ -56,7 +58,7 @@ export function FileInfoDialog() {
           </TabsList>
 
           <TabsContent value="details">
-            <FileDetailsTab item={item} />
+            <FileDetailsTab item={item} closeDialog={closeDialog} />
           </TabsContent>
 
           <TabsContent value="activity">

@@ -11,12 +11,14 @@ import { OwnerIcon } from '../../ui';
 import { useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
+import { SYSTEM_FILE } from '@keepcloud/commons/constants';
 
 interface FileDetailsTabProps {
   item: FileMinViewDto;
+  closeDialog?: () => void;
 }
 
-export function FileDetailsTab({ item }: FileDetailsTabProps) {
+export function FileDetailsTab({ item, closeDialog }: FileDetailsTabProps) {
   const authState = useAtomValue(authAtom);
   const navigate = useNavigate();
 
@@ -27,13 +29,21 @@ export function FileDetailsTab({ item }: FileDetailsTabProps) {
   });
 
   const [parentUrl, setParentUrl] = useState<string | null>(null);
+  const [parentName, setParentName] = useState<string | undefined>();
 
   useEffect(() => {
     const isSystemFile = authState?.user.root === item?.parentId;
     if (isSystemFile) {
-      setParentUrl(ROUTE_PATH.system(item?.parentId ?? ''));
+      console.log(parentFolder);
+      setParentUrl(ROUTE_PATH.system(parentFolder?.name ?? ''));
+      setParentName(
+        Object.values(SYSTEM_FILE).find(
+          (sys) => sys.code === parentFolder?.name,
+        )?.name as string,
+      );
     } else {
-      setParentUrl(ROUTE_PATH.folderDetails(item?.parentId ?? ''));
+      setParentUrl(ROUTE_PATH.folderDetails(parentFolder?.parentId ?? ''));
+      setParentName(parentFolder?.name);
     }
   }, [item?.parentId, authState?.user.root]);
 
@@ -79,10 +89,13 @@ export function FileDetailsTab({ item }: FileDetailsTabProps) {
         {parentUrl && parentFolder ? (
           <button
             className="flex max-w-[200px] cursor-pointer gap-3 truncate text-right"
-            onClick={() => navigate(parentUrl)}
+            onClick={() => {
+              navigate(parentUrl);
+              closeDialog?.();
+            }}
           >
             <FolderIcon />
-            <span>{parentFolder.name}</span>
+            <span>{parentName}</span>
           </button>
         ) : (
           '-'
