@@ -62,7 +62,7 @@ export const FileSystemItem = ({
     >
       <TooltipProviderWrapper content={file.name} sideOffset={12}>
         <div className="flex max-w-[calc(100%-24px)] items-center gap-2 overflow-hidden">
-          <Icon />
+          {Icon && <Icon />}
           <p className="truncate text-left text-14-medium text-secondary-foreground">
             {file.name}
           </p>
