@@ -54,6 +54,9 @@ export class FileMinViewDto {
   id: string;
 
   @Expose()
+  createdAt: Date;
+
+  @Expose()
   parentId: string | null;
 
   @Expose()
@@ -86,9 +89,6 @@ export class FileMinViewDto {
 }
 
 export class FilePreviewDto extends FileMinViewDto {
-  @Expose()
-  createdAt: Date;
-
   @Expose()
   updatedAt: Date;
 
