@@ -68,7 +68,6 @@ export const useFileMenuItems = (file: FileMinViewDto): MenuItem[] => {
         moveToTrash.mutate(file.id);
       },
       className: itemClassName,
-      separatorAfter: true,
     },
   ];
 };
