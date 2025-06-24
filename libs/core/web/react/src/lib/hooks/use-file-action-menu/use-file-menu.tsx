@@ -22,51 +22,43 @@ export const useFileMenuItems = (file: FileMinViewDto): MenuItem[] => {
     {
       label: 'Preview',
       icon: <PreviewIcon className={iconClassName} />,
-      onClick: () => {
+      onClick: () =>
         openDialog({
           type: 'previewFile',
           item: file,
-        });
-      },
+        }),
       className: itemClassName,
     },
-    {
-      label: 'Info',
-      icon: <Info className={iconClassName} />,
-      onClick: () => {
-        openDialog({
-          type: 'fileInfo',
-          item: file,
-        });
-      },
-      className: itemClassName,
-    },
-
     {
       label: 'Download',
       icon: <Download className={iconClassName} />,
       onClick: () => console.log(`Download ${file.name}`),
       className: itemClassName,
-      separatorAfter: true,
     },
     {
       label: 'Rename',
       icon: <RenameIcon className={iconClassName} />,
-      onClick: () => {
+      onClick: () =>
         openDialog({
           type: 'rename',
           item: file,
-        });
-      },
+        }),
       className: itemClassName,
     },
-
+    {
+      label: 'Info',
+      icon: <Info className={iconClassName} />,
+      onClick: () =>
+        openDialog({
+          type: 'fileInfo',
+          item: file,
+        }),
+      className: itemClassName,
+    },
     {
       label: 'Move to Trash',
       icon: <Trash2 className={iconClassName} />,
-      onClick: () => {
-        moveToTrash.mutate(file.id);
-      },
+      onClick: () => moveToTrash.mutate(file.id),
       className: itemClassName,
     },
   ];
