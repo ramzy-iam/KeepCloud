@@ -87,10 +87,9 @@ export function FileDetailsTab({ item, closeDialog }: FileDetailsTabProps) {
   if (isPending) {
     return (
       <div className="space-y-3">
-        {[...Array(6)].map((_, i) => (
-          <div key={i} className="flex items-center justify-between py-3">
-            <Skeleton className="h-4 w-20" />
-            <Skeleton className="h-4 w-32" />
+        {[...Array(5)].map((_, i) => (
+          <div key={i} className="py-3">
+            <Skeleton className="h-10 w-full" />
           </div>
         ))}
       </div>
