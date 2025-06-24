@@ -29,17 +29,6 @@ export const useFolderMenuItems = (file: FileMinViewDto): MenuItem[] => {
       className: itemClassName,
     },
     {
-      label: 'Info',
-      icon: <Info className={iconClassName} />,
-      onClick: () => {
-        openDialog({
-          type: 'fileInfo',
-          item: file,
-        });
-      },
-      className: itemClassName,
-    },
-    {
       label: 'Rename',
       icon: <RenameIcon className={iconClassName} />,
       onClick: () =>
@@ -49,13 +38,20 @@ export const useFolderMenuItems = (file: FileMinViewDto): MenuItem[] => {
         }),
       className: itemClassName,
     },
-
+    {
+      label: 'Info',
+      icon: <Info className={iconClassName} />,
+      onClick: () =>
+        openDialog({
+          type: 'fileInfo',
+          item: file,
+        }),
+      className: itemClassName,
+    },
     {
       label: 'Move to trash',
       icon: <Trash2 className={iconClassName} />,
-      onClick: () => {
-        moveToTrash.mutate(file.id);
-      },
+      onClick: () => moveToTrash.mutate(file.id),
       className: itemClassName,
     },
   ];
