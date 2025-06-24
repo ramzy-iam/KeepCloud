@@ -45,7 +45,7 @@ export function FileDetailsTab({ item, closeDialog }: FileDetailsTabProps) {
       setParentUrl(ROUTE_PATH.folderDetails(parentFolder?.parentId ?? ''));
       setParentName(parentFolder?.name);
     }
-  }, [item?.parentId, authState?.user.root]);
+  }, [item?.parentId, authState?.user.root, parentFolder]);
 
   if (isPending) {
     return (
