@@ -5,6 +5,7 @@ import {
   ROUTE_PATH,
   Skeleton,
   Separator,
+  TooltipProviderWrapper,
 } from '@keepcloud/web-core/react';
 import { DayjsHelper, FileHelper } from '@keepcloud/commons/helpers';
 import { FileMinViewDto } from '@keepcloud/commons/dtos';
@@ -71,7 +72,7 @@ export function FileDetailsTab({ item, closeDialog }: FileDetailsTabProps) {
         )?.name as string,
       );
     } else {
-      setParentUrl(ROUTE_PATH.folderDetails(parentFolder?.parentId ?? ''));
+      setParentUrl(ROUTE_PATH.folderDetails(parentFolder?.id ?? ''));
       setParentName(parentFolder?.name);
     }
   }, [item?.parentId, authState?.user.root, parentFolder]);
@@ -152,14 +153,15 @@ export function FileDetailsTab({ item, closeDialog }: FileDetailsTabProps) {
         label="Location"
         value={
           parentUrl && parentFolder && !isError ? (
-            <button
-              className="flex max-w-full cursor-pointer items-center gap-2"
-              onClick={handleNavigateToParent}
-              title={`Navigate to ${parentName}`}
-            >
-              <FolderIcon />
-              <span className="truncate">{parentName}</span>
-            </button>
+            <TooltipProviderWrapper content={`Navigate to ${parentName}`}>
+              <button
+                className="flex max-w-full cursor-pointer items-center gap-2"
+                onClick={handleNavigateToParent}
+              >
+                <FolderIcon />
+                <span className="truncate">{parentName}</span>
+              </button>
+            </TooltipProviderWrapper>
           ) : (
             <span className="text-muted-foreground">
               {isError
