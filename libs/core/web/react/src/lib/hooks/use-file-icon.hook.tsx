@@ -9,6 +9,7 @@ import {
   AudioIcon,
 } from '../components/misc';
 import { MimeTypes } from '@keepcloud/commons/constants';
+import { FC } from 'react';
 
 export const useFileIcon = (file?: FileMinViewDto) => {
   if (!file) return null;
