@@ -61,7 +61,10 @@ export function FileInfoDialog() {
             <FileDetailsTab item={item} closeDialog={closeDialog} />
           </TabsContent>
 
-          <TabsContent value="activity">
+          <TabsContent
+            value="activity"
+            className="flex items-center justify-center"
+          >
             <FileActivityTab />
           </TabsContent>
         </Tabs>
