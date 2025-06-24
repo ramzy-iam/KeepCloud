@@ -41,7 +41,7 @@ export function FileInfoDialog() {
         <DialogDescription className="sr-only"></DialogDescription>
       </DialogHeader>
 
-      <DialogContent className="overflow-hidden p-0 sm:max-w-lg">
+      <DialogContent className="flex flex-col overflow-hidden p-0 sm:max-w-lg">
         <div className="border-b px-6 py-4">
           <div className="flex items-center space-x-3">
             {FileIconComponent && <FileIconComponent />}
@@ -51,7 +51,7 @@ export function FileInfoDialog() {
           </div>
         </div>
 
-        <Tabs defaultValue="details" className="min-h-[248px] px-6 pt-2 pb-4">
+        <Tabs defaultValue="details" className="min-h-[445px] px-6 pt-2 pb-4">
           <TabsList className="mb-4 w-full">
             <TabsTrigger value="details">Details</TabsTrigger>
             <TabsTrigger value="activity">Activity</TabsTrigger>

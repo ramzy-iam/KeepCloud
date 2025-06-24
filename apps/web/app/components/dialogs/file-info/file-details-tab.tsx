@@ -4,6 +4,7 @@ import {
   authAtom,
   ROUTE_PATH,
   Skeleton,
+  Separator,
 } from '@keepcloud/web-core/react';
 import { DayjsHelper, FileHelper } from '@keepcloud/commons/helpers';
 import { FileMinViewDto } from '@keepcloud/commons/dtos';
@@ -18,11 +19,38 @@ interface FileDetailsTabProps {
   closeDialog?: () => void;
 }
 
+interface DetailRowProps {
+  label: string;
+  value: React.ReactNode;
+  icon?: React.ReactNode;
+  className?: string;
+}
+
+function DetailRow({ label, value, icon, className = '' }: DetailRowProps) {
+  return (
+    <div
+      className={`flex max-w-full items-center justify-between py-3 ${className}`}
+    >
+      <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+        {icon}
+        <span>{label}</span>
+      </div>
+      <div className="max-w-[50%] flex-shrink-0 text-right text-sm">
+        {value}
+      </div>
+    </div>
+  );
+}
+
 export function FileDetailsTab({ item, closeDialog }: FileDetailsTabProps) {
   const authState = useAtomValue(authAtom);
   const navigate = useNavigate();
 
-  const { data: parentFolder, isPending } = useGetFolder({
+  const {
+    data: parentFolder,
+    isPending,
+    isError,
+  } = useGetFolder({
     id: item?.parentId ?? '',
     query: { withAncestors: false },
     enabled: !!item?.parentId,
@@ -32,6 +60,8 @@ export function FileDetailsTab({ item, closeDialog }: FileDetailsTabProps) {
   const [parentName, setParentName] = useState<string | undefined>();
 
   useEffect(() => {
+    if (!parentFolder || !item?.parentId) return;
+
     const isSystemFile = authState?.user.root === item?.parentId;
     if (isSystemFile) {
       setParentUrl(ROUTE_PATH.system(parentFolder?.name ?? ''));
@@ -46,60 +76,101 @@ export function FileDetailsTab({ item, closeDialog }: FileDetailsTabProps) {
     }
   }, [item?.parentId, authState?.user.root, parentFolder]);
 
+  const handleNavigateToParent = () => {
+    if (parentUrl) {
+      navigate(parentUrl);
+      closeDialog?.();
+    }
+  };
+
   if (isPending) {
     return (
-      <div className="space-y-2 text-sm">
-        {[...Array(5)].map((_, i) => (
-          <Skeleton key={i} className="h-10 w-full" />
+      <div className="space-y-3">
+        {[...Array(6)].map((_, i) => (
+          <div key={i} className="flex items-center justify-between py-3">
+            <Skeleton className="h-4 w-20" />
+            <Skeleton className="h-4 w-32" />
+          </div>
         ))}
       </div>
     );
   }
 
   return (
-    <div className="space-y-2 text-sm">
-      <div className="flex items-center justify-between gap-2">
-        <span className="font-medium">Name</span> <span>{item.name}</span>
-      </div>
-      <div className="flex items-center justify-between gap-2">
-        <span className="font-medium">Type</span>
-        <span>{item.isFolder ? 'Folder' : item.format?.toUpperCase()}</span>
-      </div>
-      {!item.isFolder && (
-        <div className="flex items-center justify-between gap-2">
-          <span className="font-medium">Size</span>
-          <span>{item.size ? FileHelper.formatBytes(+item.size) : '-'}</span>
-        </div>
+    <div className="space-y-1">
+      {/* Basic Information */}
+      <DetailRow
+        label="Name"
+        value={
+          <div className="w-full truncate font-medium" title={item.name}>
+            {item.name}
+          </div>
+        }
+      />
+
+      {!item.isFolder && item.size && (
+        <DetailRow label="Size" value={FileHelper.formatBytes(+item.size)} />
       )}
-      <div className="flex items-center justify-between gap-2">
-        <span className="font-medium">Owner</span>
-        <OwnerIcon user={item.owner} withName={false} />
-      </div>
-      {item.createdAt && (
-        <div className="flex items-center justify-between gap-2">
-          <span className="font-medium">Created</span>
+
+      <DetailRow
+        label="Type"
+        value={
           <span>
-            {DayjsHelper.new(item.createdAt).format('DD MMM YYYY, HH:mm')}
+            {item.isFolder ? 'Folder' : item.format?.toUpperCase() || 'File'}
           </span>
-        </div>
+        }
+      />
+
+      <Separator className="my-4" />
+
+      {/* Ownership & Dates */}
+      <DetailRow
+        label="Owner"
+        value={
+          <OwnerIcon user={item.owner} withName={true} withTooltip={true} />
+        }
+      />
+
+      {item.createdAt && (
+        <DetailRow
+          label="Created"
+          value={
+            <div className="text-right">
+              <div>{DayjsHelper.new(item.createdAt).format('DD MMM YYYY')}</div>
+              <div className="text-xs text-muted-foreground">
+                {DayjsHelper.new(item.createdAt).format('HH:mm')}
+              </div>
+            </div>
+          }
+        />
       )}
-      <div className="flex items-start justify-between gap-2">
-        <span className="font-medium">Location</span>
-        {parentUrl && parentFolder ? (
-          <button
-            className="flex max-w-[200px] cursor-pointer gap-3 truncate text-right"
-            onClick={() => {
-              navigate(parentUrl);
-              closeDialog?.();
-            }}
-          >
-            <FolderIcon />
-            <span>{parentName}</span>
-          </button>
-        ) : (
-          '-'
-        )}
-      </div>
+
+      <Separator className="my-4" />
+
+      {/* Location */}
+      <DetailRow
+        label="Location"
+        value={
+          parentUrl && parentFolder && !isError ? (
+            <button
+              className="flex max-w-full cursor-pointer items-center gap-2"
+              onClick={handleNavigateToParent}
+              title={`Navigate to ${parentName}`}
+            >
+              <FolderIcon />
+              <span className="truncate">{parentName}</span>
+            </button>
+          ) : (
+            <span className="text-muted-foreground">
+              {isError
+                ? 'Unable to load'
+                : item.parentId
+                  ? 'Loading...'
+                  : 'Root'}
+            </span>
+          )
+        }
+      />
     </div>
   );
 }
