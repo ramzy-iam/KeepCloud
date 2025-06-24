@@ -38,9 +38,7 @@ const NameColumn = ({ row }: { row: Row<FileMinViewDto> }) => {
         className="max- flex max-w-[200px] cursor-pointer items-center gap-2 overflow-hidden text-14-medium text-secondary-foreground sm:max-w-[400px] lg:max-w-[600px]"
         onClick={handleClick}
       >
-        <span className="flex-shrink-0">
-          <Icon />
-        </span>
+        <span className="flex-shrink-0">{Icon && <Icon />}</span>
         <span className="truncate">{file.name}</span>
       </div>
     </TooltipProviderWrapper>
