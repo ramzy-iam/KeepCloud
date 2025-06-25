@@ -1,4 +1,4 @@
-import { Logger } from '@keepcloud/commons/backend';
+import { Env, Logger } from '@keepcloud/commons/backend';
 import { APP_LOCAL_QUEUES } from '@keepcloud/commons/constants';
 import { OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { Worker, Job, ConnectionOptions } from 'bullmq';
@@ -12,7 +12,7 @@ export abstract class QueueWorkerService
   protected abstract logger: Logger;
   protected abstract queueName: string;
   protected connection: ConnectionOptions = {
-    url: process.env.SYSTEM_QUEUE_URL,
+    url: Env.SYSTEM_QUEUE_URL,
   };
 
   constructor(
@@ -21,7 +21,7 @@ export abstract class QueueWorkerService
   ) {}
 
   protected isLocal(): boolean {
-    return process.env.NODE_ENV !== 'production';
+    return Env.NODE_ENV !== 'production';
   }
 
   onModuleInit() {

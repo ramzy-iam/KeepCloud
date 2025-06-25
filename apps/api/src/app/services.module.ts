@@ -1,3 +1,4 @@
+import { ConfigModule } from '@keepcloud/commons/backend';
 import {
   FileRepository,
   SubscriptionPlanRepository,
@@ -38,6 +39,7 @@ const services = [
 
 @Global()
 @Module({
+  imports: [ConfigModule],
   providers: services,
   exports: services,
 })
