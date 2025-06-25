@@ -1,14 +1,23 @@
-export const getAWSConfig = (): {
-  awsKeyId: string;
-  awsSecret: string;
-  awsRegion: string;
-} => {
-  const awsKeyId =
-    process.env.APP_AWS_ACCESS_KEY_ID ?? process.env.AWS_ACCESS_KEY_ID;
-  const awsSecret =
-    process.env.APP_AWS_SECRET_ACCESS_KEY ?? process.env.AWS_SECRET_ACCESS_KEY;
-  const awsRegion =
-    process.env.APP_AWS_DEFAULT_REGION ?? process.env.AWS_DEFAULT_REGION;
+import 'dotenv/config';
+import * as z from 'zod/v4';
+import { awsSchema } from '../../config';
 
-  return { awsKeyId, awsSecret, awsRegion };
-};
+const result = awsSchema.safeParse(process.env);
+
+if (!result.success) {
+  console.error(
+    '❌ Invalid environment variables:\n',
+    z.prettifyError(result.error),
+  );
+  process.exit(1);
+}
+
+const config = result.data;
+
+export function getAWSConfig() {
+  return {
+    awsKeyId: config.APP_AWS_ACCESS_KEY_ID,
+    awsSecret: config.APP_AWS_SECRET_ACCESS_KEY,
+    awsRegion: config.AWS_DEFAULT_REGION,
+  };
+}
