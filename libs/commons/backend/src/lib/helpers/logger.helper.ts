@@ -1,5 +1,7 @@
+import 'dotenv/config';
 import winston, { format, Logger as WinstonLogger } from 'winston';
 import util from 'util';
+import { Env } from '../config';
 
 const { combine, label, printf, colorize, timestamp } = format;
 
@@ -34,7 +36,7 @@ const myFormat = printf(({ timestamp, level, message, label, ...meta }) => {
 });
 
 function getLogLevel(): string {
-  const level = process.env.LOG_LEVEL?.toLowerCase();
+  const level = Env.LOG_LEVEL?.toLowerCase();
   if (level && ['error', 'warn', 'info', 'debug'].includes(level)) {
     return level;
   }

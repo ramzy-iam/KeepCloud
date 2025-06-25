@@ -9,12 +9,13 @@ import {
   DeleteNodeData,
   DeleteFileFromStorageData,
 } from '@keepcloud/commons/types';
+import { Env } from '@keepcloud/commons/backend';
 
 @Injectable()
 export class SystemQueueService extends AbstractQueueService {
   protected readonly queueName = APP_LOCAL_QUEUES.system.name;
   protected readonly jobName = APP_LOCAL_QUEUES.system.jobName;
-  protected readonly queueUrl = process.env.SYSTEM_QUEUE_URL;
+  protected readonly queueUrl = Env.SYSTEM_QUEUE_URL;
 
   enqueueUpdateFileTagInStorage(data: UpdateFileTagInStorageData) {
     return this.sendJob({
