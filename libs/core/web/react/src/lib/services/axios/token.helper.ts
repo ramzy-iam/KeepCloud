@@ -71,5 +71,5 @@ export const renewAccessToken = async (
 };
 
 const redirectToLogin = () => {
-  window.location.href = Env.VITE_WEB_APP_URL;
+  window.location.href = '/';
 };

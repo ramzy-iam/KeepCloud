@@ -2,7 +2,6 @@ import * as z from 'zod/v4';
 
 export const envSchema = z.object({
   VITE_GOOGLE_CLIENT_ID: z.string(),
-  VITE_WEB_APP_URL: z.string(),
   VITE_API_BASE_URL: z.string(),
   VITE_DOMAIN_NAME: z.string(),
 });
