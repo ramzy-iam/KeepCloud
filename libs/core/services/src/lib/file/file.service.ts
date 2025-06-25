@@ -7,6 +7,7 @@ import {
   PresignedPostResultDto,
 } from '@keepcloud/commons/dtos';
 import {
+  AppConfigService,
   FileKeyInvalidException,
   FileNotFoundException,
   FolderNotFoundException,
@@ -35,10 +36,11 @@ export class FileService extends BaseFileService {
     private readonly userService: UserService,
     private readonly systemQueueService: SystemQueueService,
     protected override readonly nestedSetService: NestedSetService,
+    protected readonly configService: AppConfigService,
   ) {
     super(fileRepository, nestedSetService);
     this.s3helper = S3Helper.getInstance();
-    this.bucket = process.env.FILE_BUCKET;
+    this.bucket = this.configService.env.FILE_BUCKET;
     this.logger = new Logger(FileService.name);
   }
 

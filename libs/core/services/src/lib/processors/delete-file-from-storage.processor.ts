@@ -1,4 +1,4 @@
-import { Logger, S3Helper } from '@keepcloud/commons/backend';
+import { Env, Logger, S3Helper } from '@keepcloud/commons/backend';
 import { Injectable } from '@nestjs/common';
 import { DeleteFileFromStorageData, Processor } from '@keepcloud/commons/types';
 
@@ -9,7 +9,7 @@ export class DeleteFileFromStorageProcessor implements Processor {
   private readonly bucket: string;
   constructor() {
     this.s3helper = S3Helper.getInstance();
-    this.bucket = process.env.FILE_BUCKET;
+    this.bucket = Env.FILE_BUCKET;
   }
 
   async execute(data: DeleteFileFromStorageData) {

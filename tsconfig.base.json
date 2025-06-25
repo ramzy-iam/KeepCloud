@@ -36,6 +36,6 @@
       "@keepcloud/web-core/react": ["libs/core/web/react/src/index.ts"]
     }
   },
-  "include": ["./env.d.ts", "**/*.ts"],
+  "include": ["**/*.ts"],
   "exclude": ["node_modules", "tmp"]
 }
