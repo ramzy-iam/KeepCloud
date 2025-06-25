@@ -1,4 +1,4 @@
-import { SQShelper } from '@keepcloud/commons/backend';
+import { Env, SQShelper } from '@keepcloud/commons/backend';
 import { ProcessorAction } from '@keepcloud/commons/constants';
 import { Queue } from 'bullmq';
 
@@ -14,14 +14,14 @@ export abstract class AbstractQueueService {
   private get bullQueue(): Queue {
     if (!this._bullQueue) {
       this._bullQueue = new Queue(this.queueName, {
-        connection: { url: process.env.SYSTEM_QUEUE_URL },
+        connection: { url: Env.SYSTEM_QUEUE_URL },
       });
     }
     return this._bullQueue;
   }
 
   protected isLocal(): boolean {
-    return process.env.NODE_ENV !== 'production';
+    return Env.NODE_ENV !== 'production';
   }
 
   async sendJob<T>(payload: {

@@ -1,5 +1,6 @@
 import { ACCESS_TOKEN, REFRESH_TOKEN } from '@keepcloud/commons/constants';
 import { CookiesHelper } from './cookies.helper';
+import { Env } from '../services';
 
 export class AuthHelper {
   static checkIfSessionValid(): boolean {
@@ -31,7 +32,7 @@ export class AuthHelper {
   static clearCookies() {
     const domainOptions = {
       path: '/',
-      domain: import.meta.env['VITE_DOMAIN_NAME'],
+      domain: Env.VITE_DOMAIN_NAME,
     };
     CookiesHelper.remove(ACCESS_TOKEN, domainOptions);
     CookiesHelper.remove(REFRESH_TOKEN, domainOptions);
