@@ -42,8 +42,6 @@ export function ErrorBoundary({ error }: { error: unknown }) {
   const navigate = useNavigate();
   const isDev = import.meta.env.DEV;
 
-  console.error('ErrorBoundary:', error);
-
   if (isRouteErrorResponse(error)) {
     return (
       <div className="flex h-svh flex-col items-center justify-center gap-4 bg-background px-6 text-center">
