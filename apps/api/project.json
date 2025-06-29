@@ -63,6 +63,12 @@
         "command": "serverless deploy --package .serverless",
         "cwd": "apps/api"
       }
+    },
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node scripts/start-dev.js"
+      }
     }
   }
 }
