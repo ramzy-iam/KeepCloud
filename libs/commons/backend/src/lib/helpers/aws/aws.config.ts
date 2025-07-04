@@ -1,11 +1,12 @@
 import 'dotenv/config';
 import * as z from 'zod/v4';
 import { awsSchema } from '../../config';
+import { Logger } from '../logger.helper';
 
 const result = awsSchema.safeParse(process.env);
 
 if (!result.success) {
-  console.error(
+  Logger.error(
     'Invalid environment variables:\n',
     z.prettifyError(result.error),
   );
