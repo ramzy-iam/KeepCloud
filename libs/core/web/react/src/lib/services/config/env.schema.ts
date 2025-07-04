@@ -1,3 +1,4 @@
+import { Logger } from '@keepcloud/commons/backend';
 import * as z from 'zod/v4';
 
 export const envSchema = z.object({
@@ -11,10 +12,7 @@ export type EnvVariables = z.infer<typeof envSchema>;
 const result = envSchema.safeParse(import.meta.env);
 
 if (!result.success) {
-  console.error(
-    'Invalid environment variables:',
-    z.prettifyError(result.error),
-  );
+  Logger.error('Invalid environment variables:', z.prettifyError(result.error));
   throw new Error('Invalid environment variables');
 }
 

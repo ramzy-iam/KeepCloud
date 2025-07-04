@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import * as z from 'zod/v4';
+import { Logger } from '../helpers';
 
 export const awsSchema = z.object({
   APP_AWS_ACCESS_KEY_ID: z.string(),
@@ -38,7 +39,7 @@ export type EnvVariables = z.infer<typeof envSchema>;
 const result = envSchema.safeParse(process.env);
 
 if (!result.success) {
-  console.error('Invalid environment variables:', result.error.format());
+  Logger.error('Invalid environment variables:', z.prettifyError(result.error));
   process.exit(1);
 }
 

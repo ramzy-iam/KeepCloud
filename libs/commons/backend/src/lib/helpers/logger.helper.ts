@@ -45,6 +45,7 @@ function getLogLevel(): string {
 
 export class Logger {
   private logger: WinstonLogger;
+  private static defaultLogger: Logger;
 
   constructor(programName: string) {
     this.logger = winston.createLogger({
@@ -86,5 +87,28 @@ export class Logger {
 
   get raw(): WinstonLogger {
     return this.logger;
+  }
+
+  private static getDefaultLogger(): Logger {
+    if (!Logger.defaultLogger) {
+      Logger.defaultLogger = new Logger('App');
+    }
+    return Logger.defaultLogger;
+  }
+
+  static info(message: string, ...meta: unknown[]) {
+    Logger.getDefaultLogger().info(message, ...meta);
+  }
+
+  static error(message: string, ...meta: unknown[]) {
+    Logger.getDefaultLogger().error(message, ...meta);
+  }
+
+  static debug(message: string, ...meta: unknown[]) {
+    Logger.getDefaultLogger().debug(message, ...meta);
+  }
+
+  static warn(message: string, ...meta: unknown[]) {
+    Logger.getDefaultLogger().warn(message, ...meta);
   }
 }
