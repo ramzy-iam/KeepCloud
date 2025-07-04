@@ -6,7 +6,7 @@ const result = awsSchema.safeParse(process.env);
 
 if (!result.success) {
   console.error(
-    '❌ Invalid environment variables:\n',
+    'Invalid environment variables:\n',
     z.prettifyError(result.error),
   );
   process.exit(1);

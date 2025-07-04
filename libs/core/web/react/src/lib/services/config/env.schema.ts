@@ -12,7 +12,7 @@ const result = envSchema.safeParse(import.meta.env);
 
 if (!result.success) {
   console.error(
-    '❌ Invalid environment variables:',
+    'Invalid environment variables:',
     z.prettifyError(result.error),
   );
   throw new Error('Invalid environment variables');

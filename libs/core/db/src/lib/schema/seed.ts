@@ -29,7 +29,7 @@ async function main() {
         },
       ],
     });
-    console.log('✅ subscription plans seeded');
+    console.log('subscription plans seeded');
   } else {
     console.log('⛔ Subscription plans already exist, skipping seed.');
   }
