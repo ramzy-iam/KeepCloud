@@ -14,7 +14,7 @@ import * as z from 'zod/v4';
         const logger = new Logger(ConfigModule.name);
         if (!result.success) {
           logger.error(
-            '❌ Invalid .env configuration:\n',
+            'Invalid .env configuration:\n',
             z.prettifyError(result.error),
           );
           throw new Error('Invalid environment variables');

@@ -33,7 +33,7 @@ async function waitForRedis(maxAttempts = 30) {
       await execCommand('docker compose exec redis redis-cli ping', {
         pipe: false,
       });
-      console.log('✅ Redis is ready!\n');
+      console.log('Redis is ready!\n');
       return true;
     } catch {
       if (i === maxAttempts - 1) {
@@ -76,9 +76,9 @@ async function startDevelopment() {
       // Stop Redis
       try {
         await execCommand('docker compose down');
-        console.log('✅ Services stopped successfully');
+        console.log('Services stopped successfully');
       } catch (error) {
-        console.error('❌ Error stopping services:', error.message);
+        console.error('Error stopping services:', error.message);
       }
 
       process.exit(0);
@@ -87,13 +87,13 @@ async function startDevelopment() {
     // Handle API process exit
     apiProcess.on('exit', (code) => {
       if (code !== 0) {
-        console.error(`❌ API server exited with code ${code}`);
+        console.error(`API server exited with code ${code}`);
         process.exit(code);
       }
     });
   } catch (error) {
-    console.error('❌ Error starting development environment:', error.message);
-    console.log('\n🔧 Troubleshooting tips:');
+    console.error('Error starting development environment:', error.message);
+    console.log('\nTroubleshooting tips:');
     console.log('1. Make sure Docker is running');
     console.log('2. Check if ports 3000 and 6379 are available');
     console.log(

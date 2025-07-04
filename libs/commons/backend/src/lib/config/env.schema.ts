@@ -38,7 +38,7 @@ export type EnvVariables = z.infer<typeof envSchema>;
 const result = envSchema.safeParse(process.env);
 
 if (!result.success) {
-  console.error('❌ Invalid environment variables:', result.error.format());
+  console.error('Invalid environment variables:', result.error.format());
   process.exit(1);
 }
 
