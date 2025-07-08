@@ -1,102 +1,361 @@
-# keepcloud
+# KeepCloud
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+<div align="center">
+  <img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45" alt="Nx logo">
+  <h3>Modern Cloud Storage Platform</h3>
+  <p>A full-stack cloud storage solution built with NestJS, React, and AWS</p>
+</div>
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
+---
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/nx-api/nest?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+## 🚀 Overview
 
-## Run tasks
+KeepCloud is a modern, scalable cloud storage platform that provides secure file management, sharing, and organization capabilities. Built with a microservices architecture using NestJS for the backend and React for the frontend, all orchestrated within an Nx monorepo.
 
-To run the dev server for your app, use:
+### ✨ Key Features
 
-```sh
+- **📁 File Management**: Upload, organize, and manage files with nested folder structures
+- **🗑️ Trash System**: Soft delete with restoration capabilities
+- **🔍 Smart Search**: Find files and folders with intelligent suggestions
+- **👥 Sharing**: Share files and folders with other users
+- **🏷️ File Organization**: Automatic file categorization and tagging
+- **📊 Storage Analytics**: Track usage and manage storage limits
+- **🔐 Authentication**: Secure Google OAuth integration
+- **☁️ AWS Integration**: Leverages S3 for storage and SQS for background processing
+- **📱 Responsive UI**: Modern interface built with Tailwind CSS and Radix UI
+
+## 🏗️ Architecture
+
+### Applications
+
+- **`apps/api`**: NestJS backend API with serverless deployment support
+- **`apps/web`**: React frontend application with React Router
+
+### Core Libraries
+
+- **`libs/core/db`**: Database layer with Prisma ORM and TypeORM
+- **`libs/core/services`**: Business logic and service layer
+- **`libs/core/web/react`**: Shared React components and utilities
+- **`libs/commons`**: Shared utilities, DTOs, and constants
+- **`libs/storage/api`**: Storage-specific API endpoints
+- **`libs/files/api`**: File management API endpoints
+- **`libs/iam/api`**: Identity and Access Management
+- **`libs/processors`**: Background job processors
+
+## 🛠️ Technology Stack
+
+### Backend
+
+- **Framework**: NestJS with Express
+- **Database**: PostgreSQL with Prisma ORM
+- **Authentication**: JWT with Google OAuth
+- **Cloud Storage**: AWS S3
+- **Queue Management**: BullMQ with Redis
+- **Background Jobs**: AWS SQS
+- **Logging**: Winston
+
+### Frontend
+
+- **Framework**: React 19 with React Router 7
+- **Styling**: Tailwind CSS with custom components
+- **UI Components**: Radix UI primitives
+- **State Management**: Jotai
+- **Data Fetching**: TanStack Query
+- **Forms**: React Hook Form with Zod validation
+
+### DevOps & Deployment
+
+- **Monorepo**: Nx workspace
+- **Deployment**: Serverless Framework
+- **Testing**: Jest with React Testing Library
+- **Linting**: ESLint with TypeScript support
+- **Bundling**: Vite for frontend, Webpack for backend
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- PostgreSQL
+- Redis
+- AWS Account (S3 & SQS)
+- Google OAuth credentials
+
+### Installation
+
+1. **Clone the repository**
+
+   ```bash
+   git clone <repository-url>
+   cd KeepCloud
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+   npm install
+   ```
+
+3. **Environment Setup**
+
+   ```bash
+   # Copy environment template
+   cp .env.example .env
+
+   # Configure your environment variables
+   # - Database connection
+   # - AWS credentials
+   # - Google OAuth keys
+   # - Redis connection
+   ```
+
+4. **Database Setup**
+
+   ```bash
+   # Run migrations
+   npx prisma migrate dev
+
+   # Seed the database
+   npx prisma db seed
+   ```
+
+## 🏃‍♂️ Development
+
+### Start Development Servers
+
+**Backend API:**
+
+```bash
 npx nx serve api
 ```
 
-To create a production bundle:
+**Frontend Web App:**
 
-```sh
+```bash
+npx nx serve web
+```
+
+**View All Available Tasks:**
+
+```bash
+npx nx show project api
+npx nx show project web
+```
+
+### Building for Production
+
+**Build API:**
+
+```bash
 npx nx build api
 ```
 
-To see all available targets to run for a project, run:
+**Build Web App:**
 
-```sh
-npx nx show project api
+```bash
+npx nx build web
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+### Testing
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+**Run All Tests:**
 
-## Add new projects
-
-While you could add new projects to your workspace manually, you might want to leverage [Nx plugins](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) and their [code generation](https://nx.dev/features/generate-code?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) feature.
-
-Use the plugin's generator to create new projects.
-
-To generate a new application, use:
-
-```sh
-npx nx g @nx/nest:app demo
+```bash
+npx nx test
 ```
 
-To generate a new library, use:
+**Run Specific Project Tests:**
 
-```sh
-npx nx g @nx/node:lib mylib
+```bash
+npx nx test core-services
+npx nx test web
 ```
 
-You can use `npx nx list` to get a list of installed plugins. Then, run `npx nx list <plugin-name>` to learn about more specific capabilities of a particular plugin. Alternatively, [install Nx Console](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) to browse plugins and generators in your IDE.
+### Database Operations
 
-[Learn more about Nx plugins &raquo;](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) | [Browse the plugin registry &raquo;](https://nx.dev/plugin-registry?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+**Generate Prisma Client:**
 
-## Set up CI!
-
-### Step 1
-
-To connect to Nx Cloud, run the following command:
-
-```sh
-npx nx connect
+```bash
+npx prisma generate
 ```
 
-Connecting to Nx Cloud ensures a [fast and scalable CI](https://nx.dev/ci/intro/why-nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
+**Run Migrations:**
 
-- [Remote caching](https://nx.dev/ci/features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task distribution across multiple machines](https://nx.dev/ci/features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Automated e2e test splitting](https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task flakiness detection and rerunning](https://nx.dev/ci/features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-### Step 2
-
-Use the following command to configure a CI workflow for your workspace:
-
-```sh
-npx nx g ci-workflow
+```bash
+npx prisma migrate dev
 ```
 
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+**View Database:**
 
-## Install Nx Console
+```bash
+npx prisma studio
+```
 
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
+## 📊 Project Structure
 
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+```
+KeepCloud/
+├── apps/
+│   ├── api/                    # NestJS Backend API
+│   ├── api-e2e/               # End-to-end tests for API
+│   └── web/                   # React Frontend Application
+├── libs/
+│   ├── commons/               # Shared utilities and constants
+│   │   └── backend/           # Backend-specific common utilities
+│   ├── core/
+│   │   ├── db/                # Database layer (Prisma/TypeORM)
+│   │   ├── services/          # Business logic services
+│   │   └── web/react/         # React-specific utilities
+│   ├── files/api/             # File management API
+│   ├── iam/api/               # Identity & Access Management
+│   ├── processors/            # Background job processors
+│   └── storage/api/           # Storage-specific API endpoints
+└── scripts/                   # Build and deployment scripts
+```
 
-## Useful links
+## 🔧 Key Components
 
-Learn more:
+### Storage System
 
-- [Learn more about this workspace setup](https://nx.dev/nx-api/nest?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+- **Nested Set Model**: Efficient hierarchical file/folder organization
+- **S3 Integration**: Secure cloud storage with presigned URLs
+- **File Processing**: Background jobs for file operations
+- **Trash Management**: Soft delete with restoration capabilities
 
-And join the Nx community:
+### Authentication & Security
 
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+- **Google OAuth**: Secure authentication flow
+- **JWT Tokens**: Stateless session management
+- **User Storage Limits**: Configurable storage quotas
+- **File Access Control**: Secure file sharing and permissions
+
+### Background Processing
+
+- **Queue System**: Redis-backed job processing with BullMQ
+- **File Operations**: Async file uploads, moves, and deletions
+- **Storage Cleanup**: Automated cleanup of orphaned files
+- **Tag Management**: Automatic file metadata extraction
+
+## 🚀 Deployment
+
+### Serverless Deployment (AWS)
+
+The API is configured for serverless deployment using the Serverless Framework:
+
+```bash
+# Deploy to staging
+serverless deploy --stage staging
+
+# Deploy to production
+serverless deploy --stage production
+```
+
+### Environment Configuration
+
+Required environment variables:
+
+```env
+# Database
+DATABASE_URL="postgresql://..."
+
+# AWS
+AWS_ACCESS_KEY_ID="..."
+AWS_SECRET_ACCESS_KEY="..."
+AWS_REGION="us-east-1"
+FILE_BUCKET="keepcloud-files"
+SQS_QUEUE_URL="..."
+
+# Authentication
+GOOGLE_CLIENT_ID="..."
+GOOGLE_CLIENT_SECRET="..."
+JWT_SECRET="..."
+
+# Redis
+REDIS_URL="redis://..."
+
+# Application
+LOG_LEVEL="info"
+NODE_ENV="production"
+```
+
+### Docker Support
+
+```bash
+# Start services with Docker Compose
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+```
+
+## 📈 Monitoring & Logging
+
+- **Structured Logging**: Winston-based logging with multiple transports
+- **Error Tracking**: Comprehensive error handling and reporting
+- **Performance Monitoring**: Built-in metrics and health checks
+- **Queue Monitoring**: Job processing status and failure handling
+
+## 🧪 Testing Strategy
+
+- **Unit Tests**: Jest for service and utility testing
+- **Integration Tests**: API endpoint testing
+- **E2E Tests**: Full application flow testing
+- **Component Tests**: React component testing with Testing Library
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📝 API Documentation
+
+### Core Endpoints
+
+**Authentication:**
+
+- `POST /auth/google` - Google OAuth login
+- `POST /auth/refresh` - Refresh JWT token
+- `GET /auth/profile` - Get user profile
+
+**Storage:**
+
+- `GET /storage/my-storage` - Get user's root files/folders
+- `GET /storage/trash` - Get trashed items
+- `POST /storage/resources/:id/trash` - Move to trash
+- `POST /storage/resources/:id/restore` - Restore from trash
+- `PATCH /storage/resources/:id/rename` - Rename file/folder
+
+**Files:**
+
+- `POST /files/presigned-post` - Get upload URL
+- `POST /files` - Create file record
+- `GET /files/:id/download` - Download file
+- `DELETE /files/:id` - Delete file
+
+## 🔐 Security Features
+
+- **Input Validation**: Zod schemas for all API inputs
+- **SQL Injection Protection**: Prisma ORM with parameterized queries
+- **File Upload Security**: Presigned URLs and content type validation
+- **CORS Configuration**: Proper cross-origin resource sharing setup
+
+## 📚 Additional Resources
+
+- [Nx Documentation](https://nx.dev) - Monorepo management
+- [NestJS Documentation](https://nestjs.com) - Backend framework
+- [React Router Documentation](https://reactrouter.com) - Frontend routing
+- [Prisma Documentation](https://prisma.io) - Database ORM
+- [AWS S3 Documentation](https://docs.aws.amazon.com/s3/) - Cloud storage
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+<div align="center">
+  <p>Built with ❤️ using modern web technologies</p>
+</div>
