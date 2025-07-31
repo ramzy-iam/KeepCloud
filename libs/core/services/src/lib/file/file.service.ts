@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { File, FileRepository, FileType } from '@keepcloud/core/db';
+import { File, FileRepository, FileType, Prisma } from '@keepcloud/core/db';
 import {
   CreateFileDto,
   FileAncestorDto,
   PresignedGetResultDto,
-  PresignedPostResultDto,
 } from '@keepcloud/commons/dtos';
 import {
   AppConfigService,
@@ -16,7 +15,6 @@ import {
   Logger,
   S3Helper,
 } from '@keepcloud/commons/backend';
-import { Prisma } from '@prisma/client';
 import { BaseFileService } from './base-file-service';
 import { FileHelper } from '@keepcloud/commons/helpers';
 import { UserService } from '../user';
@@ -49,12 +47,12 @@ export class FileService extends BaseFileService {
     dto: CreateFileDto,
   ): Promise<File & { ancestors: FileAncestorDto[] }> {
     let parentId = dto.parentId || null;
-    if (!parentId) {
+    if (!parentId || FileHelper.isSystemFile(parentId)) {
       const root = await this.fileRepository.getRootFolder();
       parentId = root.id;
     }
 
-    await this.validateParentFolder(dto.parentId);
+    await this.validateParentFolder(parentId);
     await this.validateFileExistsInStorage(dto.storagePath);
 
     const { name, format } = FileHelper.splitNameAndFormat(dto.filename);
