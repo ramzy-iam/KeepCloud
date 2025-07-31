@@ -1,5 +1,4 @@
 import { PrismaClient } from '@prisma/client';
-import { Logger } from '@keepcloud/commons/backend';
 const prisma = new PrismaClient();
 
 async function main() {
@@ -30,12 +29,12 @@ async function main() {
         },
       ],
     });
-    Logger.info('Subscription plans seeded');
+    console.info('Subscription plans seeded');
   } else {
     console.log('Subscription plans already exist, skipping seed.');
   }
 }
 
 main()
-  .catch(Logger.error)
+  .catch(console.error)
   .finally(() => prisma.$disconnect());
