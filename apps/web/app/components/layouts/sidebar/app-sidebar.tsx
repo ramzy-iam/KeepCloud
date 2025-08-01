@@ -19,6 +19,7 @@ import {
   SidebarOverviewIcon,
 } from './icons';
 import { RootTree } from './menus/file-tree';
+import { Zap } from 'lucide-react';
 
 const SidebarItems = [
   {
@@ -96,9 +97,53 @@ export function AppSidebar({ user }: Readonly<AppSidebarProps>) {
               {(open || openMobile) && <SidebarTrigger />}
             </div>
 
-            <div className="relative flex h-full w-[267px] flex-col gap-8 border-0 border-x border-section-border p-6">
+            <div className="relative flex h-full w-[267px] flex-col gap-8 border-0 border-x border-section-border bg-red-600 p-6">
               <UserProfileIcon user={user} />
-              <div className="h-full overflow-auto">{activeContent}</div>
+              <div className="flex h-full flex-col justify-between overflow-auto">
+                {activeContent}
+                <div className="flex h-[140px] w-[219px] flex-col gap-3 border-2 border-primary p-4">
+                  <div className="flex items-center justify-between text-14-semibold">
+                    <span>Available Storage</span>
+                    <span>50%</span>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <div className="h-[8px] rounded-[20px] bg-white">
+                      <div
+                        className="h-full rounded-[20px] bg-primary"
+                        style={{ width: '50%' }}
+                      ></div>
+                    </div>
+                    <div className="flex items-center justify-between text-12-semibold">
+                      <span>
+                        50GB used <span>of 100GB</span>
+                      </span>
+                      <span>See details</span>
+                    </div>
+                  </div>
+                  <Button variant="primary">
+                    <span className="flex items-center gap-2">
+                      <svg
+                        width="17"
+                        height="16"
+                        viewBox="0 0 17 16"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M9.16723 1.33301L3.22953 8.45824C2.99699 8.73729 2.88072 8.87681 2.87894 8.99465C2.8774 9.09709 2.92305 9.19454 3.00273 9.25894C3.09439 9.33301 3.27601 9.33301 3.63925 9.33301H8.50056L7.83389 14.6663L13.7716 7.54111C14.0041 7.26206 14.1204 7.12254 14.1222 7.0047C14.1237 6.90226 14.0781 6.8048 13.9984 6.74041C13.9067 6.66634 13.7251 6.66634 13.3619 6.66634H8.50056L9.16723 1.33301Z"
+                          fill="white"
+                          stroke="white"
+                          stroke-width="0.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+
+                      <span className="text-14-medium">Upgrade</span>
+                    </span>
+                  </Button>
+                </div>
+              </div>
             </div>
           </SidebarGroupContent>
         </SidebarGroup>
