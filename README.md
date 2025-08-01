@@ -12,6 +12,8 @@
 
 KeepCloud is a modern, scalable cloud storage platform that provides secure file management, sharing, and organization capabilities. Built with a microservices architecture using NestJS for the backend and React for the frontend, all orchestrated within an Nx monorepo.
 
+🌐 **Live Application**: [Try KeepCloud Now - Your Modern Cloud Storage Solution](https://dl6cfmxnx2fqe.cloudfront.net)
+
 ### ✨ Key Features
 
 - **📁 File Management**: Upload, organize, and manage files with nested folder structures
