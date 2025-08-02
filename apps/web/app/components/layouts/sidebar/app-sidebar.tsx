@@ -73,8 +73,8 @@ export function AppSidebar({ user, userStorage }: Readonly<AppSidebarProps>) {
   return (
     <>
       <Sidebar className="border-0 border-r-1 border-section-border">
-        <SidebarContent className="h-full overflow-hidden">
-          <SidebarGroup className="h-full py-0">
+        <SidebarContent className="h-full overflow-hidden p-0">
+          <SidebarGroup className="h-full px-0 py-0">
             <SidebarGroupContent className="flex h-full">
               <div className="flex h-full w-[88px] flex-col items-center justify-between p-6 text-foreground">
                 <div className="flex h-full flex-col items-center gap-y-6">
