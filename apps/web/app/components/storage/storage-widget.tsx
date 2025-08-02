@@ -35,6 +35,11 @@ export function StorageWidget({
   }
 
   const usagePercentage = Math.round((usedStorage / totalStorage) * 100);
+  const { used, total } = FileHelper.formatStorageConsistent(
+    usedStorage,
+    totalStorage,
+    usedStorage >= FileHelper.convertToBytes(10, 'MB') ? 0 : 1,
+  );
 
   return (
     <div
@@ -82,13 +87,9 @@ export function StorageWidget({
         {/* Storage Details */}
         <div className="flex flex-wrap items-center justify-between text-12-medium text-neutral-500 dark:text-white-light">
           <span>
-            {FileHelper.formatBytes(
-              usedStorage,
-              usedStorage >= FileHelper.convertToBytes(10, 'MB') ? 0 : 1,
-            )}{' '}
-            used{' '}
+            {used} used{' '}
             <span className="text-12 text-neutral-400 dark:text-neutral-200">
-              of {FileHelper.formatBytes(totalStorage, 0)}
+              of {total}
             </span>
           </span>
           {onSeeDetails && (
@@ -96,7 +97,7 @@ export function StorageWidget({
               onClick={onSeeDetails}
               className="hover:text-primary-600 cursor-pointer text-12 text-heading transition-colors"
             >
-              See details
+              Details
             </button>
           )}
         </div>
