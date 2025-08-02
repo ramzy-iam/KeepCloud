@@ -1,5 +1,10 @@
-import { useMutation } from '@tanstack/react-query';
-import { FolderFilterDto, FileMinViewDto } from '@keepcloud/commons/dtos';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  FolderFilterDto,
+  FileMinViewDto,
+  UserStorageDto,
+  StorageBreakdownDto,
+} from '@keepcloud/commons/dtos';
 import { StorageService, ApiError } from '../services';
 import { SYSTEM_FILE } from '@keepcloud/commons/constants';
 import { useGetActiveFolder } from './folder.hook';
@@ -136,21 +141,52 @@ export const useMoveToTrash = ({ parentId }: { parentId: string }) => {
 
 export const useRestoreResource = () => {
   const { removeItem } = useFileListUpdater(SYSTEM_FILE.TRASH.id);
+  const refreshStorageData = useRefreshStorageData();
   return useMutation<FileMinViewDto, ApiError, string>({
     mutationFn: (id) => StorageService.restore(id),
     onSuccess: (_, id) => {
       removeItem(id);
+      refreshStorageData();
     },
   });
 };
 
 export const useDeletePermanently = () => {
   const { removeItem } = useFileListUpdater(SYSTEM_FILE.TRASH.id);
+  const refreshStorageData = useRefreshStorageData();
   return useMutation<FileMinViewDto, ApiError, string>({
     mutationFn: (id) => StorageService.deletePermanently(id),
     onSuccess: (_, id) => {
       removeItem(id);
       updateFileEverywhere(id, () => null);
+      refreshStorageData();
     },
   });
+};
+
+export const useGetUserStorage = () => {
+  return useQuery<UserStorageDto, ApiError>({
+    queryKey: ['storage', 'usage'],
+    queryFn: () => StorageService.getUserStorage(),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
+  });
+};
+
+export const useGetStorageBreakdown = () => {
+  return useQuery<StorageBreakdownDto, ApiError>({
+    queryKey: ['storage', 'breakdown'],
+    queryFn: () => StorageService.getStorageBreakdown(),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
+  });
+};
+
+export const useRefreshStorageData = () => {
+  const queryClient = useQueryClient();
+
+  return () => {
+    queryClient.invalidateQueries({ queryKey: ['storage', 'usage'] });
+    queryClient.invalidateQueries({ queryKey: ['storage', 'breakdown'] });
+  };
 };
