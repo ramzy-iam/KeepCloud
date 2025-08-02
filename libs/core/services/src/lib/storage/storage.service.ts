@@ -225,7 +225,6 @@ export class StorageService {
         ownerId: userId,
         type: 'FILE',
         deletedAt: null,
-        trashedAt: null,
       },
       _sum: {
         size: true,
