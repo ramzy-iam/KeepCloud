@@ -204,7 +204,7 @@ export class FileService extends BaseFileService {
   ): Promise<void> {
     const remainingStorage =
       await this.userService.getRemainingStorage(ownerId);
-    if (remainingStorage < size) {
+    if (remainingStorage < BigInt(size)) {
       throw new InsufficientStorageException();
     }
   }
@@ -266,31 +266,5 @@ export class FileService extends BaseFileService {
         ...ancestors,
       ],
     };
-  }
-
-  async deleteFileOnStorage(
-    ownerId: string,
-    left: number,
-    right: number,
-  ): Promise<void> {
-    const filesToDelete = await this.fileRepository.prisma.file.findMany({
-      where: {
-        ownerId,
-        left: { gte: left },
-        right: { lte: right },
-        // assuming you have a 'type' or 'isFolder' flag
-        isFolder: false, // or type: FileType.FILE
-        deletedAt: { not: null }, // optionally ensure they're marked deleted
-      },
-      select: { id: true, storagePath: true },
-    });
-
-    for (const file of filesToDelete) {
-      await this.systemQueueService.enqueueDeleteFileFromStorage({
-        ownerId,
-        fileId: file.id,
-        storagePath: file.storagePath as string,
-      });
-    }
   }
 }
