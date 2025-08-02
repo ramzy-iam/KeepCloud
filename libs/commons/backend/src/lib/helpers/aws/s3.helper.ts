@@ -3,6 +3,7 @@ import {
   PutObjectCommand,
   GetObjectCommand,
   DeleteObjectCommand,
+  DeleteObjectsCommand,
   HeadObjectCommand,
   PutObjectCommandInput,
   _Object,
@@ -412,6 +413,78 @@ export class S3Helper extends AwsServiceHelper<S3Client> {
         error: (error as Error).message,
       });
       throw new Error(`Delete failed: ${(error as Error).message}`);
+    }
+  }
+
+  /**
+   * Delete multiple files from S3 in a single batch operation (up to 1000 files)
+   * @param bucket - The bucket name
+   * @param keys - Array of S3 keys to delete
+   * @returns Results with successful and failed deletions
+   */
+  async deleteMultipleFiles(
+    bucket: string,
+    keys: string[],
+  ): Promise<{
+    successfulDeletes: string[];
+    errors: Array<{ key: string; code?: string; message?: string }>;
+  }> {
+    this.logger.debug('Deleting multiple files from S3', {
+      bucket,
+      fileCount: keys.length,
+    });
+
+    if (keys.length === 0) {
+      return { successfulDeletes: [], errors: [] };
+    }
+
+    if (keys.length > 1000) {
+      throw new Error('Cannot delete more than 1000 objects in a single batch');
+    }
+
+    try {
+      const command = new DeleteObjectsCommand({
+        Bucket: bucket,
+        Delete: {
+          Objects: keys.map((key) => ({ Key: key })),
+          Quiet: false, // Return info about both successful and failed deletes
+        },
+      });
+
+      const result = await this.client.send(command);
+
+      const successfulDeletes =
+        result.Deleted?.map((obj) => obj.Key).filter(
+          (key): key is string => typeof key === 'string',
+        ) || [];
+      const errors =
+        result.Errors?.map((error) => ({
+          key: error.Key!,
+          code: error.Code,
+          message: error.Message,
+        })) || [];
+
+      this.logger.debug('Batch delete completed', {
+        bucket,
+        successful: successfulDeletes.length,
+        failed: errors.length,
+      });
+
+      if (errors.length > 0) {
+        this.logger.warn('Some files failed to delete', {
+          bucket,
+          failedFiles: errors,
+        });
+      }
+
+      return { successfulDeletes, errors };
+    } catch (error) {
+      this.logger.error('Failed to delete multiple files', {
+        bucket,
+        fileCount: keys.length,
+        error: (error as Error).message,
+      });
+      throw new Error(`Batch delete failed: ${(error as Error).message}`);
     }
   }
 

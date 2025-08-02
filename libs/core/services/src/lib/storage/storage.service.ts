@@ -150,17 +150,11 @@ export class StorageService {
       });
     }
 
-    const filesToDelete = await this.getFilesUnderNode(id, deleted.ownerId);
-
-    await Promise.all(
-      filesToDelete.map((file) =>
-        this.queueService.enqueueDeleteFileFromStorage({
-          ownerId: file.ownerId,
-          fileId: file.id,
-          storagePath: file.storagePath as string,
-        }),
-      ),
-    );
+    // delete all files under this node including the node itself
+    await this.queueService.enqueueDeleteFileAndChildrenFromStorage({
+      ownerId: deleted.ownerId,
+      fileId: id,
+    });
 
     await this.queueService.enqueueNestedSetDeleteNode({
       nodeId: id,
@@ -187,7 +181,7 @@ export class StorageService {
     return restored;
   }
 
-  private async getFilesUnderNode(nodeId: string, ownerId: string) {
+  async getFilesUnderNode(nodeId: string, ownerId: string) {
     const node = await this.fileRepository.prisma.file.findUnique({
       where: { id: nodeId },
       select: { left: true, right: true },
