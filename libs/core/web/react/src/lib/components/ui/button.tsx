@@ -21,6 +21,8 @@ const buttonVariants = cva(
           'border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground',
 
         ghost: 'hover:bg-accent hover:text-accent-foreground',
+        primaryDark:
+          'text-white bg-primary-dark-gradient border-[#020202] shadow-[0_4px_8px_0_rgba(0,0,0,0.16)] ',
       },
 
       size: {
