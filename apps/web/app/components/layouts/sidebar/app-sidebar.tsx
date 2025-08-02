@@ -20,8 +20,7 @@ import {
   SidebarOverviewIcon,
 } from './icons';
 import { RootTree } from './menus/file-tree';
-import { StorageWidget } from './storage-widget';
-import { StorageDetailsModal } from './storage-details-modal';
+import { StorageDetailsModal, StorageWidget } from '../../storage';
 import { useState } from 'react';
 
 const SidebarItems = [
@@ -57,6 +56,7 @@ export function AppSidebar({ user }: Readonly<AppSidebarProps>) {
     data: storageData,
     isLoading: storageLoading,
     error: storageError,
+    refetch: refetchStorage,
   } = useGetUserStorage();
 
   // Default storage values if data is not loaded
@@ -136,6 +136,8 @@ export function AppSidebar({ user }: Readonly<AppSidebarProps>) {
                     onUpgrade={handleUpgrade}
                     onSeeDetails={handleSeeDetails}
                     isLoading={storageLoading}
+                    error={!!storageError}
+                    onRetry={() => refetchStorage()}
                     className="mx-6 mb-6"
                   />
                 </div>

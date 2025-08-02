@@ -1,6 +1,7 @@
 import { Button, cn, useTheme } from '@keepcloud/web-core/react';
 import { FileHelper } from '@keepcloud/commons/helpers';
 import { StorageWidgetSkeleton } from './storage-widget-skeleton';
+import { StorageWidgetError } from './storage-widget-error';
 
 interface StorageWidgetProps {
   usedStorage: number;
@@ -9,6 +10,8 @@ interface StorageWidgetProps {
   onSeeDetails?: () => void;
   className?: string;
   isLoading?: boolean;
+  error?: boolean;
+  onRetry?: () => void;
 }
 
 export function StorageWidget({
@@ -18,8 +21,14 @@ export function StorageWidget({
   onSeeDetails,
   className = '',
   isLoading = false,
+  error = false,
+  onRetry,
 }: StorageWidgetProps) {
   const { isDarkMode } = useTheme();
+
+  if (error) {
+    return <StorageWidgetError onRetry={onRetry} className={className} />;
+  }
 
   if (isLoading) {
     return <StorageWidgetSkeleton className={className} />;
