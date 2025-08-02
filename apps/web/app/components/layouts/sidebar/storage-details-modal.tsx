@@ -5,8 +5,17 @@ import {
   DialogHeader,
   DialogTitle,
   Button,
+  useGetStorageBreakdown,
 } from '@keepcloud/web-core/react';
-import { HardDrive, Files, Image, Video, Music, FileText } from 'lucide-react';
+import {
+  HardDrive,
+  Files,
+  Image,
+  Video,
+  Music,
+  FileText,
+  Loader2,
+} from 'lucide-react';
 import { FileHelper } from '@keepcloud/commons/helpers';
 
 interface StorageDetailsModalProps {
@@ -14,13 +23,6 @@ interface StorageDetailsModalProps {
   onClose: () => void;
   usedStorage: number;
   totalStorage: number;
-  storageBreakdown?: {
-    images: number;
-    videos: number;
-    documents: number;
-    audio: number;
-    other: number;
-  };
 }
 
 export function StorageDetailsModal({
@@ -28,48 +30,85 @@ export function StorageDetailsModal({
   onClose,
   usedStorage,
   totalStorage,
-  storageBreakdown,
 }: StorageDetailsModalProps) {
+  const { data: breakdownData, isLoading, error } = useGetStorageBreakdown();
   const usagePercentage = Math.round((usedStorage / totalStorage) * 100);
   const availableStorage = totalStorage - usedStorage;
 
-  // Default breakdown if not provided
-  const breakdown = storageBreakdown ?? {
-    images: usedStorage * 0.4,
-    videos: usedStorage * 0.3,
-    documents: usedStorage * 0.2,
-    audio: usedStorage * 0.05,
-    other: usedStorage * 0.05,
+  // Default breakdown if not provided or loading
+  const breakdown = breakdownData ?? {
+    images: {
+      type: 'images',
+      size: Math.round(usedStorage * 0.4),
+      percentage: 40,
+      count: 0,
+    },
+    videos: {
+      type: 'videos',
+      size: Math.round(usedStorage * 0.3),
+      percentage: 30,
+      count: 0,
+    },
+    documents: {
+      type: 'documents',
+      size: Math.round(usedStorage * 0.2),
+      percentage: 20,
+      count: 0,
+    },
+    audio: {
+      type: 'audio',
+      size: Math.round(usedStorage * 0.05),
+      percentage: 5,
+      count: 0,
+    },
+    other: {
+      type: 'other',
+      size: Math.round(usedStorage * 0.05),
+      percentage: 5,
+      count: 0,
+    },
+    totalFiles: 0,
+    totalSize: usedStorage,
   };
 
   const storageItems = [
     {
       label: 'Images',
-      value: breakdown.images,
+      value: breakdown.images.size,
+      count: breakdown.images.count,
+      percentage: breakdown.images.percentage,
       icon: Image,
       color: 'bg-blue-500',
     },
     {
       label: 'Videos',
-      value: breakdown.videos,
+      value: breakdown.videos.size,
+      count: breakdown.videos.count,
+      percentage: breakdown.videos.percentage,
       icon: Video,
       color: 'bg-red-500',
     },
     {
       label: 'Documents',
-      value: breakdown.documents,
+      value: breakdown.documents.size,
+      count: breakdown.documents.count,
+      percentage: breakdown.documents.percentage,
       icon: FileText,
       color: 'bg-green-500',
     },
     {
       label: 'Audio',
-      value: breakdown.audio,
+      value: breakdown.audio.size,
+      count: breakdown.audio.count,
+      percentage: breakdown.audio.percentage,
       icon: Music,
       color: 'bg-yellow-500',
     },
     {
       label: 'Other',
-      value: breakdown.other,
+      value: breakdown.other.size,
+      count: breakdown.other.count,
+      percentage: breakdown.other.percentage,
       icon: Files,
       color: 'bg-gray-500',
     },
@@ -114,34 +153,67 @@ export function StorageDetailsModal({
 
           {/* Storage Breakdown */}
           <div className="space-y-3">
-            <h4 className="text-sm font-medium">Storage Breakdown</h4>
-            <div className="space-y-2">
-              {storageItems.map((item) => {
-                const percentage = Math.round((item.value / usedStorage) * 100);
-                const Icon = item.icon;
-
-                return (
+            <h4 className="text-sm font-medium">
+              Storage Breakdown
+              {isLoading && (
+                <span className="ml-2 flex items-center gap-1 text-xs text-muted-foreground">
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  Loading...
+                </span>
+              )}
+            </h4>
+            {isLoading ? (
+              <div className="space-y-2">
+                {Array.from({ length: 5 }).map((_, index) => (
                   <div
-                    key={item.label}
+                    key={index}
                     className="flex items-center justify-between"
                   >
                     <div className="flex items-center gap-2">
-                      <div className={`h-3 w-3 rounded-full ${item.color}`} />
-                      <Icon className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">{item.label}</span>
+                      <div className="h-3 w-3 animate-pulse rounded-full bg-gray-200" />
+                      <div className="h-4 w-4 animate-pulse rounded bg-gray-200" />
+                      <div className="h-4 w-16 animate-pulse rounded bg-gray-200" />
                     </div>
                     <div className="text-right">
-                      <div className="text-sm font-medium">
-                        {FileHelper.formatBytes(item.value)}
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {percentage}%
-                      </div>
+                      <div className="mb-1 h-4 w-12 animate-pulse rounded bg-gray-200" />
+                      <div className="h-3 w-8 animate-pulse rounded bg-gray-200" />
                     </div>
                   </div>
-                );
-              })}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {storageItems.map((item) => {
+                  const Icon = item.icon;
+
+                  return (
+                    <div
+                      key={item.label}
+                      className="flex items-center justify-between"
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className={`h-3 w-3 rounded-full ${item.color}`} />
+                        <Icon className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm">{item.label}</span>
+                        {item.count > 0 && (
+                          <span className="text-xs text-muted-foreground">
+                            ({item.count} files)
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm font-medium">
+                          {FileHelper.formatBytes(item.value)}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {item.percentage}%
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* Actions */}

@@ -8,6 +8,7 @@ import {
   SidebarTrigger,
   cn,
   useSidebar,
+  useGetUserStorage,
 } from '@keepcloud/web-core/react';
 import { UserProfileIcon } from '../../user';
 import { UserProfileDto } from '@keepcloud/commons/dtos';
@@ -40,13 +41,9 @@ const contents = [<HomeMenu />, <RootTree />];
 
 interface AppSidebarProps {
   user: UserProfileDto;
-  userStorage?: {
-    used: number;
-    total: number;
-  };
 }
 
-export function AppSidebar({ user, userStorage }: Readonly<AppSidebarProps>) {
+export function AppSidebar({ user }: Readonly<AppSidebarProps>) {
   const location = useLocation();
   const activeTabIndex = SidebarItems.findIndex((item) =>
     location.pathname.startsWith(item.url),
@@ -55,10 +52,19 @@ export function AppSidebar({ user, userStorage }: Readonly<AppSidebarProps>) {
   const { open, openMobile } = useSidebar();
   const [showStorageDetails, setShowStorageDetails] = useState(false);
 
-  // Default storage values if not provided
-  const storage = userStorage ?? {
-    used: 53687091200, // 50GB in bytes
-    total: 107374182400, // 100GB in bytes
+  // Fetch user storage data
+  const {
+    data: storageData,
+    isLoading: storageLoading,
+    error: storageError,
+  } = useGetUserStorage();
+
+  // Default storage values if data is not loaded
+  const storage = storageData ?? {
+    usedStorage: 0,
+    totalStorage: 107374182400, // 100GB in bytes
+    usagePercentage: 0,
+    planName: 'Free',
   };
 
   const handleUpgrade = () => {
@@ -125,10 +131,11 @@ export function AppSidebar({ user, userStorage }: Readonly<AppSidebarProps>) {
                 <div className="flex h-full flex-col justify-between overflow-auto">
                   <div className="px-6">{activeContent}</div>
                   <StorageWidget
-                    usedStorage={storage.used}
-                    totalStorage={storage.total}
+                    usedStorage={storage.usedStorage}
+                    totalStorage={storage.totalStorage}
                     onUpgrade={handleUpgrade}
                     onSeeDetails={handleSeeDetails}
+                    isLoading={storageLoading}
                     className="mx-6 mb-6"
                   />
                 </div>
@@ -141,8 +148,8 @@ export function AppSidebar({ user, userStorage }: Readonly<AppSidebarProps>) {
       <StorageDetailsModal
         isOpen={showStorageDetails}
         onClose={() => setShowStorageDetails(false)}
-        usedStorage={storage.used}
-        totalStorage={storage.total}
+        usedStorage={storage.usedStorage}
+        totalStorage={storage.totalStorage}
       />
     </>
   );

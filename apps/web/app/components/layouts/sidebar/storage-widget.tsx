@@ -1,4 +1,4 @@
-import { Button, cn, useTheme } from '@keepcloud/web-core/react';
+import { Button, cn, useTheme, Skeleton } from '@keepcloud/web-core/react';
 import { Zap } from 'lucide-react';
 import { FileHelper } from '@keepcloud/commons/helpers';
 
@@ -8,6 +8,7 @@ interface StorageWidgetProps {
   onUpgrade?: () => void;
   onSeeDetails?: () => void;
   className?: string;
+  isLoading?: boolean;
 }
 
 export function StorageWidget({
@@ -16,6 +17,7 @@ export function StorageWidget({
   onUpgrade,
   onSeeDetails,
   className = '',
+  isLoading = false,
 }: StorageWidgetProps) {
   const { isDarkMode } = useTheme();
 
@@ -52,7 +54,9 @@ export function StorageWidget({
       )}
       <div className="flex items-center justify-between text-14-medium text-heading">
         <span>Available Storage</span>
-        <span className="text-14-semibold">{usagePercentage}%</span>
+        <span className="text-14-semibold">
+          {isLoading ? '...' : `${usagePercentage}%`}
+        </span>
       </div>
 
       <div className="flex flex-col gap-2">
@@ -67,12 +71,14 @@ export function StorageWidget({
         {/* Storage Details */}
         <div className="flex flex-wrap items-center justify-between text-12-medium text-neutral-500 dark:text-white-light">
           <span>
-            {FileHelper.formatBytes(usedStorage, 0)} used{' '}
+            {isLoading
+              ? 'Loading...'
+              : `${FileHelper.formatBytes(usedStorage, 0)} used`}{' '}
             <span className="text-12 text-neutral-400 dark:text-neutral-200">
               of {FileHelper.formatBytes(totalStorage, 0)}
             </span>
           </span>
-          {onSeeDetails && (
+          {onSeeDetails && !isLoading && (
             <button
               onClick={onSeeDetails}
               className="hover:text-primary-600 cursor-pointer text-12 text-heading transition-colors"
