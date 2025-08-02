@@ -6,6 +6,7 @@ import { Processor } from '@keepcloud/commons/types';
 import { DeleteNodeProcessor } from './delete-node.processor';
 import { DeleteFileFromStorageProcessor } from './delete-file-from-storage.processor';
 import { RebuildTreeProcessor } from './rebuild-tree.processor';
+import { DeleteFileAndChildrenFromStorageProcessor } from './delete-file-and-children-from-storage.processor';
 
 @Injectable()
 export class ProcessorProvider {
@@ -14,6 +15,7 @@ export class ProcessorProvider {
     private readonly deleteNodeProcessor: DeleteNodeProcessor,
     private readonly deleteFileFromStorageProcessor: DeleteFileFromStorageProcessor,
     private readonly rebuildTreeProcessor: RebuildTreeProcessor,
+    private readonly deleteFileAndChildrenFromStorageProcessor: DeleteFileAndChildrenFromStorageProcessor,
   ) {}
 
   getFromMessage(message: string): Processor {
@@ -28,6 +30,10 @@ export class ProcessorProvider {
         this.deleteFileFromStorageProcessor,
       ],
       [ProcessorAction.NESTED_SET_REBUILD_TREE, this.rebuildTreeProcessor],
+      [
+        ProcessorAction.DELETE_FILE_AND_CHILDREN_FROM_STORAGE,
+        this.deleteFileAndChildrenFromStorageProcessor,
+      ],
     ]);
 
     const processor = processorMap.get(message);

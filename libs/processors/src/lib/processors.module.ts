@@ -1,6 +1,7 @@
 import { Global, Module } from '@nestjs/common';
 import {
   DeleteFileFromStorageProcessor,
+  DeleteFileAndChildrenFromStorageProcessor,
   DeleteNodeProcessor,
   UpdateFileTagInAfterCreateProcessor,
   ProcessorProvider,
@@ -12,6 +13,7 @@ const services = [
   UpdateFileTagInAfterCreateProcessor,
   DeleteNodeProcessor,
   DeleteFileFromStorageProcessor,
+  DeleteFileAndChildrenFromStorageProcessor,
   RebuildTreeProcessor,
 ];
 
