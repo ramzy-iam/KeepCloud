@@ -49,11 +49,19 @@ export class FileHelper {
   }
 
   formatBytes(bytes: number, decimals = 1, forceUnit?: string): string {
-    if (bytes === 0) return '0 B';
-
     const k = 1024;
     const dm = decimals < 0 ? 0 : decimals;
     const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+
+    if (bytes === 0) {
+      if (forceUnit) {
+        const unitIndex = sizes.indexOf(forceUnit.toUpperCase());
+        if (unitIndex !== -1) {
+          return `0 ${sizes[unitIndex]}`;
+        }
+      }
+      return '0 B';
+    }
 
     if (forceUnit) {
       const unitIndex = sizes.indexOf(forceUnit.toUpperCase());
