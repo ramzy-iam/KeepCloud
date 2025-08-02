@@ -43,15 +43,37 @@ export class StorageService {
   }
 
   async getTrashedItems(filters: FolderFilterDto) {
-    const data = await this.fileRepository.scoped
-      .filterByTrashed()
-      .filterByNotDeleted()
-      .joinOwner()
-      .orderBy({ isFolder: 'desc' })
-      .orderBy({ name: filters.order })
-      .getManyPaginated(filters.page, filters.pageSize);
+    // Get trashed items that are top-level (their parent is not trashed)
 
-    const items = data.items.map(async (item) => {
+    const trashedFiles = await this.fileRepository.findManyPaginated(
+      filters.page,
+      filters.pageSize,
+      {
+        where: {
+          trashedAt: { not: null },
+          deletedAt: null,
+          OR: [
+            {
+              parent: {
+                trashedAt: null,
+              },
+            },
+            {
+              parentId: null,
+            },
+          ],
+        },
+        include: {
+          owner: true,
+        },
+        orderBy: [
+          { isFolder: 'desc' }, // folders first
+          { name: filters.order },
+        ],
+      },
+    );
+
+    const items = trashedFiles.items.map(async (item) => {
       const ancestors = await this.fileRepository.getAncestors(item.id);
       return {
         ...item,
@@ -68,7 +90,7 @@ export class StorageService {
     });
 
     return {
-      ...data,
+      ...trashedFiles,
       items: await Promise.all(items),
     };
   }
@@ -115,10 +137,28 @@ export class StorageService {
   }
 
   async moveToTrash(id: string): Promise<File> {
+    await this.fileRepository.scoped
+      .filterById(id)
+      .filterByIsSystem(false)
+      .getOneOrFail();
+
+    const trashedAt = new Date();
     const file = await this.fileRepository.update(
       { id },
-      { trashedAt: new Date(), isSystem: false },
+      { trashedAt, isSystem: false },
     );
+
+    // Mark all files under this node as trashed (cascade)
+    if (this.fileRepository.isFolder(file)) {
+      await this.fileRepository.prisma.file.updateMany({
+        where: {
+          left: { gt: file.left },
+          right: { lt: file.right },
+        },
+        data: { trashedAt },
+      });
+    }
+
     return file;
   }
 
@@ -177,6 +217,14 @@ export class StorageService {
       { id, isSystem: false },
       { trashedAt: null },
     );
+
+    await this.fileRepository.prisma.file.updateMany({
+      where: {
+        left: { gt: restored.left },
+        right: { lt: restored.right },
+      },
+      data: { trashedAt: null },
+    });
 
     return restored;
   }
