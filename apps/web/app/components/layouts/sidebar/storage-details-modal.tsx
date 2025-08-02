@@ -77,7 +77,7 @@ export function StorageDetailsModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <HardDrive className="h-5 w-5" />
@@ -99,9 +99,9 @@ export function StorageDetailsModal({
               </span>
             </div>
 
-            <div className="h-2 overflow-hidden rounded-full bg-muted">
+            <div className="h-2 overflow-hidden rounded-full bg-[#D9D9D9]">
               <div
-                className="h-full bg-primary transition-all duration-300"
+                className="h-full border-[#5749BF] bg-primary-gradient transition-all duration-300"
                 style={{ width: `${usagePercentage}%` }}
               />
             </div>
