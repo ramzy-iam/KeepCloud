@@ -7,16 +7,9 @@ import {
   Button,
   useGetStorageBreakdown,
 } from '@keepcloud/web-core/react';
-import {
-  HardDrive,
-  Files,
-  Image,
-  Video,
-  Music,
-  FileText,
-  Loader2,
-} from 'lucide-react';
+import { HardDrive, Files, Image, Video, Music, FileText } from 'lucide-react';
 import { FileHelper } from '@keepcloud/commons/helpers';
+import { StorageDetailsSkeleton } from './storage-details-skeleton';
 
 interface StorageDetailsModalProps {
   isOpen: boolean;
@@ -31,7 +24,8 @@ export function StorageDetailsModal({
   usedStorage,
   totalStorage,
 }: StorageDetailsModalProps) {
-  const { data: breakdownData, isLoading, error } = useGetStorageBreakdown();
+  const { data: breakdownData } = useGetStorageBreakdown();
+  const isLoading = true; // Simulating loading state for demonstration
   const usagePercentage = Math.round((usedStorage / totalStorage) * 100);
   const availableStorage = totalStorage - usedStorage;
 
@@ -127,61 +121,38 @@ export function StorageDetailsModal({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6">
-          {/* Overall Usage */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Total Usage</span>
-              <span className="text-sm text-muted-foreground">
-                {FileHelper.formatBytes(usedStorage)} of{' '}
-                {FileHelper.formatBytes(totalStorage)}
-              </span>
-            </div>
-
-            <div className="h-2 overflow-hidden rounded-full bg-[#D9D9D9]">
-              <div
-                className="h-full border-[#5749BF] bg-primary-gradient transition-all duration-300"
-                style={{ width: `${usagePercentage}%` }}
-              />
-            </div>
-
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>{usagePercentage}% used</span>
-              <span>{FileHelper.formatBytes(availableStorage)} available</span>
-            </div>
-          </div>
-
-          {/* Storage Breakdown */}
-          <div className="space-y-3">
-            <h4 className="text-sm font-medium">
-              Storage Breakdown
-              {isLoading && (
-                <span className="ml-2 flex items-center gap-1 text-xs text-muted-foreground">
-                  <Loader2 className="h-3 w-3 animate-spin" />
-                  Loading...
+        {isLoading ? (
+          <StorageDetailsSkeleton />
+        ) : (
+          <div className="space-y-6">
+            {/* Overall Usage */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Total Usage</span>
+                <span className="text-sm text-muted-foreground">
+                  {FileHelper.formatBytes(usedStorage)} of{' '}
+                  {FileHelper.formatBytes(totalStorage)}
                 </span>
-              )}
-            </h4>
-            {isLoading ? (
-              <div className="space-y-2">
-                {Array.from({ length: 5 }).map((_, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between"
-                  >
-                    <div className="flex items-center gap-2">
-                      <div className="h-3 w-3 animate-pulse rounded-full bg-gray-200" />
-                      <div className="h-4 w-4 animate-pulse rounded bg-gray-200" />
-                      <div className="h-4 w-16 animate-pulse rounded bg-gray-200" />
-                    </div>
-                    <div className="text-right">
-                      <div className="mb-1 h-4 w-12 animate-pulse rounded bg-gray-200" />
-                      <div className="h-3 w-8 animate-pulse rounded bg-gray-200" />
-                    </div>
-                  </div>
-                ))}
               </div>
-            ) : (
+
+              <div className="h-2 overflow-hidden rounded-full bg-[#D9D9D9]">
+                <div
+                  className="h-full border-[#5749BF] bg-primary-gradient transition-all duration-300"
+                  style={{ width: `${usagePercentage}%` }}
+                />
+              </div>
+
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>{usagePercentage}% used</span>
+                <span>
+                  {FileHelper.formatBytes(availableStorage)} available
+                </span>
+              </div>
+            </div>
+
+            {/* Storage Breakdown */}
+            <div className="space-y-3">
+              <h4 className="text-sm font-medium">Storage Breakdown</h4>
               <div className="space-y-2">
                 {storageItems.map((item) => {
                   const Icon = item.icon;
@@ -213,19 +184,19 @@ export function StorageDetailsModal({
                   );
                 })}
               </div>
-            )}
-          </div>
+            </div>
 
-          {/* Actions */}
-          <div className="flex gap-2 pt-4">
-            <Button variant="outline" onClick={onClose} className="flex-1">
-              Close
-            </Button>
-            <Button variant="primary" className="flex-1">
-              Manage Storage
-            </Button>
+            {/* Actions */}
+            <div className="flex gap-2 pt-4">
+              <Button variant="outline" onClick={onClose} className="flex-1">
+                Close
+              </Button>
+              <Button variant="primary" className="flex-1">
+                Manage Storage
+              </Button>
+            </div>
           </div>
-        </div>
+        )}
       </DialogContent>
     </Dialog>
   );
