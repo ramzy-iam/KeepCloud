@@ -97,7 +97,7 @@ export function AppSidebar({ user }: Readonly<AppSidebarProps>) {
               {(open || openMobile) && <SidebarTrigger />}
             </div>
 
-            <div className="relative flex h-full w-[267px] flex-col gap-8 border-0 border-x border-section-border bg-red-600 p-6">
+            <div className="relative flex h-full w-[267px] flex-col items-start gap-8 border-0 border-x border-section-border p-6">
               <UserProfileIcon user={user} />
               <div className="flex h-full flex-col justify-between overflow-auto">
                 {activeContent}
@@ -109,7 +109,7 @@ export function AppSidebar({ user }: Readonly<AppSidebarProps>) {
                   <div className="flex flex-col gap-2">
                     <div className="h-[8px] rounded-[20px] bg-white">
                       <div
-                        className="h-full rounded-[20px] bg-primary"
+                        className="h-full rounded-[20px] border-[#5749BF] bg-primary-gradient"
                         style={{ width: '50%' }}
                       ></div>
                     </div>
