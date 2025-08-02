@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { File, FileRepository, FileType } from '@keepcloud/core/db';
 import { PaginationDto, FolderFilterDto } from '@keepcloud/commons/dtos';
-import { SYSTEM_FILE } from '@keepcloud/commons/constants';
+import { ErrorCode, SYSTEM_FILE } from '@keepcloud/commons/constants';
 import {
   FileNotFoundException,
   FolderNotFoundException,
@@ -191,5 +191,118 @@ export class StorageService {
     });
 
     return files;
+  }
+
+  async getUserStorageInfo(userId: string) {
+    const user = await this.fileRepository.prisma.user.findFirst({
+      where: { id: userId },
+      include: { plan: true },
+    });
+
+    if (!user) {
+      throw new NotFoundException({
+        message: ErrorCode.USER_NOT_FOUND,
+      });
+    }
+
+    const usagePercentage = Math.round(
+      (Number(user.storageUsed) / Number(user.plan.maxStorage)) * 100,
+    );
+
+    return {
+      usedStorage: Number(user.storageUsed),
+      totalStorage: Number(user.plan.maxStorage),
+      usagePercentage,
+      planName: user.plan.nameKey,
+    };
+  }
+
+  async getStorageBreakdown(userId: string) {
+    // Get all files for the user grouped by content type
+    const fileStats = await this.fileRepository.prisma.file.groupBy({
+      by: ['contentType'],
+      where: {
+        ownerId: userId,
+        type: 'FILE',
+        deletedAt: null,
+        trashedAt: null,
+      },
+      _sum: {
+        size: true,
+      },
+      _count: {
+        id: true,
+      },
+    });
+
+    // Initialize breakdown structure
+    const breakdown = {
+      images: { type: 'images', size: 0, percentage: 0, count: 0 },
+      videos: { type: 'videos', size: 0, percentage: 0, count: 0 },
+      documents: { type: 'documents', size: 0, percentage: 0, count: 0 },
+      audio: { type: 'audio', size: 0, percentage: 0, count: 0 },
+      other: { type: 'other', size: 0, percentage: 0, count: 0 },
+      totalFiles: 0,
+      totalSize: 0,
+    };
+
+    // Process each content type
+    fileStats.forEach((stat) => {
+      const contentType = stat.contentType?.toLowerCase() || '';
+      const size = Number(stat._sum.size || 0);
+      const count = stat._count.id;
+
+      breakdown.totalFiles += count;
+      breakdown.totalSize += size;
+
+      // Categorize by content type
+      if (contentType.startsWith('image/')) {
+        breakdown.images.size += size;
+        breakdown.images.count += count;
+      } else if (contentType.startsWith('video/')) {
+        breakdown.videos.size += size;
+        breakdown.videos.count += count;
+      } else if (contentType.startsWith('audio/')) {
+        breakdown.audio.size += size;
+        breakdown.audio.count += count;
+      } else if (
+        contentType.includes('pdf') ||
+        contentType.includes('document') ||
+        contentType.includes('spreadsheet') ||
+        contentType.includes('presentation') ||
+        contentType.includes('text/') ||
+        contentType.includes('msword') ||
+        contentType.includes('excel') ||
+        contentType.includes('powerpoint') ||
+        contentType.includes('opendocument')
+      ) {
+        breakdown.documents.size += size;
+        breakdown.documents.count += count;
+      } else {
+        breakdown.other.size += size;
+        breakdown.other.count += count;
+      }
+    });
+
+    // Calculate percentages
+    if (breakdown.totalSize > 0) {
+      breakdown.images.percentage = Math.round(
+        (breakdown.images.size / breakdown.totalSize) * 100,
+      );
+      breakdown.videos.percentage = Math.round(
+        (breakdown.videos.size / breakdown.totalSize) * 100,
+      );
+      breakdown.documents.percentage = Math.round(
+        (breakdown.documents.size / breakdown.totalSize) * 100,
+      );
+      breakdown.audio.percentage = Math.round(
+        (breakdown.audio.size / breakdown.totalSize) * 100,
+      );
+      breakdown.other.percentage = Math.round(
+        (breakdown.other.size / breakdown.totalSize) * 100,
+      );
+    }
+
+    return breakdown;
   }
 }

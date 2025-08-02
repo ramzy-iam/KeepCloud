@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { useGetActiveFolder } from './folder.hook';
 import { useFileListUpdater } from './use-file-list-updater.hook';
 import { FileHelper } from '@keepcloud/commons/helpers';
+import { useRefreshStorageData } from './storage.hook';
 
 interface UploadFileProps {
   onProgress?: (progress: number, file: File) => void;
@@ -21,6 +22,7 @@ export const useUploadFile = ({ onProgress }: UploadFileProps) => {
   const { mutateAsync: createFile } = useCreateFile();
   const { activeFolder } = useGetActiveFolder();
   const parentId = activeFolder.id;
+  const refreshStorageData = useRefreshStorageData();
 
   const finalParentId = FileHelper.getValidParentId(parentId);
   const { insertItem } = useFileListUpdater(finalParentId);
@@ -111,6 +113,7 @@ export const useUploadFile = ({ onProgress }: UploadFileProps) => {
     },
     onSuccess: (data, variables) => {
       insertItem(data, 'start');
+      refreshStorageData();
     },
 
     onError: (error, variables) => {
