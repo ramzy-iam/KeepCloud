@@ -8,14 +8,21 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { Serialize, StorageService } from '@keepcloud/core/services';
+import {
+  CurrentUser,
+  Serialize,
+  StorageService,
+} from '@keepcloud/core/services';
 import {
   FileMinViewDto,
   PaginationDto,
   FolderFilterDto,
   RenameFolderDto,
   TrashedFileDto,
+  UserStorageDto,
+  StorageBreakdownDto,
 } from '@keepcloud/commons/dtos';
+import { UserProfileDto } from '@keepcloud/commons/dtos';
 
 @Controller('storage')
 export class StorageController {
@@ -79,5 +86,17 @@ export class StorageController {
   @Serialize(FileMinViewDto)
   delete(@Param('id') id: string) {
     return this.storageService.delete(id);
+  }
+
+  @Get('usage')
+  @Serialize(UserStorageDto)
+  getUserStorage(@CurrentUser() user: UserProfileDto) {
+    return this.storageService.getUserStorageInfo(user.id);
+  }
+
+  @Get('breakdown')
+  @Serialize(StorageBreakdownDto)
+  getStorageBreakdown(@CurrentUser() user: UserProfileDto) {
+    return this.storageService.getStorageBreakdown(user.id);
   }
 }
