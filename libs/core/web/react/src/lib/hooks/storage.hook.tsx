@@ -93,7 +93,7 @@ export const useGetSuggestedFiles = () => {
 export const useGetKeyToInvalidateBasedOnActiveFolder = () => {
   const { activeFolder } = useGetActiveFolder();
   if (activeFolder.isSystem) {
-    return [activeFolder.invalidationKey];
+    return [activeFolder.invalidationKey as string];
   }
   return ['folder', activeFolder.id, 'children'];
 };

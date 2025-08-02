@@ -50,6 +50,12 @@ export const useUploadFile = ({ onProgress }: UploadFileProps) => {
           xhr.setRequestHeader(key, value);
         });
 
+        // Handle abort signal
+        abortController?.signal.addEventListener('abort', () => {
+          xhr.abort();
+          reject(new Error('Upload cancelled'));
+        });
+
         xhr.upload.onprogress = (event) => {
           if (event.lengthComputable) {
             // Progress scaled 5% to 90%
