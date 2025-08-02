@@ -87,6 +87,9 @@ export class UserService {
     return plan.maxStorage - user.storageUsed;
   }
 
+  /**
+   * Fast incremental update for frequent operations (file creation)
+   */
   async updateStorageUsed(userId: string, storageUsed: number) {
     const user = await this.userRepository.scoped
       .filterById(userId)
@@ -96,6 +99,34 @@ export class UserService {
       { id: user.id },
       {
         storageUsed: user.storageUsed + BigInt(storageUsed),
+      },
+    );
+  }
+
+  /**
+   * Accurate recalculation for critical operations (deletion, maintenance)
+   */
+  async syncStorageUsage(userId: string) {
+    // Get actual storage usage from files (including trashed files, excluding permanently deleted files)
+    const result = await this.userRepository.prisma.file.aggregate({
+      where: {
+        ownerId: userId,
+        type: 'FILE',
+        deletedAt: null, // Exclude permanently deleted files
+        size: { gte: 0 },
+      },
+      _sum: {
+        size: true,
+      },
+    });
+
+    const actualStorageUsed = BigInt(result._sum.size || 0);
+
+    // Update user's storage to match actual usage
+    return this.userRepository.update(
+      { id: userId },
+      {
+        storageUsed: actualStorageUsed,
       },
     );
   }

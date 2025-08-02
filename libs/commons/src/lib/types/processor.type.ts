@@ -24,6 +24,11 @@ export interface DeleteFileFromStorageData {
   storagePath: string;
 }
 
+export interface DeleteFileAndChildrenFromStorageData {
+  ownerId: string;
+  fileId: string;
+}
+
 export interface RebuildTreeData {
   userId: string;
 }
