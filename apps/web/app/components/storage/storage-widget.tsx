@@ -82,7 +82,11 @@ export function StorageWidget({
         {/* Storage Details */}
         <div className="flex flex-wrap items-center justify-between text-12-medium text-neutral-500 dark:text-white-light">
           <span>
-            {FileHelper.formatBytes(usedStorage, 0)} used{' '}
+            {FileHelper.formatBytes(
+              usedStorage,
+              usedStorage >= FileHelper.convertToBytes(10, 'MB') ? 0 : 1,
+            )}{' '}
+            used{' '}
             <span className="text-12 text-neutral-400 dark:text-neutral-200">
               of {FileHelper.formatBytes(totalStorage, 0)}
             </span>

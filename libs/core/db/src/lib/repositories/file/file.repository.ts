@@ -55,43 +55,64 @@ export class FileRepository extends BaseRepository<
     trashedBy: 'self' | 'parent' | null;
     isFolder: boolean;
   }> {
-    let currentId: string | null = fileId;
-    let isFolder = false;
+    // First, check the file itself
+    const targetFile = await this.prisma.file.findFirst({
+      where: { id: fileId },
+      select: {
+        id: true,
+        trashedAt: true,
+        parentId: true,
+        isFolder: true,
+      },
+    });
+
+    if (!targetFile) {
+      return { trashed: false, trashedBy: null, isFolder: false };
+    }
+
+    const isFolder = targetFile.isFolder;
+    const isFileTrashed = targetFile.trashedAt !== null;
+
+    // Check parent hierarchy first (priority to parent)
+    let currentId: string | null = targetFile.parentId;
 
     while (currentId) {
-      const file: Pick<
-        File,
-        'id' | 'trashedAt' | 'parentId' | 'isFolder'
-      > | null = await this.prisma.file.findFirst({
+      const parentFile = await this.prisma.file.findFirst({
         where: { id: currentId },
         select: {
           id: true,
           trashedAt: true,
           parentId: true,
-          isFolder: true,
         },
       });
 
-      if (!file) {
-        return { trashed: false, trashedBy: null, isFolder: false };
+      if (!parentFile) {
+        // Parent not found, break the chain
+        break;
       }
 
-      // Capture if the original file is a folder
-      if (file.id === fileId) {
-        isFolder = file.isFolder;
-      }
-
-      if (file.trashedAt !== null) {
+      if (parentFile.trashedAt !== null) {
         return {
           trashed: true,
-          trashedBy: file.id === fileId ? 'self' : 'parent',
+          trashedBy: 'parent',
           isFolder,
         };
       }
 
-      currentId = file.parentId;
+      // Move to next parent
+      currentId = parentFile.parentId;
     }
 
+    // No parent is trashed, check if the file itself is trashed
+    if (isFileTrashed) {
+      return {
+        trashed: true,
+        trashedBy: 'self',
+        isFolder,
+      };
+    }
+
+    // Neither the file nor any parent is trashed
     return { trashed: false, trashedBy: null, isFolder };
   }
 
