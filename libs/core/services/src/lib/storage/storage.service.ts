@@ -8,12 +8,14 @@ import {
   NotFoundException,
 } from '@keepcloud/commons/backend';
 import { SystemQueueService } from '../queues';
+import { UserService } from '../user';
 
 @Injectable()
 export class StorageService {
   constructor(
     private readonly fileRepository: FileRepository,
     private readonly queueService: SystemQueueService,
+    private readonly userService: UserService,
   ) {}
 
   async getRootItems(filters: FolderFilterDto): Promise<PaginationDto<File>> {
@@ -137,6 +139,17 @@ export class StorageService {
       { deletedAt: new Date() },
     );
 
+    //mark all files under this node as deleted
+    if (this.fileRepository.isFolder(deleted)) {
+      await this.fileRepository.prisma.file.updateMany({
+        where: {
+          left: { gte: deleted.left },
+          right: { lte: deleted.right },
+        },
+        data: { deletedAt: new Date() },
+      });
+    }
+
     const filesToDelete = await this.getFilesUnderNode(id, deleted.ownerId);
 
     await Promise.all(
@@ -154,14 +167,24 @@ export class StorageService {
       ownerId: deleted.ownerId,
     });
 
+    // Sync user's storage usage to ensure accuracy
+    await this.userService.syncStorageUsage(deleted.ownerId);
+
     return deleted;
   }
 
-  restore(id: string): Promise<File> {
-    return this.fileRepository.update(
+  async restore(id: string): Promise<File> {
+    await this.fileRepository.scoped
+      .filterById(id)
+      .filterByIsSystem(false)
+      .getOneOrFail();
+
+    const restored = await this.fileRepository.update(
       { id, isSystem: false },
       { trashedAt: null },
     );
+
+    return restored;
   }
 
   private async getFilesUnderNode(nodeId: string, ownerId: string) {
