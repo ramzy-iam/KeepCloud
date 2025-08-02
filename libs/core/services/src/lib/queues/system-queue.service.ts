@@ -8,6 +8,7 @@ import {
   UpdateFileTagInStorageData,
   DeleteNodeData,
   DeleteFileFromStorageData,
+  DeleteFileAndChildrenFromStorageData,
 } from '@keepcloud/commons/types';
 import { Env } from '@keepcloud/commons/backend';
 
@@ -43,6 +44,15 @@ export class SystemQueueService extends AbstractQueueService {
   enqueueDeleteFileFromStorage(data: DeleteFileFromStorageData) {
     return this.sendJob({
       message: ProcessorAction.DELETE_FILE_FROM_STORAGE,
+      data,
+    });
+  }
+
+  enqueueDeleteFileAndChildrenFromStorage(
+    data: DeleteFileAndChildrenFromStorageData,
+  ) {
+    return this.sendJob({
+      message: ProcessorAction.DELETE_FILE_AND_CHILDREN_FROM_STORAGE,
       data,
     });
   }
