@@ -10,6 +10,7 @@ import {
 import { HardDrive, Files, Image, Video, Music, FileText } from 'lucide-react';
 import { FileHelper } from '@keepcloud/commons/helpers';
 import { StorageDetailsSkeleton } from './storage-details-skeleton';
+import { StorageDetailsError } from './storage-details-error';
 
 interface StorageDetailsModalProps {
   isOpen: boolean;
@@ -24,8 +25,12 @@ export function StorageDetailsModal({
   usedStorage,
   totalStorage,
 }: StorageDetailsModalProps) {
-  const { data: breakdownData } = useGetStorageBreakdown();
-  const isLoading = true; // Simulating loading state for demonstration
+  const {
+    data: breakdownData,
+    isLoading,
+    error,
+    refetch,
+  } = useGetStorageBreakdown();
   const usagePercentage = Math.round((usedStorage / totalStorage) * 100);
   const availableStorage = totalStorage - usedStorage;
 
@@ -123,6 +128,8 @@ export function StorageDetailsModal({
 
         {isLoading ? (
           <StorageDetailsSkeleton />
+        ) : error ? (
+          <StorageDetailsError onRetry={() => refetch()} />
         ) : (
           <div className="space-y-6">
             {/* Overall Usage */}
