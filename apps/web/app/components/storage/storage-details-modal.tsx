@@ -33,6 +33,11 @@ export function StorageDetailsModal({
   } = useGetStorageBreakdown();
   const usagePercentage = Math.round((usedStorage / totalStorage) * 100);
   const availableStorage = totalStorage - usedStorage;
+  const { used, total, unit } = FileHelper.formatStorageConsistent(
+    usedStorage,
+    totalStorage,
+  );
+  const availableFormatted = FileHelper.formatBytes(availableStorage, 1, unit);
 
   // Default breakdown if not provided or loading
   const breakdown = breakdownData ?? {
@@ -137,8 +142,7 @@ export function StorageDetailsModal({
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">Total Usage</span>
                 <span className="text-sm text-muted-foreground">
-                  {FileHelper.formatBytes(usedStorage)} of{' '}
-                  {FileHelper.formatBytes(totalStorage)}
+                  {used} of {total}
                 </span>
               </div>
 
@@ -151,9 +155,7 @@ export function StorageDetailsModal({
 
               <div className="flex justify-between text-xs text-muted-foreground">
                 <span>{usagePercentage}% used</span>
-                <span>
-                  {FileHelper.formatBytes(availableStorage)} available
-                </span>
+                <span>{availableFormatted} available</span>
               </div>
             </div>
 
@@ -181,7 +183,7 @@ export function StorageDetailsModal({
                       </div>
                       <div className="text-right">
                         <div className="text-sm font-medium">
-                          {FileHelper.formatBytes(item.value)}
+                          {FileHelper.formatBytes(item.value, 1, unit)}
                         </div>
                         <div className="text-xs text-muted-foreground">
                           {item.percentage}%
