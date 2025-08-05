@@ -487,6 +487,12 @@
     #4c3cc6,
     #7e60f8
   );
+  --background-image-primary-gradient-right: linear-gradient(
+    to right,
+    #4c3cc6,
+    #7e60f8
+  );
+
   --background-image-primary-dark-gradient: linear-gradient(
     to right,
     #010101,

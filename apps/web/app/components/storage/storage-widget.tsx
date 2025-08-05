@@ -77,9 +77,9 @@ export function StorageWidget({
 
       <div className="flex flex-col gap-2">
         {/* Progress Bar */}
-        <div className="h-[8px] rounded-[20px] bg-[#D9D9D9]">
+        <div className="h-[8px] overflow-hidden rounded-full bg-[#D9D9D9]">
           <div
-            className="h-full rounded-[20px] border-[#5749BF] bg-primary-gradient transition-all duration-300"
+            className="h-full border-[#5749BF] bg-primary-gradient-right transition-all duration-300"
             style={{ width: `${usagePercentage}%` }}
           />
         </div>
