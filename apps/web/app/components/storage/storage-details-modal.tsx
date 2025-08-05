@@ -149,7 +149,7 @@ export function StorageDetailsModal({
               <div className="h-2 overflow-hidden rounded-full bg-[#D9D9D9]">
                 <div
                   className="h-full border-[#5749BF] bg-primary-gradient-right transition-all duration-300"
-                  style={{ width: `${100}%` }}
+                  style={{ width: `${usagePercentage}%` }}
                 />
               </div>
 
