@@ -38,18 +38,23 @@ export const useUploadFile = ({ onProgress }: UploadFileProps) => {
       const presignedPost = await getPresignedPost({ filename: file.name });
 
       // Step 2: Upload to S3 with progress tracking
-      const formData = new FormData();
-
-      formData.append('file', file);
-
       return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
 
         xhr.open('PUT', presignedPost.url, true);
-        Object.entries(presignedPost.headers).forEach(([key, value]) => {
-          xhr.setRequestHeader(key, value);
-        });
 
+        // Set headers for PUT request with tagging
+        if (presignedPost.headers) {
+          Object.entries(presignedPost.headers).forEach(([key, value]) => {
+            xhr.setRequestHeader(key, value);
+          });
+        }
+
+        // Set content type for the file
+        xhr.setRequestHeader(
+          'Content-Type',
+          file.type || 'application/octet-stream',
+        );
         // Handle abort signal
         abortController?.signal.addEventListener('abort', () => {
           xhr.abort();
@@ -114,7 +119,8 @@ export const useUploadFile = ({ onProgress }: UploadFileProps) => {
           });
         }
 
-        xhr.send(formData);
+        // Send the raw file data for PUT request
+        xhr.send(file);
       });
     },
     onSuccess: (data, variables) => {
