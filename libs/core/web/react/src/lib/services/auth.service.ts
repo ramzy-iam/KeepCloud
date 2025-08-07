@@ -2,7 +2,7 @@ import { AuthGoogleResponseDto, UserProfileDto } from '@keepcloud/commons/dtos';
 import { BaseHttpService } from './base.service';
 
 export class AuthService extends BaseHttpService {
-  protected baseUrl: string = 'auth';
+  protected baseUrl = 'auth';
 
   async authGoogle(code: string) {
     return this.post<AuthGoogleResponseDto, { code: string }>('/google', {
