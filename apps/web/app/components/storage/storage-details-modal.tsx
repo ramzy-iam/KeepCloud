@@ -36,7 +36,9 @@ export function StorageDetailsModal({
   const { used, total, unit } = FileHelper.formatStorageConsistent(
     usedStorage,
     totalStorage,
+    usedStorage >= FileHelper.convertToBytes(10, 'MB') ? 0 : 1,
   );
+
   const availableFormatted = FileHelper.formatBytes(availableStorage, 1, unit);
 
   // Default breakdown if not provided or loading
