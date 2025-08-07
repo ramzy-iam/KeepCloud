@@ -92,7 +92,6 @@ export const useUploadFile = ({ onProgress }: UploadFileProps) => {
                 }
               }, intervalMs);
 
-              // Wait for backend createFile call
               const result = await createFile({
                 storagePath: presignedPost.key,
                 parentId: activeFolder.id,
@@ -119,7 +118,6 @@ export const useUploadFile = ({ onProgress }: UploadFileProps) => {
           });
         }
 
-        // Send the raw file data for PUT request
         xhr.send(file);
       });
     },
