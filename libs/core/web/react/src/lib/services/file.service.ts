@@ -8,7 +8,7 @@ import {
 import { BaseHttpService } from './base.service';
 
 class FileService extends BaseHttpService {
-  protected baseUrl: string = 'files';
+  protected baseUrl = 'files';
 
   create(dto: CreateFileDto) {
     return this.post<FileMinViewDto, CreateFileDto>('', dto);

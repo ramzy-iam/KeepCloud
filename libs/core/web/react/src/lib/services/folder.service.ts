@@ -9,7 +9,7 @@ import {
 import { BaseHttpService } from './base.service';
 
 class FolderService extends BaseHttpService {
-  protected baseUrl: string = 'folders';
+  protected baseUrl = 'folders';
 
   async create(dto: CreateFolderDto) {
     return this.post<FileMinViewDto, CreateFolderDto>('', dto);
