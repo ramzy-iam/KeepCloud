@@ -2,31 +2,35 @@ org: rzlab
 service: keepcloud-api
 
 custom:
-  # dotenv:
-  # path: ../../.env
-  # logging: false
   stage: ${env:STAGE}
   serverless-offline:
     httpPort: 3333
     lambdaPort: 2333
     noPrependStageInUrl: true
-
-params:
-  prod:
-    production: true
-  default:
-    production: false
+  domain:
+    dev: ${env:STAGE}-keepcloud.api.${env:DOMAIN_NAME}
+    production: keepcloud.api.${env:DOMAIN_NAME}
+  customDomain:
+    domainName: ${self:custom.domain.${env:STAGE}}
+    basePath: 'auth'
+    stage: ${env:STAGE}
+    certificateName: '*.api.${env:DOMAIN_NAME}'
+    securityPolicy: tls_1_0
+    endpointType: 'edge'
+    createRoute53Record: true
 
 plugins:
   - serverless-dotenv-plugin
   - serverless-offline
+  - serverless-plugin-utils
+  - serverless-domain-manager
 
 provider:
   name: aws
   stage: ${env:STAGE}
   runtime: nodejs20.x
   region: eu-west-3
-  timeout: 600 # in seconds
+  timeout: 900 # in seconds
   memorySize: 1024 # in MB
   versionFunctions: false
 
@@ -102,8 +106,7 @@ resources:
                 - PUT
                 - POST
                 - GET
-              AllowedOrigins:
-                - ${env:KEEPCLOUD_ALLOWED_ORIGIN}
+              AllowedOrigins: ${split(${env:API_ALLOWED_ORIGIN_LIST}, ',')}
         LifecycleConfiguration:
           Rules:
             - Id: DeletePendingUploads
