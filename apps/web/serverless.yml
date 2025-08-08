@@ -5,8 +5,9 @@ provider:
   name: aws
   stage: ${env:STAGE}
   region: eu-west-3
-  environment:
-    HostedZoneId: ${env:HOSTED_ZONE_ID}
+  deploymentBucket:
+  name: keepcloud.api.deployment
+  
 plugins:
   - serverless-s3-sync
 
