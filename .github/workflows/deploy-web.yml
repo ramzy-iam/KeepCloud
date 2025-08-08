@@ -50,12 +50,8 @@ jobs:
       - name: Build Web
         run: yarn nx run keepcloud-web:build
 
-      - name: Deploy to S3
-        uses: jakejarvis/s3-sync-action@v0.5.1
-        with:
-          args: --delete
-        env:
-          SOURCE_DIR: 'dist/apps/web/client'
+      - name: Deploy Web with Serverless
+        run: yarn nx run keepcloud-web:deploy
 
       - name: Invalidate CloudFront Cache
         uses: chetan/invalidate-cloudfront-action@v2
