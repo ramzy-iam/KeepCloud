@@ -11,6 +11,8 @@ on:
         required: true
       AWS_SECRET_ACCESS_KEY:
         required: true
+      SERVERLESS_ACCESS_KEY:
+        required: true
 
 jobs:
   deploy:
@@ -25,6 +27,11 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_REGION: ${{ vars.AWS_DEFAULT_REGION }}
       DISTRIBUTION: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
+      STAGE: ${{ vars.STAGE }}
+      DOMAIN_NAME: ${{ vars.DOMAIN_NAME }}
+      HOSTED_ZONE_ID: ${{ vars.HOSTED_ZONE_ID }}
+      AWS_ACM_CERTIFICATE_ARN: ${{ vars.AWS_ACM_CERTIFICATE_ARN }}
+      SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
 
     steps:
       - uses: actions/checkout@v4
