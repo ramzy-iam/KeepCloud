@@ -11,6 +11,7 @@ import {
   DeleteFileAndChildrenFromStorageData,
 } from '@keepcloud/commons/types';
 import { Env } from '@keepcloud/commons/backend';
+import { SendEmailOptions } from '../notifications';
 
 @Injectable()
 export class SystemQueueService extends AbstractQueueService {
@@ -53,6 +54,13 @@ export class SystemQueueService extends AbstractQueueService {
   ) {
     return this.sendJob({
       message: ProcessorAction.DELETE_FILE_AND_CHILDREN_FROM_STORAGE,
+      data,
+    });
+  }
+
+  enqueueSendEmail(data: SendEmailOptions) {
+    return this.sendJob({
+      message: ProcessorAction.SEND_EMAIL_NOTIFICATION,
       data,
     });
   }
