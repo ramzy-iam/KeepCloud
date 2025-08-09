@@ -64,6 +64,38 @@ provider:
             Fn::GetAtt:
               - SystemQueue
               - Arn
+
+        - Effect: Allow
+          Action:
+            - s3:ListBucket
+          Resource: arn:aws:s3:::templates.${env:DOMAIN_NAME}
+
+        - Effect: Allow
+          Action:
+            - s3:GetObject
+            - s3:PutObject
+          Resource: arn:aws:s3:::templates.${env:DOMAIN_NAME}/*
+
+        - Effect: Allow
+          Action:
+            - s3:ListBucket
+          Resource:
+            - 'arn:aws:s3:::keepcloud.storage.${env:STAGE}'
+
+        - Effect: Allow
+          Action:
+            - s3:PutObject
+            - s3:GetObject
+            - s3:DeleteObject
+          Resource:
+            - 'arn:aws:s3:::keepcloud.storage.${env:STAGE}/*'
+
+        - Effect: Allow
+          Action:
+            - ses:SendEmail
+            - ses:SendRawEmail
+          Resource:
+            - 'arn:aws:ses:us-east-1:*:identity/${env:DOMAIN_NAME}'
 package:
   include:
     - ../../dist/apps/api/**

@@ -3,9 +3,10 @@ import * as z from 'zod/v4';
 import { Logger } from '../helpers';
 
 export const awsSchema = z.object({
-  APP_AWS_ACCESS_KEY_ID: z.string(),
-  APP_AWS_SECRET_ACCESS_KEY: z.string(),
+  APP_AWS_ACCESS_KEY_ID: z.string().optional(),
+  APP_AWS_SECRET_ACCESS_KEY: z.string().optional(),
   AWS_DEFAULT_REGION: z.string().default('eu-west-3'),
+  SES_AWS_REGION: z.string().default('us-east-1'),
 });
 
 export const envSchema = z.object({
@@ -27,6 +28,7 @@ export const envSchema = z.object({
   VITE_GOOGLE_CLIENT_ID: z.string(),
   DATABASE_URL: z.string(),
   LOG_LEVEL: z.enum(['error', 'warn', 'info', 'debug']).default('info'),
+  NO_REPLY_EMAIL: z.string().default('no-reply@heyramzy.com'),
 
   ...awsSchema.shape,
 
