@@ -4,5 +4,25 @@
   "sourceRoot": "apps/web/src",
   "projectType": "application",
   "tags": [],
-  "targets": {}
+  "targets": {
+    "package": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "serverless package",
+        "cwd": "apps/web"
+      }
+    },
+    "deploy": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        {
+          "target": "package"
+        }
+      ],
+      "options": {
+        "command": "serverless deploy --package .serverless --verbose",
+        "cwd": "apps/web"
+      }
+    }
+  }
 }
