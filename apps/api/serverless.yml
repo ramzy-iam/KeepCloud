@@ -12,7 +12,6 @@ custom:
     production: keepcloud.api.${env:DOMAIN_NAME}
   customDomain:
     domainName: ${self:custom.domain.${env:STAGE}}
-    basePath: 'api'
     stage: ${env:STAGE}
     certificateName: '*.api.${env:DOMAIN_NAME}'
     securityPolicy: tls_1_0
