@@ -34,6 +34,7 @@ interface DirectEmailOptions extends EmailBaseOptions {
 
 export class EmailHelper extends AwsServiceHelper {
   private sesClient: SESv2Client;
+  protected static instanceMap = new Map<string, SESv2Client>();
   private readonly logger = new Logger(EmailHelper.name);
 
   constructor(accessKeyId: string, secretAccessKey: string, region: string) {
