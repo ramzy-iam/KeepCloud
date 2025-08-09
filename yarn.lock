@@ -7386,11 +7386,6 @@
   resolved "https://registry.yarnpkg.com/@tanstack/table-core/-/table-core-8.21.3.tgz#2977727d8fc8dfa079112d9f4d4c019110f1732c"
   integrity sha512-ldZXEhOBb8Is7xLs01fR3YEc3DERiz5silj8tnGkFZytt1abEvl/GhUmCE0PMLaMPTa3Jk4HbKmRlHmu+gCftg==
 
-"@teleology/fp@^1.0.6":
-  version "1.0.17"
-  resolved "https://registry.yarnpkg.com/@teleology/fp/-/fp-1.0.17.tgz#ec3a6f1c5374f8029a10e6d2835d1643afb8b2b8"
-  integrity sha512-rNORN1DExxd6CXd0XAXuIkOF3MxsK9C9ly5GkKQF7iW10opXNQ+345jslMMnkoDgtcsvnj8pZ3MkNUM52rhEYg==
-
 "@testing-library/dom@10.4.0":
   version "10.4.0"
   resolved "https://registry.yarnpkg.com/@testing-library/dom/-/dom-10.4.0.tgz#82a9d9462f11d240ecadbf406607c6ceeeff43a8"
@@ -16315,13 +16310,6 @@ serverless-offline@^14.4.0:
     tsx "^4.17.0"
     velocityjs "^2.0.6"
     ws "^8.18.0"
-
-serverless-plugin-utils@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/serverless-plugin-utils/-/serverless-plugin-utils-0.2.0.tgz#6c82d1d0302cb2d902a4927a0156ba3b4fcb997b"
-  integrity sha512-r2/pJiK/4TUHRvlD8xzLH60PaJ/dicxOaNZ2C1VcoPQ4pjbJsWfLrRm+IAgiibqoLZBdhXyG+bdNoMJWjiyKZA==
-  dependencies:
-    "@teleology/fp" "^1.0.6"
 
 serverless-s3-sync@^3.4.0:
   version "3.4.0"
