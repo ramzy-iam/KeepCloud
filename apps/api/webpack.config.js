@@ -22,6 +22,7 @@ module.exports = composePlugins(withNx(), (config) => {
       '@nestjs/websockets/socket-module': false,
       '@nestjs/microservices': false,
       '@nestjs/microservices/microservices-module': false,
+      'uglify-js': false,
     },
   };
 
