@@ -13,9 +13,11 @@ custom:
   customDomain:
     domainName: ${self:custom.domain.${env:STAGE}}
     stage: ${env:STAGE}
-    certificateName: '${env:DOMAIN_NAME}'
+    certificateName: '*.api.${env:DOMAIN_NAME}'
     securityPolicy: tls_1_0
     createRoute53Record: true
+    createRoute53IPv6Record: false
+    autoDomain: true
 
 plugins:
   - serverless-dotenv-plugin
