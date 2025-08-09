@@ -7,6 +7,7 @@ custom:
     httpPort: 3333
     lambdaPort: 2333
     noPrependStageInUrl: true
+  allowedOrigins: ${file(../../sls-helper.js):allowedOrigins}
   domain:
     dev: ${env:STAGE}-keepcloud.api.${env:DOMAIN_NAME}
     production: keepcloud.api.${env:DOMAIN_NAME}
@@ -22,7 +23,6 @@ custom:
 plugins:
   - serverless-dotenv-plugin
   - serverless-offline
-  - serverless-plugin-utils
   - serverless-domain-manager
 
 provider:
@@ -106,7 +106,7 @@ resources:
                 - PUT
                 - POST
                 - GET
-              AllowedOrigins: ${split(${env:API_ALLOWED_ORIGIN_LIST}, ',')}
+              AllowedOrigins: ${self:custom.allowedOrigins}
         LifecycleConfiguration:
           Rules:
             - Id: DeletePendingUploads
