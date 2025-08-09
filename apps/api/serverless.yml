@@ -12,11 +12,11 @@ custom:
     production: keepcloud.api.${env:DOMAIN_NAME}
   customDomain:
     domainName: ${self:custom.domain.${env:STAGE}}
-    basePath: 'auth'
+    basePath: 'api'
     stage: ${env:STAGE}
     certificateName: '*.api.${env:DOMAIN_NAME}'
     securityPolicy: tls_1_0
-    endpointType: 'edge'
+    endpointType: EDGE
     createRoute53Record: true
 
 plugins:
