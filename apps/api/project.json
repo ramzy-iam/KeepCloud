@@ -60,7 +60,7 @@
         }
       ],
       "options": {
-        "command": "serverless deploy --package .serverless",
+        "command": "serverless deploy --package .serverless --verbose",
         "cwd": "apps/api"
       }
     },
