@@ -38,9 +38,6 @@ provider:
     name: keepcloud.api.deployment
   environment:
     NODE_ENV: ${self:NODE_ENV, 'production'}
-    APP_AWS_ACCESS_KEY_ID: ${env:AWS_ACCESS_KEY_ID}
-    APP_AWS_SECRET_ACCESS_KEY: ${env:AWS_SECRET_ACCESS_KEY}
-    APP_AWS_DEFAULT_REGION: ${env:AWS_DEFAULT_REGION}
     JWT_SECRET: ${env:JWT_SECRET}
     JWT_REFRESH_SECRET: ${env:JWT_REFRESH_SECRET}
     VITE_GOOGLE_CLIENT_ID: ${env:VITE_GOOGLE_CLIENT_ID}
@@ -68,13 +65,13 @@ provider:
         - Effect: Allow
           Action:
             - s3:ListBucket
-          Resource: arn:aws:s3:::templates.${env:DOMAIN_NAME}
+          Resource: arn:aws:s3:::${env:TEMPLATES_BUCKET}
 
         - Effect: Allow
           Action:
             - s3:GetObject
             - s3:PutObject
-          Resource: arn:aws:s3:::templates.${env:DOMAIN_NAME}/*
+          Resource: arn:aws:s3:::${env:TEMPLATES_BUCKET}/*
 
         - Effect: Allow
           Action:
