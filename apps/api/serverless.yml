@@ -13,9 +13,8 @@ custom:
   customDomain:
     domainName: ${self:custom.domain.${env:STAGE}}
     stage: ${env:STAGE}
-    certificateName: '*.api.${env:DOMAIN_NAME}'
+    certificateName: '${env:DOMAIN_NAME}'
     securityPolicy: tls_1_0
-    endpointType: EDGE
     createRoute53Record: true
 
 plugins:
