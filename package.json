@@ -143,6 +143,7 @@
     "serverless-dotenv-plugin": "^6.0.0",
     "serverless-offline": "^14.4.0",
     "serverless-offline-sqs": "^8.0.0",
+    "serverless-s3-sync": "^3.4.0",
     "ts-jest": "^29.1.0",
     "ts-node": "10.9.1",
     "tslib": "^2.8.1",
