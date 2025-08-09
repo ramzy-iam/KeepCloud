@@ -68,6 +68,16 @@ export class EmailHelper extends AwsServiceHelper {
       attachments,
     };
 
+    console.log({
+      from,
+      to,
+      subject,
+      attachments,
+      cc,
+      bcc,
+    });
+    console.log(mailOptions.from);
+
     const transporter = nodemailer.createTransport({
       SES: { sesClient: this.sesClient, SendEmailCommand },
     });

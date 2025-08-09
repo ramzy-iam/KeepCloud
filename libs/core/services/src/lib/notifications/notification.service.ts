@@ -24,8 +24,6 @@ export class NotificationService {
       subject: 'Welcome to KeepCloud - Your secure cloud storage is ready!',
       data: {
         firstName: firstName || 'there',
-        email,
-        loginUrl: `${this.frontendUrl}/auth/login`,
         dashboardUrl: `${this.frontendUrl}/home`,
         supportEmail: this.supportEmail,
         currentYear: new Date().getFullYear(),
