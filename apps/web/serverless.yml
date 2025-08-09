@@ -6,8 +6,8 @@ provider:
   stage: ${env:STAGE}
   region: eu-west-3
   deploymentBucket:
-  name: keepcloud.api.deployment
-  
+    name: keepcloud.client.deployment
+
 plugins:
   - serverless-s3-sync
 
