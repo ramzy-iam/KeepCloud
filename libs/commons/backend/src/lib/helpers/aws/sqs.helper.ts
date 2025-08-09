@@ -16,7 +16,7 @@ interface SendMessageInput {
   MessageBody: string;
   MessageGroupId?: string; // Optional, only for FIFO queues
 }
-export class SQShelper extends AwsServiceHelper<SQSClient> {
+export class SQShelper extends AwsServiceHelper {
   protected client: SQSClient;
   protected static instanceMap = new Map<string, SQShelper>();
   private logger = new Logger(SQShelper.name);
@@ -26,13 +26,10 @@ export class SQShelper extends AwsServiceHelper<SQSClient> {
     secretAccessKey: string,
     region: string,
   ) {
-    super();
+    super(accessKeyId, secretAccessKey, region);
     this.client = new SQSClient({
-      credentials: {
-        accessKeyId,
-        secretAccessKey,
-      },
-      region,
+      ...super.getCredentials(),
+      region: this.getRegion(),
     });
   }
 
