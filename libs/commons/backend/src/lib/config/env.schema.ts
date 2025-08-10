@@ -15,15 +15,9 @@ export const envSchema = z.object({
     .enum(['development', 'production', 'test'])
     .default('development'),
 
-  KEEPCLOUD_ALLOWED_ORIGIN: z.string().default('http://localhost:4200'),
-  KEEPCLOUD_API_ALLOWED_ORIGIN_LIST: z
-    .string()
-    .default('http://localhost:4200'),
-
   API_ALLOWED_ORIGIN_LIST: z.string().default('http://localhost:4200'),
   SYSTEM_QUEUE_URL: z.string().default('redis://localhost:6379'),
   FILE_BUCKET: z.string(),
-  API_BASE_URL: z.url().default('http://localhost:3000'),
   FRONTEND_URL: z.url().default('http://keepcloud.heyramzy.com'),
   TEMPLATES_BUCKET: z.string().default('templates-rzlab'),
   SUPPORT_EMAIL: z.email().default('ramesfeukeng@gmail.com'),
