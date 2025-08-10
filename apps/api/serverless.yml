@@ -81,13 +81,13 @@ provider:
         - Effect: Allow
           Action:
             - s3:ListBucket
-            - s3:GetBucketLocation # use when generating pre-signed URLs
           Resource:
             - 'arn:aws:s3:::keepcloud.storage.${env:STAGE}'
 
         - Effect: Allow
           Action:
             - s3:PutObject
+            - s3:PutObjectTagging
             - s3:GetObject
             - s3:DeleteObject
           Resource:
