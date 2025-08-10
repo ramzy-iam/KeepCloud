@@ -46,11 +46,14 @@ jobs:
 
       SYSTEM_QUEUE_URL: ${{ vars.SYSTEM_QUEUE_URL }}
       SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
-      KEEPCLOUD_ALLOWED_ORIGIN: ${{ vars.KEEPCLOUD_ALLOWED_ORIGIN }}
       FILE_BUCKET: keepcloud.storage.${{ vars.STAGE }}
       LOG_LEVEL: info
       API_ALLOWED_ORIGIN_LIST: ${{ vars.API_ALLOWED_ORIGIN_LIST }}
       DOMAIN_NAME: ${{ vars.DOMAIN_NAME }}
+      FRONTEND_URL: ${{ vars.FRONTEND_URL }}
+      TEMPLATES_BUCKET: ${{ vars.TEMPLATES_BUCKET }}
+      SUPPORT_EMAIL: ${{ vars.SUPPORT_EMAIL }}
+      NO_REPLY_EMAIL: ${{ vars.NO_REPLY_EMAIL }}
 
     steps:
       - uses: actions/checkout@v4
