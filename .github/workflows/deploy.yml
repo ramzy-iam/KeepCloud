@@ -21,17 +21,17 @@ on:
           - production
 
 jobs:
-  web_dev:
-    if: |
-      (github.ref == 'refs/heads/develop' || github.event.pull_request.base.ref == 'develop') ||
-      (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'dev')
-    uses: ./.github/workflows/deploy-web.yml
-    with:
-      environment: Dev
-    secrets:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
+  # web_dev:
+  #   if: |
+  #     (github.ref == 'refs/heads/develop' || github.event.pull_request.base.ref == 'develop') ||
+  #     (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'dev')
+  #   uses: ./.github/workflows/deploy-web.yml
+  #   with:
+  #     environment: Dev
+  #   secrets:
+  #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #     SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
 
   api_dev:
     if: |
