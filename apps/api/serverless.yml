@@ -44,10 +44,15 @@ provider:
     GOOGLE_CLIENT_SECRET: ${env:GOOGLE_CLIENT_SECRET}
     FILE_BUCKET: keepcloud.storage.${env:STAGE}
     LOG_LEVEL: ${env:LOG_LEVEL, 'info'}
+    SES_AWS_REGION: ${env:SES_AWS_REGION, 'us-east-1'}
     SYSTEM_QUEUE_URL:
       Ref: SystemQueue
     API_ALLOWED_ORIGIN_LIST: ${env:API_ALLOWED_ORIGIN_LIST}
     DATABASE_URL: ${env:DATABASE_URL}
+    FRONTEND_URL: ${env:FRONTEND_URL, 'http://keepcloud.heyramzy.com'}
+    TEMPLATES_BUCKET: ${env:TEMPLATES_BUCKET, 'templates-rzlab'}
+    SUPPORT_EMAIL: ${env:SUPPORT_EMAIL, 'ramsesfeukeng@gmail.com'}
+    NO_REPLY_EMAIL: ${env:NO_REPLY_EMAIL, 'no-reply@heyramzy.com'}
   iam:
     role:
       statements:
