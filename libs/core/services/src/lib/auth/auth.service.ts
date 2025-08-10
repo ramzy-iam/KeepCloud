@@ -47,7 +47,7 @@ export class AuthService {
         });
       }
 
-      // Send welcome email for new users.
+      // Send welcome email for new users
       if (isNewUser) {
         try {
           await this.notificationService.sendWelcomeEmail(
