@@ -54,7 +54,6 @@ export class AuthService {
             user.email,
             user.firstName,
           );
-          this.logger.log(`Welcome email sent to new user: ${user.email}`);
         } catch (emailError: unknown) {
           // Log email error but don't fail authentication
           if (emailError instanceof Error) {
