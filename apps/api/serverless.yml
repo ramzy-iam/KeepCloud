@@ -38,19 +38,21 @@ provider:
     name: keepcloud.api.deployment
   environment:
     NODE_ENV: ${self:NODE_ENV, 'production'}
-    APP_AWS_ACCESS_KEY_ID: ${env:AWS_ACCESS_KEY_ID}
-    APP_AWS_SECRET_ACCESS_KEY: ${env:AWS_SECRET_ACCESS_KEY}
-    APP_AWS_DEFAULT_REGION: ${env:AWS_DEFAULT_REGION}
     JWT_SECRET: ${env:JWT_SECRET}
     JWT_REFRESH_SECRET: ${env:JWT_REFRESH_SECRET}
     VITE_GOOGLE_CLIENT_ID: ${env:VITE_GOOGLE_CLIENT_ID}
     GOOGLE_CLIENT_SECRET: ${env:GOOGLE_CLIENT_SECRET}
     FILE_BUCKET: keepcloud.storage.${env:STAGE}
     LOG_LEVEL: ${env:LOG_LEVEL, 'info'}
+    SES_AWS_REGION: ${env:SES_AWS_REGION, 'us-east-1'}
     SYSTEM_QUEUE_URL:
       Ref: SystemQueue
     API_ALLOWED_ORIGIN_LIST: ${env:API_ALLOWED_ORIGIN_LIST}
     DATABASE_URL: ${env:DATABASE_URL}
+    FRONTEND_URL: ${env:FRONTEND_URL, 'http://keepcloud.heyramzy.com'}
+    TEMPLATES_BUCKET: ${env:TEMPLATES_BUCKET, 'templates-rzlab'}
+    SUPPORT_EMAIL: ${env:SUPPORT_EMAIL, 'ramsesfeukeng@gmail.com'}
+    NO_REPLY_EMAIL: ${env:NO_REPLY_EMAIL, 'no-reply@heyramzy.com'}
   iam:
     role:
       statements:
@@ -64,6 +66,41 @@ provider:
             Fn::GetAtt:
               - SystemQueue
               - Arn
+
+        - Effect: Allow
+          Action:
+            - s3:ListBucket
+          Resource: arn:aws:s3:::${env:TEMPLATES_BUCKET}
+
+        - Effect: Allow
+          Action:
+            - s3:GetObject
+            - s3:PutObject
+          Resource: arn:aws:s3:::${env:TEMPLATES_BUCKET}/*
+
+        - Effect: Allow
+          Action:
+            - s3:ListBucket
+          Resource:
+            - 'arn:aws:s3:::keepcloud.storage.${env:STAGE}'
+
+        - Effect: Allow
+          Action:
+            - s3:PutObject
+            - s3:PutObjectTagging
+            - s3:GetObject
+            - s3:DeleteObject
+          Resource:
+            - 'arn:aws:s3:::keepcloud.storage.${env:STAGE}/*'
+
+        - Effect: Allow
+          Action:
+            - ses:SendEmail
+            - ses:SendRawEmail
+          Resource:
+            - 'arn:aws:ses:us-east-1:*:identity/${env:DOMAIN_NAME}'
+            - 'arn:aws:ses:us-east-1:*:identity/ramsesfeukeng@gmail.com' #to be removed after get access to production domain
+
 package:
   include:
     - ../../dist/apps/api/**

@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
+import { MailService } from '../notifications/mail.service';
 import { FileRepository, User } from '@keepcloud/core/db';
 import { TokenPayload } from 'google-auth-library';
 import { OAuthService } from './oauth.service';
@@ -16,6 +17,8 @@ import {
   UnauthorizedException,
 } from '@keepcloud/commons/backend';
 import { ErrorCode } from '@keepcloud/commons/constants';
+import { SystemQueueService } from '../queues';
+import { NotificationService } from '../notifications';
 
 @Injectable()
 export class AuthService {
@@ -26,6 +29,7 @@ export class AuthService {
     private readonly fileRepository: FileRepository,
     private readonly jwtService: JwtService,
     private readonly configService: AppConfigService,
+    private readonly notificationService: NotificationService,
   ) {
     this.logger = new Logger(AuthService.name);
   }
@@ -35,18 +39,44 @@ export class AuthService {
   ): Promise<{ accessToken: string; refreshToken: string }> {
     try {
       const payload = await this.verifyGoogleCode(code);
-      const user = await this.userService.createOrUpdateGoogleUser(payload);
+      const { user, isNewUser } =
+        await this.userService.createOrUpdateGoogleUser(payload);
       if (!user) {
         throw new InternalServerErrorException({
           message: 'Failed to create user',
         });
       }
 
+      // Send welcome email for new users
+      if (isNewUser) {
+        try {
+          await this.notificationService.sendWelcomeEmail(
+            user.email,
+            user.firstName,
+          );
+        } catch (emailError: unknown) {
+          // Log email error but don't fail authentication
+          if (emailError instanceof Error) {
+            this.logger.error(
+              `Failed to send welcome email to ${user.email}: ${emailError.message}`,
+              emailError.stack,
+            );
+          } else {
+            this.logger.error(
+              `Failed to send welcome email to ${user.email}: ${String(emailError)}`,
+            );
+          }
+        }
+      }
+
       return this.generateTokens(user);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      const errorStack = error instanceof Error ? error.stack : undefined;
       this.logger.error(
-        `Google authentication failed: ${error.message}`,
-        error.stack,
+        `Google authentication failed: ${errorMessage}`,
+        errorStack,
       );
 
       if (error instanceof BadRequestException) {

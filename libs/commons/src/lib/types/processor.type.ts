@@ -32,3 +32,12 @@ export interface DeleteFileAndChildrenFromStorageData {
 export interface RebuildTreeData {
   userId: string;
 }
+
+export interface SendEmailData {
+  senderEmail?: string;
+  recipientEmail: string;
+  subject: string;
+  templateKey: string;
+  data: Record<string, unknown>;
+  attachments?: unknown[];
+}

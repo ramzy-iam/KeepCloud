@@ -11,3 +11,12 @@ export enum BOOLEAN_ENUM {
   FALSE = 'false',
   ZERO = '0',
 }
+
+const templatePrefix = 'keepcloud/';
+
+/**
+ * Template key constants
+ */
+export enum TemplateKey {
+  WELCOME_EMAIL = `${templatePrefix}email/welcome.hbs`,
+}
