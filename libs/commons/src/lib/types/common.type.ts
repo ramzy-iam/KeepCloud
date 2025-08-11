@@ -1,4 +1,4 @@
-export type SortOrder = 'ASC' | 'DESC';
+export type SortOrder = 'asc' | 'desc';
 export type FilterByOperator = 'AND' | 'OR';
 export type Nullable<T> = {
   [P in keyof T]: T[P] | null;

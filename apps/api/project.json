@@ -27,16 +27,13 @@
       }
     },
     "serve": {
-      "executor": "nx:run-commands",
-      "defaultConfiguration": "development",
-      "dependsOn": ["build"],
+      "executor": "@nx/js:node",
       "options": {
-        "command": "cross-env NODE_ENV=development node dist/apps/api/main.js"
+        "buildTarget": "keepcloud-api:build"
       },
       "configurations": {
-        "development": {},
         "production": {
-          "command": "cross-env NODE_ENV=production node dist/apps/api/main.js"
+          "buildTarget": "keepcloud-api:build:production"
         }
       }
     },
@@ -63,8 +60,14 @@
         }
       ],
       "options": {
-        "command": "serverless deploy --package .serverless",
+        "command": "serverless deploy --package .serverless --verbose",
         "cwd": "apps/api"
+      }
+    },
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node scripts/start-dev.js"
       }
     }
   }

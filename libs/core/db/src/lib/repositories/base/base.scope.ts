@@ -2,7 +2,6 @@ import { PaginationDto } from '@keepcloud/commons/dtos';
 import { Prisma, PrismaService } from '../../prisma';
 import { BaseRepository } from './base.repository';
 import { PAGINATION } from '@keepcloud/commons/constants';
-import { GenericPrismaModel } from './model';
 
 export abstract class BaseScope<
   T extends object,
@@ -28,10 +27,13 @@ export abstract class BaseScope<
 
   protected _where: WhereInput = {} as WhereInput;
   protected _include: Include = {} as Include;
-  protected _orderBy: OrderByWithRelationInput = {} as OrderByWithRelationInput;
+  protected _orderBy: OrderByWithRelationInput[] = [];
 
-  orderBy(orderBy: OrderByWithRelationInput) {
-    this._orderBy = orderBy;
+  orderBy(orderBy: OrderByWithRelationInput | OrderByWithRelationInput[]) {
+    this._orderBy = [
+      ...this._orderBy,
+      ...(Array.isArray(orderBy) ? orderBy : [orderBy]),
+    ];
     return this;
   }
 

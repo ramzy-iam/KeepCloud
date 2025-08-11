@@ -10,7 +10,8 @@ import {
 } from '../components/misc';
 import { MimeTypes } from '@keepcloud/commons/constants';
 
-export const useFileIcon = (file: FileMinViewDto) => {
+export const useFileIcon = (file?: FileMinViewDto) => {
+  if (!file) return null;
   if (file.isFolder) return FolderIcon;
 
   const contentType = file.contentType ?? '';

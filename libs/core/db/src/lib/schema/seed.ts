@@ -29,9 +29,9 @@ async function main() {
         },
       ],
     });
-    console.log('✅ subscription plans seeded');
+    console.info('Subscription plans seeded');
   } else {
-    console.log('⛔ Subscription plans already exist, skipping seed.');
+    console.log('Subscription plans already exist, skipping seed.');
   }
 }
 

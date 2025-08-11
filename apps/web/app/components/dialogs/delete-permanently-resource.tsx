@@ -11,20 +11,14 @@ import {
   useDeletePermanently,
 } from '@keepcloud/web-core/react';
 import { useAtom } from 'jotai';
-import { SYSTEM_FILE } from '@keepcloud/commons/constants';
 
 export function DeletePermanentlyDialog() {
   const [dialogState, setDialogState] = useAtom(dialogAtom);
-  const { isOpen, type, context } = dialogState;
-
-  if (!isOpen || type !== 'deletePermanently') return null;
+  const { isOpen, context } = dialogState;
 
   const { item: file } = context;
 
-  const deleteMutation = useDeletePermanently({
-    resourceName: file?.isFolder ? 'Folder' : 'File',
-    keysToInvalidate: [[SYSTEM_FILE.TRASH.invalidationKey]],
-  });
+  const deleteMutation = useDeletePermanently();
 
   const handleDelete = () => {
     if (file?.id)

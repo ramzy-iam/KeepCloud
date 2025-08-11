@@ -1,5 +1,7 @@
+import 'dotenv/config';
 import winston, { format, Logger as WinstonLogger } from 'winston';
 import util from 'util';
+import { Env } from '../config';
 
 const { combine, label, printf, colorize, timestamp } = format;
 
@@ -34,7 +36,7 @@ const myFormat = printf(({ timestamp, level, message, label, ...meta }) => {
 });
 
 function getLogLevel(): string {
-  const level = process.env.LOG_LEVEL?.toLowerCase();
+  const level = Env.LOG_LEVEL?.toLowerCase();
   if (level && ['error', 'warn', 'info', 'debug'].includes(level)) {
     return level;
   }
@@ -43,6 +45,7 @@ function getLogLevel(): string {
 
 export class Logger {
   private logger: WinstonLogger;
+  private static defaultLogger: Logger;
 
   constructor(programName: string) {
     this.logger = winston.createLogger({
@@ -84,5 +87,28 @@ export class Logger {
 
   get raw(): WinstonLogger {
     return this.logger;
+  }
+
+  private static getDefaultLogger(): Logger {
+    if (!Logger.defaultLogger) {
+      Logger.defaultLogger = new Logger('App');
+    }
+    return Logger.defaultLogger;
+  }
+
+  static info(message: string, ...meta: unknown[]) {
+    Logger.getDefaultLogger().info(message, ...meta);
+  }
+
+  static error(message: string, ...meta: unknown[]) {
+    Logger.getDefaultLogger().error(message, ...meta);
+  }
+
+  static debug(message: string, ...meta: unknown[]) {
+    Logger.getDefaultLogger().debug(message, ...meta);
+  }
+
+  static warn(message: string, ...meta: unknown[]) {
+    Logger.getDefaultLogger().warn(message, ...meta);
   }
 }

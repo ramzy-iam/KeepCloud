@@ -2,6 +2,7 @@ import axios, { AxiosRequestConfig, AxiosResponse, AxiosInstance } from 'axios';
 import { CookiesHelper } from '../../helpers';
 import { ACCESS_TOKEN, REFRESH_TOKEN } from '@keepcloud/commons/constants';
 import { AuthHelper } from '../../helpers/auth.helper';
+import { Env } from '../config';
 
 let tokenRefreshPromise: Promise<string | undefined> | null = null;
 
@@ -22,7 +23,7 @@ const refreshTokenInternal = async (): Promise<string | undefined> => {
     }
 
     const axiosInstance = axios.create({
-      baseURL: import.meta.env.VITE_API_BASE_URL,
+      baseURL: Env.VITE_API_BASE_URL,
     });
 
     try {
@@ -49,7 +50,7 @@ const refreshTokenInternal = async (): Promise<string | undefined> => {
 
 export const renewAccessToken = async (
   originalAxiosInstance?: AxiosInstance,
-  config?: AxiosRequestConfig
+  config?: AxiosRequestConfig,
 ): Promise<void | AxiosResponse<any> | string> => {
   const newAccessToken = await refreshTokenInternal();
 
@@ -70,5 +71,5 @@ export const renewAccessToken = async (
 };
 
 const redirectToLogin = () => {
-  window.location.href = import.meta.env.VITE_WEB_APP_URL;
+  window.location.href = '/';
 };

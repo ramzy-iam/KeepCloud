@@ -48,12 +48,28 @@ export class FileHelper {
     };
   }
 
-  formatBytes(bytes: number, decimals = 1): string {
-    if (bytes === 0) return '0 B';
-
+  formatBytes(bytes: number, decimals = 1, forceUnit?: string): string {
     const k = 1024;
     const dm = decimals < 0 ? 0 : decimals;
     const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+
+    if (bytes === 0) {
+      if (forceUnit) {
+        const unitIndex = sizes.indexOf(forceUnit.toUpperCase());
+        if (unitIndex !== -1) {
+          return `0 ${sizes[unitIndex]}`;
+        }
+      }
+      return '0 B';
+    }
+
+    if (forceUnit) {
+      const unitIndex = sizes.indexOf(forceUnit.toUpperCase());
+      if (unitIndex !== -1) {
+        const sizedValue = bytes / Math.pow(k, unitIndex);
+        return `${sizedValue.toFixed(dm)} ${sizes[unitIndex]}`;
+      }
+    }
 
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     const sizedValue = bytes / Math.pow(k, i);
@@ -91,6 +107,49 @@ export class FileHelper {
       (file) => file.code === fileCode,
     );
     return systemFile ? systemFile.name : '';
+  }
+
+  /**
+   * Extract the unit from a bytes value for consistent formatting
+   * @param bytes - The bytes value to get unit for
+   * @returns The unit (B, KB, MB, GB, TB)
+   */
+  getUnit(bytes: number): string {
+    if (bytes === 0) return 'B';
+
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+    return sizes[i];
+  }
+
+  /**
+   * Format used and total storage with consistent units
+   * @param usedBytes - Used storage in bytes
+   * @param totalBytes - Total storage in bytes
+   * @param decimals - Number of decimal places
+   * @returns Object with formatted used and total storage with consistent units
+   */
+  formatStorageConsistent(
+    usedBytes: number,
+    totalBytes: number,
+    usedBytesDecimals = 0,
+    totalBytesDecimals = 0,
+  ): { used: string; total: string; unit: string } {
+    const totalUnit = this.getUnit(totalBytes);
+    const usedFormatted = this.formatBytes(
+      usedBytes,
+      usedBytesDecimals,
+      totalUnit,
+    );
+    const totalFormatted = this.formatBytes(totalBytes, totalBytesDecimals);
+
+    return {
+      used: usedFormatted,
+      total: totalFormatted,
+      unit: totalUnit,
+    };
   }
 }
 

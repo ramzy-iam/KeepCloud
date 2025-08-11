@@ -1,13 +1,14 @@
+import { Env } from '@keepcloud/commons/backend';
 import { BadRequestException } from '@nestjs/common';
 import { OAuth2Client, TokenPayload } from 'google-auth-library';
 
-const { VITE_GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } = process.env;
+const { VITE_GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } = Env;
 
 export class OAuthService {
   private static client: OAuth2Client = new OAuth2Client(
     VITE_GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET,
-    'postmessage'
+    'postmessage',
   );
 
   static async verifyGoogleCode(code: string): Promise<TokenPayload> {
@@ -16,7 +17,7 @@ export class OAuthService {
     const { tokens } = await client.getToken(code);
     if (!tokens?.id_token) {
       throw new BadRequestException(
-        'Google authentication failed: ID token not found'
+        'Google authentication failed: ID token not found',
       );
     }
 
@@ -28,7 +29,7 @@ export class OAuthService {
     const payload = ticket.getPayload();
     if (!payload) {
       throw new BadRequestException(
-        'Google authentication failed: Invalid token payload'
+        'Google authentication failed: Invalid token payload',
       );
     }
 

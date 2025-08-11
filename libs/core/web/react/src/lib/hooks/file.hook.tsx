@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { useGetActiveFolder } from './folder.hook';
 import { useFileListUpdater } from './use-file-list-updater.hook';
 import { FileHelper } from '@keepcloud/commons/helpers';
+import { useRefreshStorageData } from './storage.hook';
 
 interface UploadFileProps {
   onProgress?: (progress: number, file: File) => void;
@@ -21,6 +22,7 @@ export const useUploadFile = ({ onProgress }: UploadFileProps) => {
   const { mutateAsync: createFile } = useCreateFile();
   const { activeFolder } = useGetActiveFolder();
   const parentId = activeFolder.id;
+  const refreshStorageData = useRefreshStorageData();
 
   const finalParentId = FileHelper.getValidParentId(parentId);
   const { insertItem } = useFileListUpdater(finalParentId);
@@ -36,16 +38,27 @@ export const useUploadFile = ({ onProgress }: UploadFileProps) => {
       const presignedPost = await getPresignedPost({ filename: file.name });
 
       // Step 2: Upload to S3 with progress tracking
-      const formData = new FormData();
-
-      formData.append('file', file);
-
       return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
 
         xhr.open('PUT', presignedPost.url, true);
-        Object.entries(presignedPost.headers).forEach(([key, value]) => {
-          xhr.setRequestHeader(key, value);
+
+        // Set headers for PUT request with tagging
+        if (presignedPost.headers) {
+          Object.entries(presignedPost.headers).forEach(([key, value]) => {
+            xhr.setRequestHeader(key, value);
+          });
+        }
+
+        // Set content type for the file
+        xhr.setRequestHeader(
+          'Content-Type',
+          file.type || 'application/octet-stream',
+        );
+        // Handle abort signal
+        abortController?.signal.addEventListener('abort', () => {
+          xhr.abort();
+          reject(new Error('Upload cancelled'));
         });
 
         xhr.upload.onprogress = (event) => {
@@ -79,7 +92,6 @@ export const useUploadFile = ({ onProgress }: UploadFileProps) => {
                 }
               }, intervalMs);
 
-              // Wait for backend createFile call
               const result = await createFile({
                 storagePath: presignedPost.key,
                 parentId: activeFolder.id,
@@ -106,11 +118,12 @@ export const useUploadFile = ({ onProgress }: UploadFileProps) => {
           });
         }
 
-        xhr.send(formData);
+        xhr.send(file);
       });
     },
     onSuccess: (data, variables) => {
       insertItem(data, 'start');
+      refreshStorageData();
     },
 
     onError: (error, variables) => {

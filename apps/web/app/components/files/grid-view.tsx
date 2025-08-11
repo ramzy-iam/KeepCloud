@@ -1,4 +1,4 @@
-import { cn, Skeleton } from '@keepcloud/web-core/react';
+import { Button, cn, Skeleton } from '@keepcloud/web-core/react';
 import { FileMinViewDto } from '@keepcloud/commons/dtos';
 import { FolderEmpty } from '../ui';
 import { FileSystemItem } from './file-system-item';
@@ -12,6 +12,9 @@ interface GridViewProps {
   CustomFileSystemItem?: React.FC<{
     file: FileMinViewDto;
   }>;
+  hasNextPage?: boolean;
+  fetchNextPage?: () => void;
+  isFetchingNextPage?: boolean;
 }
 
 export const GridView = ({
@@ -21,6 +24,9 @@ export const GridView = ({
   isLoading = false,
   noDataComponent = <FolderEmpty />,
   CustomFileSystemItem = FileSystemItem,
+  hasNextPage,
+  fetchNextPage,
+  isFetchingNextPage,
 }: GridViewProps) => {
   if (isLoading) {
     return (
@@ -46,7 +52,7 @@ export const GridView = ({
     const folders = data.filter((item) => !item.format);
 
     return (
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-6">
         {folders.length > 0 && (
           <div>
             <h4 className="mb-2 text-16-medium text-heading">Folders</h4>
@@ -67,6 +73,17 @@ export const GridView = ({
             </div>
           </div>
         )}
+        {hasNextPage && (
+          <div className="mt-4 flex justify-center">
+            <Button
+              variant="secondary"
+              onClick={() => fetchNextPage?.()}
+              disabled={isFetchingNextPage}
+            >
+              {isFetchingNextPage ? 'Loading...' : 'Load More'}
+            </Button>
+          </div>
+        )}
       </div>
     );
   }
@@ -78,11 +95,26 @@ export const GridView = ({
         isFolderEmpty && 'flex-row items-center justify-center',
       )}
     >
-      {isFolderEmpty
-        ? noDataComponent
-        : itemsToDisplay.map((item) => (
+      {isFolderEmpty ? (
+        noDataComponent
+      ) : (
+        <>
+          {itemsToDisplay.map((item) => (
             <CustomFileSystemItem key={item.id} file={item} />
           ))}
+          {hasNextPage && (
+            <div className="mt-4 flex w-full justify-center">
+              <Button
+                variant="secondary"
+                onClick={() => fetchNextPage?.()}
+                disabled={isFetchingNextPage}
+              >
+                {isFetchingNextPage ? 'Loading...' : 'Load More'}
+              </Button>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 };

@@ -34,6 +34,7 @@ interface UseFileTableProps<TData> {
   isLoading?: boolean; // Indicates initial data loading
   isLoadingMore?: boolean; // Indicates loading more data
   skeletonComponent?: React.ReactNode; // Custom skeleton UI
+  usePagination?: boolean;
 }
 
 interface UseFileTableReturn<TData> {
@@ -93,6 +94,7 @@ export function useFileTable<TData>({
   isLoading = false,
   isLoadingMore = false,
   skeletonComponent,
+  usePagination = false,
 }: UseFileTableProps<TData>): UseFileTableReturn<TData> {
   const [sorting, setSorting] = React.useState<SortingState>(initialSorting);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -108,11 +110,14 @@ export function useFileTable<TData>({
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    ...(usePagination && {
+      getPaginationRowModel: getPaginationRowModel(),
+    }),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
+
     state: {
       sorting,
       columnFilters,

@@ -33,6 +33,10 @@ interface FolderViewProps {
    * Current folder id to subscribe to atom.
    */
   currentId: string;
+
+  hasNextPage?: boolean;
+  fetchNextPage?: () => void;
+  isFetchingNextPage?: boolean;
 }
 
 export const FolderView = ({
@@ -49,12 +53,21 @@ export const FolderView = ({
   noDataComponent = <FolderEmpty />,
   CustomFileSystemItem,
   currentId,
+  hasNextPage,
+  fetchNextPage,
+  isFetchingNextPage,
 }: FolderViewProps) => {
   const { view: preferredViewMode, setFolderViewMode } = useFolderViewMode();
   const [viewMode, setViewMode] = useState<FolderViewMode>(
     fixedView ?? preferredViewMode,
   );
   const [internalLoading, setInternalLoading] = useState(isLoading);
+
+  const paginationOptions = {
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  };
 
   const data = folder?.children ?? items;
 
@@ -64,13 +77,6 @@ export const FolderView = ({
     if (categoryToDisplay === 'folder') return item.isFolder;
     if (categoryToDisplay === 'file') return !item.isFolder;
     return true;
-  });
-
-  const sortedItems = [...filteredItems].sort((a, b) => {
-    if (a.isFolder && b.isFolder) {
-      return a.name.localeCompare(b.name);
-    }
-    return a.isFolder ? -1 : 1;
   });
 
   const tabClassName =
@@ -128,20 +134,21 @@ export const FolderView = ({
       </div>
       {viewMode === 'grid' ? (
         <GridView
-          data={sortedItems}
+          data={filteredItems}
           onlyFolders={displayOnlyFolders}
           group={group}
           isLoading={internalLoading}
           noDataComponent={noDataComponent}
           CustomFileSystemItem={CustomFileSystemItem}
+          {...paginationOptions}
         />
       ) : (
         <TableView
-          data={sortedItems}
+          data={filteredItems}
           onlyFolders={displayOnlyFolders}
           columns={columns}
           isLoading={internalLoading}
-          noDataComponent={noDataComponent}
+          {...paginationOptions}
         />
       )}
     </div>

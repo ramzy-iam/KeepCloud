@@ -3,11 +3,13 @@ import {
   FolderFilterDto,
   FileMinViewDto,
   TrashedFileDto,
+  UserStorageDto,
+  StorageBreakdownDto,
 } from '@keepcloud/commons/dtos';
 import { BaseHttpService } from './base.service';
 
 class StorageService extends BaseHttpService {
-  protected baseUrl: string = 'storage';
+  protected baseUrl = 'storage';
 
   async getRootItems(filters?: FolderFilterDto) {
     return this.get<PaginationDto<FileMinViewDto>>('/my-storage', {
@@ -27,15 +29,15 @@ class StorageService extends BaseHttpService {
     });
   }
 
-  async getSuggestedFolders() {
+  async getSuggestedFolders(filters: FolderFilterDto) {
     return this.get<PaginationDto<FileMinViewDto>>('/suggested-folders', {
-      params: { page: 1, pageSize: 10 },
+      params: filters,
     });
   }
 
-  async getSuggestedFiles() {
+  async getSuggestedFiles(filters: FolderFilterDto) {
     return this.get<PaginationDto<FileMinViewDto>>('/suggested-files', {
-      params: { page: 1, pageSize: 15 },
+      params: filters,
     });
   }
 
@@ -64,6 +66,14 @@ class StorageService extends BaseHttpService {
 
   async restore(id: string) {
     return this.post<FileMinViewDto>(`/resources/${id}/restore`);
+  }
+
+  async getUserStorage() {
+    return this.get<UserStorageDto>('/usage');
+  }
+
+  async getStorageBreakdown() {
+    return this.get<StorageBreakdownDto>('/breakdown');
   }
 }
 
