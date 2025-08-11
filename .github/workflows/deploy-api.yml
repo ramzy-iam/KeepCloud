@@ -1,4 +1,4 @@
-name: Deploy API (${{ inputs.environment }})
+name: Deploy KeepCloud API
 
 on:
   workflow_call:
