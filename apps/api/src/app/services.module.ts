@@ -12,6 +12,8 @@ import {
   UserService,
   NestedSetService,
   StorageService,
+  MailService,
+  NotificationService,
 } from '@keepcloud/core/services';
 import { Global, Module } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -23,6 +25,8 @@ const services = [
   StorageService,
   JwtService,
   NestedSetService,
+  MailService,
+  NotificationService,
 
   // Repositories
   UserRepository,

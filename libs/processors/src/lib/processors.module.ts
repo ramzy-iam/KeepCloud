@@ -6,6 +6,7 @@ import {
   UpdateFileTagInAfterCreateProcessor,
   ProcessorProvider,
   RebuildTreeProcessor,
+  SendEmailNotificationProcessor,
 } from '@keepcloud/core/services';
 
 const services = [
@@ -15,6 +16,7 @@ const services = [
   DeleteFileFromStorageProcessor,
   DeleteFileAndChildrenFromStorageProcessor,
   RebuildTreeProcessor,
+  SendEmailNotificationProcessor,
 ];
 
 @Global()

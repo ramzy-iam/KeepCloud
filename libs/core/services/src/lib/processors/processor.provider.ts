@@ -7,6 +7,7 @@ import { DeleteNodeProcessor } from './delete-node.processor';
 import { DeleteFileFromStorageProcessor } from './delete-file-from-storage.processor';
 import { RebuildTreeProcessor } from './rebuild-tree.processor';
 import { DeleteFileAndChildrenFromStorageProcessor } from './delete-file-and-children-from-storage.processor';
+import { SendEmailNotificationProcessor } from './send-email-notification.processor';
 
 @Injectable()
 export class ProcessorProvider {
@@ -16,6 +17,7 @@ export class ProcessorProvider {
     private readonly deleteFileFromStorageProcessor: DeleteFileFromStorageProcessor,
     private readonly rebuildTreeProcessor: RebuildTreeProcessor,
     private readonly deleteFileAndChildrenFromStorageProcessor: DeleteFileAndChildrenFromStorageProcessor,
+    private readonly sendEmailNotificationProcessor: SendEmailNotificationProcessor,
   ) {}
 
   getFromMessage(message: string): Processor {
@@ -33,6 +35,10 @@ export class ProcessorProvider {
       [
         ProcessorAction.DELETE_FILE_AND_CHILDREN_FROM_STORAGE,
         this.deleteFileAndChildrenFromStorageProcessor,
+      ],
+      [
+        ProcessorAction.SEND_EMAIL_NOTIFICATION,
+        this.sendEmailNotificationProcessor,
       ],
     ]);
 
