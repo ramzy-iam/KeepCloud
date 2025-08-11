@@ -1,4 +1,4 @@
-name: Deploy KeepCloud API
+name: Deploy API
 
 on:
   workflow_call:
