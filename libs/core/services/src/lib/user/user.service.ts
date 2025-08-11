@@ -12,20 +12,24 @@ export class UserService {
     private readonly subscriptionPlanRepository: SubscriptionPlanRepository,
   ) {}
 
-  async createOrUpdateGoogleUser(profile: TokenPayload): Promise<User> {
+  async createOrUpdateGoogleUser(
+    profile: TokenPayload,
+  ): Promise<{ user: User; isNewUser: boolean }> {
     if (!profile.email) {
       throw new UserNotFoundException('Email not provided in profile');
     }
     const email = profile.email;
 
     let user = await this.userRepository.scoped.filterByEmail(email).getOne();
+    let isNewUser = false;
 
     const plan = await this.subscriptionPlanRepository.scoped
       .filterByDefault()
       .getOneOrFail();
 
     if (!user) {
-      const [newUser, _] = await this.userRepository.prisma.$transaction(
+      isNewUser = true;
+      const [newUser] = await this.userRepository.prisma.$transaction(
         async (tx) => {
           const newUser = await tx.user.create({
             data: {
@@ -37,7 +41,7 @@ export class UserService {
             },
           });
 
-          const myStorage = await tx.file.create({
+          await tx.file.create({
             data: {
               name: SYSTEM_FILE.MY_STORAGE.code,
               owner: {
@@ -53,13 +57,13 @@ export class UserService {
             },
           });
 
-          return [newUser, myStorage];
+          return [newUser];
         },
       );
       user = newUser;
     }
 
-    return user;
+    return { user, isNewUser };
   }
 
   findOne({ email, id }: { email?: string; id?: string }) {
