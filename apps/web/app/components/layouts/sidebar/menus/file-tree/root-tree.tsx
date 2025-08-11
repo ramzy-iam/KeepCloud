@@ -1,12 +1,7 @@
 import { FileFormat, SYSTEM_FILE } from '@keepcloud/commons/constants';
 import { FileMinViewDto } from '@keepcloud/commons/dtos';
-import {
-  ROUTE_PATH,
-  Skeleton,
-  useGetFoldersForTree,
-} from '@keepcloud/web-core/react';
+import { ROUTE_PATH } from '@keepcloud/web-core/react';
 import { FileNode } from './file-node';
-import { FileTreeNode } from './file-tree-node';
 
 export const RootTree = () => {
   const root: FileMinViewDto = {
@@ -24,30 +19,14 @@ export const RootTree = () => {
       lastName: SYSTEM_FILE.MY_STORAGE.name,
       email: SYSTEM_FILE.MY_STORAGE.name,
       picture: SYSTEM_FILE.MY_STORAGE.name,
+      root: SYSTEM_FILE.MY_STORAGE.id,
     },
-    parentId: 'null',
+    parentId: null,
   };
 
-  const { data, isLoading } = useGetFoldersForTree({
-    filters: { type: 'FOLDER' },
-  });
-
   return (
-    <div>
-      <FileNode file={root} noIcon={true} isRoot={true} url={ROUTE_PATH.folder}>
-        {isLoading ? (
-          <div className="space-y-2">
-            {Array.from({ length: 3 }).map((_, index) => (
-              <Skeleton key={index} className="h-8 w-full" />
-            ))}
-          </div>
-        ) : (
-          data?.items
-            ?.filter((child) => child.isFolder)
-            .sort((a, b) => a.name.localeCompare(b.name))
-            .map((child) => <FileTreeNode key={child.id} file={child} />)
-        )}
-      </FileNode>
+    <div className="max-w-xs">
+      <FileNode file={root} noIcon isRoot url={ROUTE_PATH.folder} />
     </div>
   );
 };

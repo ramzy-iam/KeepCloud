@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  FileUp,
-  FolderPlus,
-  FolderUp,
-  PlusIcon,
-  UploadIcon,
-} from 'lucide-react';
+import { FileUp, FolderPlus, PlusIcon, UploadIcon } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -94,12 +88,6 @@ export const QuickActionButtons = ({
           icon: <FileUp absoluteStrokeWidth className={iconClassName} />,
           className: itemClassName,
           onClick: () => triggerUpload(),
-        },
-        {
-          label: 'Import a folder',
-          icon: <FolderUp absoluteStrokeWidth className={iconClassName} />,
-          className: itemClassName,
-          onClick: () => console.log('Import a folder clicked'),
         },
       ],
     },

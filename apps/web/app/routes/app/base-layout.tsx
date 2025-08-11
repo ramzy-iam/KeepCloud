@@ -1,4 +1,9 @@
-import { Navigate, Outlet } from 'react-router';
+import {
+  Navigate,
+  Outlet,
+  isRouteErrorResponse,
+  useNavigate,
+} from 'react-router';
 import {
   ModeToggle,
   SidebarProvider,
@@ -7,6 +12,7 @@ import {
   ROUTE_PATH,
   useAuth,
   useInitializeFolderViewMode,
+  Button,
 } from '@keepcloud/web-core/react';
 import { UserProfileDto } from '@keepcloud/commons/dtos';
 import {
@@ -16,6 +22,7 @@ import {
   QuickActionButtons,
   UserProfileIcon,
 } from '../../components';
+import ScreenLoader from './loader';
 
 const LocalSidebarTrigger = () => {
   const { open, openMobile, isMobile } = useSidebar();
@@ -31,12 +38,84 @@ const ProfileIcon = ({ user }: { user: UserProfileDto }) => {
   );
 };
 
+export function ErrorBoundary({ error }: { error: unknown }) {
+  const navigate = useNavigate();
+  const isDev = import.meta.env.DEV;
+
+  if (isRouteErrorResponse(error)) {
+    return (
+      <div className="flex h-svh flex-col items-center justify-center gap-4 bg-background px-6 text-center">
+        <h1 className="bg-primary-gradient bg-clip-text text-[100px] leading-none font-black text-transparent drop-shadow-md">
+          {error.status}
+        </h1>
+        <p className="text-xl font-semibold">{error.statusText}</p>
+        {isDev && (
+          <details className="max-w-xl rounded bg-muted p-4 text-left text-xs text-muted-foreground">
+            <summary className="cursor-pointer font-semibold">Details</summary>
+            <pre className="mt-2 break-all whitespace-pre-wrap">
+              {JSON.stringify(error, null, 2)}
+            </pre>
+          </details>
+        )}
+        <Button variant="primary" onClick={() => navigate('/')}>
+          Go Home
+        </Button>
+      </div>
+    );
+  }
+
+  if (error instanceof Error) {
+    return (
+      <div className="flex h-svh flex-col items-center justify-center gap-4 bg-background px-6 text-center">
+        <h1 className="bg-primary-gradient bg-clip-text text-[72px] font-black text-transparent drop-shadow-md">
+          Error
+        </h1>
+        <p className="text-xl font-semibold">Something went wrong</p>
+        <p className="text-sm">An unexpected error has occurred.</p>
+        {isDev && (
+          <details className="max-w-xl rounded bg-muted p-4 text-left text-xs text-muted-foreground">
+            <summary className="cursor-pointer font-semibold">Details</summary>
+            <pre className="mt-2 break-all whitespace-pre-wrap">
+              {error.message}
+              {'\n'}
+              {error.stack}
+            </pre>
+          </details>
+        )}
+        <Button variant="primary" onClick={() => window.location.reload()}>
+          Try Again
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-svh flex-col items-center justify-center gap-4 bg-background px-6 text-center">
+      <h1 className="bg-primary-gradient bg-clip-text text-[72px] font-black text-transparent drop-shadow-md">
+        Unknown Error
+      </h1>
+      <p className="text-sm">An unexpected error has occurred.</p>
+      {isDev && (
+        <details className="max-w-xl rounded bg-muted p-4 text-left text-xs text-muted-foreground">
+          <summary className="cursor-pointer font-semibold">Details</summary>
+          <pre className="mt-2 break-all whitespace-pre-wrap">
+            {JSON.stringify(error, null, 2)}
+          </pre>
+        </details>
+      )}
+      <Button variant="primary" onClick={() => window.location.reload()}>
+        Reload
+      </Button>
+    </div>
+  );
+}
+
 export default function BaseLayout() {
   const { user, authChecked, redirect, isLoading } = useAuth();
   useInitializeFolderViewMode();
 
   if (redirect) return <Navigate to={ROUTE_PATH.login} />;
-  if (!authChecked || isLoading) return <div>Loading...</div>;
+  if (!authChecked || isLoading) return <ScreenLoader />;
 
   return (
     <div className="h-svh overflow-hidden">

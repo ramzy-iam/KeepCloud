@@ -5,7 +5,7 @@ import {
   IsOptional,
   IsBoolean,
 } from '../validators';
-import { ErrorCode, FileFormat } from '@keepcloud/commons/constants';
+import { ErrorCode, FileFormat } from '../constants';
 
 import { Expose, Transform, Type } from 'class-transformer';
 import { FileType } from '@prisma/client';
@@ -54,7 +54,10 @@ export class FileMinViewDto {
   id: string;
 
   @Expose()
-  parentId: string;
+  createdAt: Date;
+
+  @Expose()
+  parentId: string | null;
 
   @Expose()
   name: string;
@@ -86,9 +89,6 @@ export class FileMinViewDto {
 }
 
 export class FilePreviewDto extends FileMinViewDto {
-  @Expose()
-  createdAt: Date;
-
   @Expose()
   updatedAt: Date;
 

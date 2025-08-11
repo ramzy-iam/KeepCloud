@@ -16,6 +16,7 @@
     "@codegenie/serverless-express": "^4.16.0",
     "@hookform/resolvers": "^5.0.1",
     "@nestjs/common": "^10.0.2",
+    "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^10.0.2",
     "@nestjs/jwt": "^11.0.0",
     "@nestjs/passport": "^11.0.5",
@@ -85,7 +86,7 @@
     "typeorm": "^0.3.21",
     "universal-cookie": "^8.0.1",
     "winston": "^3.17.0",
-    "zod": "^3.24.3"
+    "zod": "^3.25.67"
   },
   "devDependencies": {
     "@babel/core": "^7.14.5",
@@ -142,6 +143,7 @@
     "serverless-dotenv-plugin": "^6.0.0",
     "serverless-offline": "^14.4.0",
     "serverless-offline-sqs": "^8.0.0",
+    "serverless-s3-sync": "^3.4.0",
     "ts-jest": "^29.1.0",
     "ts-node": "10.9.1",
     "tslib": "^2.8.1",

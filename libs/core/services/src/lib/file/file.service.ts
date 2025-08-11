@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { File, FileRepository, FileType } from '@keepcloud/core/db';
+import { File, FileRepository, FileType, Prisma } from '@keepcloud/core/db';
 import {
   CreateFileDto,
   FileAncestorDto,
   PresignedGetResultDto,
-  PresignedPostResultDto,
 } from '@keepcloud/commons/dtos';
 import {
+  AppConfigService,
   FileKeyInvalidException,
   FileNotFoundException,
   FolderNotFoundException,
@@ -15,7 +15,6 @@ import {
   Logger,
   S3Helper,
 } from '@keepcloud/commons/backend';
-import { Prisma } from '@prisma/client';
 import { BaseFileService } from './base-file-service';
 import { FileHelper } from '@keepcloud/commons/helpers';
 import { UserService } from '../user';
@@ -35,10 +34,11 @@ export class FileService extends BaseFileService {
     private readonly userService: UserService,
     private readonly systemQueueService: SystemQueueService,
     protected override readonly nestedSetService: NestedSetService,
+    protected readonly configService: AppConfigService,
   ) {
     super(fileRepository, nestedSetService);
     this.s3helper = S3Helper.getInstance();
-    this.bucket = process.env.FILE_BUCKET;
+    this.bucket = this.configService.env.FILE_BUCKET;
     this.logger = new Logger(FileService.name);
   }
 
@@ -47,12 +47,12 @@ export class FileService extends BaseFileService {
     dto: CreateFileDto,
   ): Promise<File & { ancestors: FileAncestorDto[] }> {
     let parentId = dto.parentId || null;
-    if (!parentId) {
+    if (!parentId || FileHelper.isSystemFile(parentId)) {
       const root = await this.fileRepository.getRootFolder();
       parentId = root.id;
     }
 
-    await this.validateParentFolder(dto.parentId);
+    await this.validateParentFolder(parentId);
     await this.validateFileExistsInStorage(dto.storagePath);
 
     const { name, format } = FileHelper.splitNameAndFormat(dto.filename);
@@ -204,7 +204,7 @@ export class FileService extends BaseFileService {
   ): Promise<void> {
     const remainingStorage =
       await this.userService.getRemainingStorage(ownerId);
-    if (remainingStorage < size) {
+    if (remainingStorage < BigInt(size)) {
       throw new InsufficientStorageException();
     }
   }
@@ -266,31 +266,5 @@ export class FileService extends BaseFileService {
         ...ancestors,
       ],
     };
-  }
-
-  async deleteFileOnStorage(
-    ownerId: string,
-    left: number,
-    right: number,
-  ): Promise<void> {
-    const filesToDelete = await this.fileRepository.prisma.file.findMany({
-      where: {
-        ownerId,
-        left: { gte: left },
-        right: { lte: right },
-        // assuming you have a 'type' or 'isFolder' flag
-        isFolder: false, // or type: FileType.FILE
-        deletedAt: { not: null }, // optionally ensure they're marked deleted
-      },
-      select: { id: true, storagePath: true },
-    });
-
-    for (const file of filesToDelete) {
-      await this.systemQueueService.enqueueDeleteFileFromStorage({
-        ownerId,
-        fileId: file.id,
-        storagePath: file.storagePath as string,
-      });
-    }
   }
 }

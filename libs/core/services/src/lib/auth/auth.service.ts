@@ -10,13 +10,12 @@ import { TokenPayload } from 'google-auth-library';
 import { OAuthService } from './oauth.service';
 import { AccessTokenPayload, UserProfileDto } from '@keepcloud/commons/dtos';
 import {
+  AppConfigService,
   BadRequestException,
   InternalServerErrorException,
   UnauthorizedException,
 } from '@keepcloud/commons/backend';
 import { ErrorCode } from '@keepcloud/commons/constants';
-
-const { JWT_REFRESH_SECRET, JWT_SECRET } = process.env;
 
 @Injectable()
 export class AuthService {
@@ -26,6 +25,7 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly fileRepository: FileRepository,
     private readonly jwtService: JwtService,
+    private readonly configService: AppConfigService,
   ) {
     this.logger = new Logger(AuthService.name);
   }
@@ -73,12 +73,11 @@ export class AuthService {
     const { id: sub, email, picture } = user;
     const payload: AccessTokenPayload = { sub, email, picture };
     const accessToken = this.jwtService.sign(payload, {
-      secret: JWT_SECRET,
-      // expiresIn: '1h',
+      secret: this.configService.env.JWT_SECRET,
       expiresIn: '15d',
     });
     const refreshToken = this.jwtService.sign(payload, {
-      secret: JWT_REFRESH_SECRET,
+      secret: this.configService.env.JWT_REFRESH_SECRET,
       expiresIn: '15d',
     });
     return { accessToken, refreshToken };
@@ -95,7 +94,7 @@ export class AuthService {
 
       const { email, sub }: { sub: string; email: string } =
         this.jwtService.verify(refreshToken, {
-          secret: JWT_REFRESH_SECRET,
+          secret: this.configService.env.JWT_REFRESH_SECRET,
         });
 
       const user = await this.userService.findOne({ id: sub, email });

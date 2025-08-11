@@ -22,7 +22,7 @@ export abstract class BaseRepository<
   abstract get scoped(): unknown;
 
   get model() {
-    return RLSContextService.prisma![
+    return RLSContextService.prisma[
       this.modelName
     ] as unknown as GenericPrismaModel<
       T,
@@ -56,7 +56,7 @@ export abstract class BaseRepository<
   }: {
     where?: WhereInput;
     include?: Include;
-    orderBy?: OrderByWithRelationInput;
+    orderBy?: OrderByWithRelationInput[];
   } = {}) {
     return this.model.findMany({
       where,
@@ -75,7 +75,7 @@ export abstract class BaseRepository<
     }: {
       where?: WhereInput;
       include?: Include;
-      orderBy?: OrderByWithRelationInput;
+      orderBy?: OrderByWithRelationInput[];
     } = {},
   ): Promise<PaginationDto<T>> {
     const safePage = Math.max(1, page);

@@ -15,7 +15,7 @@ export interface GenericPrismaModel<
   findMany: (args: {
     where?: WhereInput;
     include?: Include;
-    orderBy?: OrderByWithRelationInput;
+    orderBy?: OrderByWithRelationInput[];
     skip?: number;
     take?: number;
   }) => Promise<T[]>;
