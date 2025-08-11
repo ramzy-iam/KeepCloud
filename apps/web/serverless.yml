@@ -65,7 +65,7 @@ resources:
       Type: AWS::CloudFront::OriginAccessControl
       Properties:
         OriginAccessControlConfig:
-          Name: keepcloud-web-oac
+          Name: keepcloud-web-oac-${env:STAGE}
           Description: KeepCloud Web OAC
           OriginAccessControlOriginType: s3
           SigningBehavior: always
