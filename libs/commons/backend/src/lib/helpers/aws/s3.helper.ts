@@ -79,7 +79,7 @@ interface FileMetadata {
   storageClass?: string;
 }
 
-export class S3Helper extends AwsServiceHelper<S3Client> {
+export class S3Helper extends AwsServiceHelper {
   protected client: S3Client;
   protected static instanceMap = new Map<string, S3Helper>();
   private logger = new Logger(S3Helper.name);
@@ -89,13 +89,10 @@ export class S3Helper extends AwsServiceHelper<S3Client> {
     secretAccessKey: string,
     region: string,
   ) {
-    super();
+    super(accessKeyId, secretAccessKey, region);
     this.client = new S3Client({
-      credentials: {
-        accessKeyId,
-        secretAccessKey,
-      },
-      region,
+      ...this.getCredentials(),
+      region: this.getRegion(),
     });
     this.logger.debug(`S3Helper initialized for region: ${region}`);
   }
