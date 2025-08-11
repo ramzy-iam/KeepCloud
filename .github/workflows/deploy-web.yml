@@ -1,4 +1,4 @@
-name: Deploy KeepCloud Web
+name: Deploy Web (${{ inputs.environment }})
 
 on:
   workflow_call:

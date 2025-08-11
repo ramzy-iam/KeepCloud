@@ -19,7 +19,6 @@ on:
 
 jobs:
   web:
-    name: Deploy Web (${{ (github.ref == 'refs/heads/develop' || github.event.inputs.environment == 'dev') && 'Dev' || 'Production' }})
     if: |
       github.ref == 'refs/heads/develop' ||
       (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'dev') ||
@@ -31,7 +30,6 @@ jobs:
     secrets: inherit
 
   api:
-    name: Deploy API (${{ (github.ref == 'refs/heads/develop' || github.event.inputs.environment == 'dev') && 'Dev' || 'Production' }})
     if: |
       github.ref == 'refs/heads/develop' ||
       (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'dev') ||
