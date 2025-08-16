@@ -33,7 +33,7 @@ export default function Login() {
         </div>
         <div className="flex w-full max-w-[360px] flex-col items-center justify-center gap-6 md:w-[350px] md:max-w-full">
           <Logo />
-          <h1 className="text-[32px] leading-[40px] font-semibold text-neutral-500 dark:text-white">
+          <h1 className="text-[32px] leading-[40px] font-semibold tracking-[-0.03em] text-neutral-500 dark:text-white">
             Welcome to{' '}
             <span className="bg-linear-to-r from-[#4C3CC6] to-[#7E60F8] bg-clip-text text-transparent">
               KeepCloud
