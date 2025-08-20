@@ -33,7 +33,12 @@ model File {
 
   accessLogs FileAccessLog[] @relation("FileToAccessLog")
 
-  sharedWith SharedFile[]
+  // Simple sharing approach using flags and tokens
+  isPublic    Boolean  @default(false)
+  isShared    Boolean  @default(false)
+  shareToken  String?  @unique // For secure sharing
+  shareExpiry DateTime? // Optional expiry for shares
+
   left       Int
   right      Int
 
@@ -43,4 +48,7 @@ model File {
   @@index([ownerId])
   @@index([parentId])
   @@index([trashedAt])
+  @@index([shareToken])
+  @@index([isPublic])
+  @@index([isShared])
 }

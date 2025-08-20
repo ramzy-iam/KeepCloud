@@ -73,6 +73,21 @@ export class FileScope extends BaseScope<
     return this;
   }
 
+  filterByShareToken(shareToken: string) {
+    this._where.shareToken = shareToken;
+    return this;
+  }
+
+  filterByIsShared(isShared: boolean) {
+    this._where.isShared = isShared;
+    return this;
+  }
+
+  filterByIsPublic(isPublic: boolean) {
+    this._where.isPublic = isPublic;
+    return this;
+  }
+
   joinOwner(): this {
     this._include.owner = true;
     return this;

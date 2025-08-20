@@ -3,10 +3,9 @@ import { DatabaseModule } from '@keepcloud/core/db';
 import { IamApiModule } from '@keepcloud/iam/api';
 import { FileApiModule } from '@keepcloud/files/api';
 import { StorageApiModule } from '@keepcloud/storage/api';
+import { SharingApiModule } from '@keepcloud/sharing/api';
 import { GlobalExceptionFilter } from '@keepcloud/commons/backend';
 import { ServicesModule } from './services.module';
-// RLS removed for simplified file sharing approach
-// import { RLSContextMiddleware } from '@keepcloud/core/services';
 import { ProcessorsModule } from '@keepcloud/processors';
 import { ConfigModule } from '@nestjs/config';
 
@@ -19,6 +18,7 @@ import { ConfigModule } from '@nestjs/config';
     IamApiModule,
     FileApiModule,
     StorageApiModule,
+    SharingApiModule,
   ],
   providers: [
     {
@@ -29,7 +29,6 @@ import { ConfigModule } from '@nestjs/config';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    // RLS middleware removed for simplified approach with user-level filtering
-    // consumer.apply(RLSContextMiddleware).forRoutes('*');
+    // Simplified sharing approach without RLS
   }
 }

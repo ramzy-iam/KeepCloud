@@ -34,12 +34,6 @@ export class StorageController {
     return this.storageService.getRootItems(user.id, filters);
   }
 
-  @Get('shared-with-me')
-  @Serialize(new PaginationDto(FileMinViewDto))
-  getSharedWithMe(@Query() filters: FolderFilterDto, @CurrentUser() user: UserProfileDto) {
-    return this.storageService.getSharedWithMe(user.id, filters);
-  }
-
   @Get('trash')
   @Serialize(new PaginationDto(TrashedFileDto))
   getTrashedItems(@Query() filters: FolderFilterDto) {
