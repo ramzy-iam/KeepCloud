@@ -5,7 +5,8 @@ import { FileApiModule } from '@keepcloud/files/api';
 import { StorageApiModule } from '@keepcloud/storage/api';
 import { GlobalExceptionFilter } from '@keepcloud/commons/backend';
 import { ServicesModule } from './services.module';
-import { RLSContextMiddleware } from '@keepcloud/core/services';
+// RLS removed for simplified file sharing approach
+// import { RLSContextMiddleware } from '@keepcloud/core/services';
 import { ProcessorsModule } from '@keepcloud/processors';
 import { ConfigModule } from '@nestjs/config';
 
@@ -28,6 +29,7 @@ import { ConfigModule } from '@nestjs/config';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(RLSContextMiddleware).forRoutes('*');
+    // RLS middleware removed for simplified approach with user-level filtering
+    // consumer.apply(RLSContextMiddleware).forRoutes('*');
   }
 }

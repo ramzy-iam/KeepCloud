@@ -19,10 +19,34 @@ export class StorageService {
     private readonly userService: UserService,
   ) {}
 
-  async getRootItems(filters: FolderFilterDto): Promise<PaginationDto<File>> {
-    const root = await this.fileRepository.getRootFolder();
+  /**
+   * Check if user has access to a file (owns it or it's shared with them)
+   * This replaces the complex RLS approach with simple application-level filtering
+   */
+  async hasFileAccess(fileId: string, userId: string): Promise<boolean> {
+    // Check if user owns the file
+    const ownedFile = await this.fileRepository.scoped
+      .filterById(fileId)
+      .filterByOwnerId(userId)
+      .getOne();
+    
+    if (ownedFile) {
+      return true;
+    }
+
+    // Check if file is shared with user
+    const sharedFile = await this.sharedFileRepository.findByFileIdAndUserId(fileId, userId);
+    return !!sharedFile;
+  }
+
+  /**
+   * Get user's root items with proper access control
+   */
+  async getRootItems(userId: string, filters: FolderFilterDto): Promise<PaginationDto<File>> {
+    const root = await this.fileRepository.getRootFolder(userId);
     const scope = this.fileRepository.scoped
       .filterByParentId(root.id)
+      .filterByOwnerId(userId) // Ensure user only sees their own files
       .filterByNotTrashed()
       .orderBy({ isFolder: 'desc' }) //folder first
       .orderBy({ name: filters.order })
@@ -124,11 +148,12 @@ export class StorageService {
     };
   }
 
-  async getSuggestedFolders(): Promise<PaginationDto<File>> {
-    const root = await this.fileRepository.getRootFolder();
+  async getSuggestedFolders(userId: string): Promise<PaginationDto<File>> {
+    const root = await this.fileRepository.getRootFolder(userId);
 
     return this.fileRepository.scoped
       .filterByParentId(root.id)
+      .filterByOwnerId(userId) // Add user filtering
       .filterByType(FileType.FOLDER)
       .filterByNotTrashed()
       .joinOwner()
@@ -136,11 +161,12 @@ export class StorageService {
       .getManyPaginated(1, 15);
   }
 
-  async getSuggestedFiles(): Promise<PaginationDto<File>> {
-    const root = await this.fileRepository.getRootFolder();
+  async getSuggestedFiles(userId: string): Promise<PaginationDto<File>> {
+    const root = await this.fileRepository.getRootFolder(userId);
 
     return this.fileRepository.scoped
       .filterByParentId(root.id)
+      .filterByOwnerId(userId) // Add user filtering
       .filterByType(FileType.FILE)
       .filterByNotTrashed()
       .joinOwner()
@@ -149,23 +175,41 @@ export class StorageService {
   }
 
   async getFoldersForTree(
+    userId: string,
     filters: FolderFilterDto,
   ): Promise<PaginationDto<File>> {
-    const root = await this.fileRepository.getRootFolder();
+    const root = await this.fileRepository.getRootFolder(userId);
     const parentId = filters.parentId ?? root.id;
     return this.fileRepository.scoped
       .filterByParentId(parentId)
+      .filterByOwnerId(userId) // Add user filtering
       .filterByType(FileType.FOLDER)
       .filterByNotTrashed()
       .orderBy({ name: filters.order })
       .getManyPaginated(filters.page, filters.pageSize);
   }
 
-  rename(id: string, name: string): Promise<File> {
+  async rename(id: string, name: string, userId: string): Promise<File> {
+    // First check if user has access to this file
+    const hasAccess = await this.hasFileAccess(id, userId);
+    if (!hasAccess) {
+      throw new NotFoundException({
+        message: ErrorCode.FILE_NOT_FOUND,
+      });
+    }
+
     return this.fileRepository.update({ id }, { name });
   }
 
-  async moveToTrash(id: string): Promise<File> {
+  async moveToTrash(id: string, userId: string): Promise<File> {
+    // First check if user has access to this file
+    const hasAccess = await this.hasFileAccess(id, userId);
+    if (!hasAccess) {
+      throw new NotFoundException({
+        message: ErrorCode.FILE_NOT_FOUND,
+      });
+    }
+
     await this.fileRepository.scoped
       .filterById(id)
       .filterByIsSystem(false)
@@ -191,7 +235,15 @@ export class StorageService {
     return file;
   }
 
-  async delete(id: string): Promise<File> {
+  async delete(id: string, userId: string): Promise<File> {
+    // First check if user has access to this file
+    const hasAccess = await this.hasFileAccess(id, userId);
+    if (!hasAccess) {
+      throw new NotFoundException({
+        message: ErrorCode.FILE_NOT_FOUND,
+      });
+    }
+
     const resource = await this.fileRepository.scoped
       .filterById(id)
       .filterByIsSystem(false)
@@ -236,7 +288,15 @@ export class StorageService {
     return deleted;
   }
 
-  async restore(id: string): Promise<File> {
+  async restore(id: string, userId: string): Promise<File> {
+    // First check if user has access to this file
+    const hasAccess = await this.hasFileAccess(id, userId);
+    if (!hasAccess) {
+      throw new NotFoundException({
+        message: ErrorCode.FILE_NOT_FOUND,
+      });
+    }
+
     await this.fileRepository.scoped
       .filterById(id)
       .filterByIsSystem(false)
