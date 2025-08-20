@@ -18,7 +18,6 @@ export type File = {
   lastModified: string;
   isStarred?: boolean;
   isTrashed?: boolean;
-  sharedWith?: string[];
   fileType?: 'folder' | 'file' | 'image' | 'video';
   parent?: File;
   parentId?: string | null;

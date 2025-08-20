@@ -34,14 +34,6 @@ export class StorageService {
     return scope.getManyPaginated(filters.page, filters.pageSize);
   }
 
-  getSharedWithMe(filters: FolderFilterDto): Promise<PaginationDto<File>> {
-    return this.fileRepository.scoped
-      .filterByParentId('null')
-      .orderBy({ isFolder: 'desc' })
-      .orderBy({ name: filters.order })
-      .getManyPaginated(filters.page, filters.pageSize);
-  }
-
   async getTrashedItems(filters: FolderFilterDto) {
     // Get trashed items that are top-level (their parent is not trashed)
 

@@ -349,13 +349,6 @@ export const SYSTEM_FILE = {
     isSystem: true,
     invalidationKey: 'MY_STORAGE',
   },
-  SHARED_WITH_ME: {
-    id: 'shared_with_me',
-    name: 'Shared with me',
-    code: 'SHARED_WITH_ME',
-    isSystem: true,
-    invalidationKey: 'SHARED_WITH_ME',
-  },
   TRASH: {
     id: 'trash',
     name: 'Trash',

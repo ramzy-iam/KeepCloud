@@ -33,7 +33,6 @@ model File {
 
   accessLogs FileAccessLog[] @relation("FileToAccessLog")
 
-  sharedWith SharedFile[]
   left       Int
   right      Int
 

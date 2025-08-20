@@ -21,7 +21,6 @@ const filterInitialValues: FilterFormData = {
   type: 'all',
   owner: 'any',
   ownerId: undefined,
-  sharedWith: '',
   name: undefined,
   modifiedDate: undefined,
 };
@@ -63,7 +62,7 @@ export const GlobalSearch = () => {
     const matchesLocation =
       filters.location === 'my-storage'
         ? item.owner.id === currentUserId
-        : filters.location === 'shared-with-me'
+        : filters.location === 'others'
           ? item.owner.id !== currentUserId
           : true;
     const matchesInTrash = filters.inTrash ? item.isTrashed : true;
@@ -81,9 +80,6 @@ export const GlobalSearch = () => {
           : filters.ownerId
             ? item.owner.id === filters.ownerId
             : true;
-    const matchesSharedWith = filters.sharedWith
-      ? item.sharedWith?.includes(filters.sharedWith)
-      : true;
     const matchesName = filters.name
       ? item.name.toLowerCase().includes(filters.name.toLowerCase())
       : true;
@@ -98,7 +94,6 @@ export const GlobalSearch = () => {
       matchesInTrash &&
       matchesType &&
       matchesOwner &&
-      matchesSharedWith &&
       matchesName &&
       matchesModifiedDate
     );

@@ -54,7 +54,6 @@ export const FilterDialog = ({
       type: 'all',
       owner: 'any',
       ownerId: undefined,
-      sharedWith: undefined,
       name: undefined,
       modifiedDate: undefined,
       ...initialFilters,
@@ -120,9 +119,6 @@ export const FilterDialog = ({
                     <SelectContent>
                       <SelectItem value="anywhere">Anywhere</SelectItem>
                       <SelectItem value="my-storage">My Storage</SelectItem>
-                      <SelectItem value="shared-with-me">
-                        Shared with Me
-                      </SelectItem>
                       <SelectItem value="others">Others</SelectItem>
                     </SelectContent>
                   </Select>
@@ -232,25 +228,6 @@ export const FilterDialog = ({
                 )}
               />
             )}
-
-            <FormField
-              control={form.control}
-              name="sharedWith"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Shared With</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Enter user email"
-                      className="w-full"
-                      {...field}
-                      aria-label="Shared with user email"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
 
             <FormField
               control={form.control}

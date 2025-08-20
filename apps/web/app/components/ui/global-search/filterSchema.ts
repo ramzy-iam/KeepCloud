@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const filterSchema = z.object({
   location: z
-    .enum(['my-storage', 'shared-with-me', 'others', 'anywhere'])
+    .enum(['my-storage', 'others', 'anywhere'])
     .default('anywhere')
     .optional(),
   inTrash: z.boolean().default(false).optional(),
@@ -15,7 +15,6 @@ export const filterSchema = z.object({
     .default('any')
     .optional(),
   ownerId: z.string().optional(),
-  sharedWith: z.string().optional(),
   name: z.string().optional(),
   modifiedDate: z.string().optional(),
 });

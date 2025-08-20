@@ -17,12 +17,6 @@ class StorageService extends BaseHttpService {
     });
   }
 
-  async getSharedWithMe(filters: FolderFilterDto) {
-    return this.get<PaginationDto<FileMinViewDto>>('/shared-with-me', {
-      params: filters,
-    });
-  }
-
   async getTrashedItems(filters: FolderFilterDto) {
     return this.get<PaginationDto<TrashedFileDto>>('/trash', {
       params: filters,

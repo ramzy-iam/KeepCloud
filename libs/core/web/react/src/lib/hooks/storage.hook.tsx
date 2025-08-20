@@ -44,20 +44,6 @@ export const useGetRootItems = ({
   });
 };
 
-export const useGetSharedWithMe = ({
-  filters = {},
-  enabled = true,
-}: StorageQueryProps = {}) => {
-  return useInfiniteListQuery<FileMinViewDto>({
-    queryKey: [SYSTEM_FILE.SHARED_WITH_ME.invalidationKey],
-    listKey: SYSTEM_FILE.SHARED_WITH_ME.id,
-    enabled,
-    fetchFn: async (page) => {
-      return StorageService.getSharedWithMe({ ...filters, page });
-    },
-  });
-};
-
 export const useGetTrashedItems = ({
   filters = {},
   enabled = true,
