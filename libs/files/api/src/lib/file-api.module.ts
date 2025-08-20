@@ -1,11 +1,19 @@
-import { FileService, FolderService } from '@keepcloud/core/services';
+import { FileService, FolderService, FileShareService } from '@keepcloud/core/services';
 import { Module } from '@nestjs/common';
 import { FolderController } from './folder.controller';
 import { FileController } from './file.controller';
-import { FileRepository } from '@keepcloud/core/db';
+import { FileShareController } from './file-share.controller';
+import { FileRepository, SharedFileRepository, UserRepository } from '@keepcloud/core/db';
 
 @Module({
-  controllers: [FolderController, FileController],
-  providers: [FileService, FolderService, FileRepository],
+  controllers: [FolderController, FileController, FileShareController],
+  providers: [
+    FileService, 
+    FolderService, 
+    FileShareService,
+    FileRepository, 
+    SharedFileRepository,
+    UserRepository
+  ],
 })
 export class FileApiModule {}

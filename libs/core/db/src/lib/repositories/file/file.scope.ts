@@ -82,4 +82,9 @@ export class FileScope extends BaseScope<
     this._where.isSystem = isSystem;
     return this;
   }
+
+  filterByIds(ids: string[]) {
+    this._where.id = { in: ids };
+    return this;
+  }
 }
