@@ -5,20 +5,22 @@ import {
   Get, 
   Param, 
   Patch, 
-  Post 
+  Post,
+  ForbiddenException,
 } from '@nestjs/common';
 import {
   CurrentUser,
   CurrentUserPipe,
   Serialize,
   FileShareService,
+  Public,
 } from '@keepcloud/core/services';
 import { User } from '@keepcloud/core/db';
 import {
-  CreateFileShareDto,
-  UpdateFileShareDto,
-  FileShareResponseDto,
-  ShareFileWithUserDto,
+  CreateShareLinkDto,
+  UpdateShareLinkDto,
+  ShareLinkResponseDto,
+  SharedFileAccessDto,
 } from '@keepcloud/commons/dtos';
 
 @Controller('files')
@@ -26,54 +28,59 @@ export class FileShareController {
   constructor(private readonly fileShareService: FileShareService) {}
 
   @Post(':fileId/share')
-  @Serialize(FileShareResponseDto)
-  shareFileWithUser(
+  @Serialize(ShareLinkResponseDto)
+  createShareLink(
     @Param('fileId') fileId: string,
-    @Body() dto: ShareFileWithUserDto,
+    @Body() dto: CreateShareLinkDto,
     @CurrentUser(CurrentUserPipe) user: User,
   ) {
-    return this.fileShareService.shareFileWithUser(user.id, fileId, dto);
+    return this.fileShareService.createShareLink(user.id, fileId, dto);
   }
 
-  @Post('share')
-  @Serialize(FileShareResponseDto)
-  shareFile(
-    @Body() dto: CreateFileShareDto,
-    @CurrentUser(CurrentUserPipe) user: User,
-  ) {
-    return this.fileShareService.shareFile(user.id, dto);
-  }
-
-  @Get(':fileId/shares')
-  @Serialize([FileShareResponseDto])
-  getFileShares(
+  @Get(':fileId/share')
+  @Serialize(ShareLinkResponseDto)
+  getShareInfo(
     @Param('fileId') fileId: string,
     @CurrentUser(CurrentUserPipe) user: User,
   ) {
-    return this.fileShareService.getFileShares(user.id, fileId);
+    return this.fileShareService.getShareInfo(user.id, fileId);
   }
 
-  @Get('shared-with-me')
-  @Serialize([FileShareResponseDto])
-  getSharedWithMe(@CurrentUser(CurrentUserPipe) user: User) {
-    return this.fileShareService.getSharedWithMe(user.id);
-  }
-
-  @Patch('shares/:shareId')
-  @Serialize(FileShareResponseDto)
-  updateFileShare(
-    @Param('shareId') shareId: string,
-    @Body() dto: UpdateFileShareDto,
+  @Patch(':fileId/share')
+  @Serialize(ShareLinkResponseDto)
+  updateShareLink(
+    @Param('fileId') fileId: string,
+    @Body() dto: UpdateShareLinkDto,
     @CurrentUser(CurrentUserPipe) user: User,
   ) {
-    return this.fileShareService.updateFileShare(user.id, shareId, dto);
+    return this.fileShareService.updateShareLink(user.id, fileId, dto);
   }
 
-  @Delete('shares/:shareId')
-  deleteFileShare(
-    @Param('shareId') shareId: string,
+  @Delete(':fileId/share')
+  removeShareLink(
+    @Param('fileId') fileId: string,
     @CurrentUser(CurrentUserPipe) user: User,
   ) {
-    return this.fileShareService.deleteFileShare(user.id, shareId);
+    return this.fileShareService.removeShareLink(user.id, fileId);
+  }
+
+  @Get('shared/:shareToken')
+  @Public()
+  @Serialize(SharedFileAccessDto)
+  getSharedFile(@Param('shareToken') shareToken: string) {
+    return this.fileShareService.getFileByShareToken(shareToken);
+  }
+
+  @Get('shared/:shareToken/download')
+  @Public()
+  async downloadSharedFile(@Param('shareToken') shareToken: string) {
+    const sharedFileAccess = await this.fileShareService.getFileByShareToken(shareToken);
+    
+    if (!sharedFileAccess.canDownload) {
+      throw new ForbiddenException('Download not allowed for this share');
+    }
+
+    // Return presigned download URL
+    return this.fileShareService.generateDownloadUrl(shareToken);
   }
 }

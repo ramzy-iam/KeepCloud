@@ -11,7 +11,7 @@ model User {
 
   planId         String
   plan           SubscriptionPlan @relation(fields: [planId], references: [id])
-  sharedFiles    SharedFile[]     @relation("UserSharedFiles")
+  // sharedFiles relation removed - sharing now handled via File.shareToken
   fileAccessLogs FileAccessLog[]  @relation("UserFileAccessLogs")
   ownedFiles     File[]           @relation("FileOwner")
   createdFiles   File[]           @relation("FileCreator")

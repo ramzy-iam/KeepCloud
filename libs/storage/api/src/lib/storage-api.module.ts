@@ -1,10 +1,9 @@
 import { StorageService } from '@keepcloud/core/services';
-import { SharedFileRepository } from '@keepcloud/core/db';
 import { Module } from '@nestjs/common';
 import { StorageController } from './storage.controller';
 
 @Module({
   controllers: [StorageController],
-  providers: [StorageService, SharedFileRepository],
+  providers: [StorageService], // SharedFileRepository removed - using token-based sharing
 })
 export class StorageApiModule {}

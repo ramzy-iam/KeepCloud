@@ -1,70 +1,71 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsString, IsEnum } from '../validators';
+import { IsOptional, IsString, IsEnum, IsDateString, IsBoolean } from '../validators';
 import { ErrorCode } from '../constants';
 import { Expose, Type } from 'class-transformer';
-import { UserProfileDto } from './user.dto';
 import { FileMinViewDto } from './file.dto';
 
-export enum PermissionType {
+export enum SharePermissionType {
   VIEW = 'VIEW',
-  EDIT = 'EDIT',
+  EDIT = 'EDIT', 
   COMMENT = 'COMMENT'
 }
 
-export class CreateFileShareDto {
-  @IsNotEmpty(ErrorCode.FILE_ID_REQUIRED)
-  @IsString(ErrorCode.FILE_ID_REQUIRED)
-  fileId: string;
-
-  @IsNotEmpty(ErrorCode.EMAIL_REQUIRED)
-  @IsEmail(ErrorCode.INVALID_EMAIL_FORMAT)
-  sharedWithEmail: string;
+export class CreateShareLinkDto {
+  @IsOptional()
+  @IsEnum(SharePermissionType, { message: 'Permission must be VIEW, EDIT, or COMMENT' })
+  permission?: SharePermissionType = SharePermissionType.VIEW;
 
   @IsOptional()
-  @IsEnum(PermissionType, { message: 'Permission must be VIEW, EDIT, or COMMENT' })
-  permission?: PermissionType = PermissionType.VIEW;
+  @IsDateString({}, { message: 'Expiry date must be a valid ISO string' })
+  expiresAt?: string;
 }
 
-export class UpdateFileShareDto {
-  @IsEnum(PermissionType, { message: 'Permission must be VIEW, EDIT, or COMMENT' })
-  permission: PermissionType;
+export class UpdateShareLinkDto {
+  @IsOptional()
+  @IsEnum(SharePermissionType, { message: 'Permission must be VIEW, EDIT, or COMMENT' })
+  permission?: SharePermissionType;
+
+  @IsOptional()
+  @IsDateString({}, { message: 'Expiry date must be a valid ISO string' })
+  expiresAt?: string;
+
+  @IsOptional()
+  @IsBoolean({ message: 'isPublic must be a boolean' })
+  isPublic?: boolean;
 }
 
-export class FileShareResponseDto {
+export class ShareLinkResponseDto {
   @Expose()
-  id: string;
+  shareToken: string;
+
+  @Expose()
+  shareUrl: string;
 
   @Expose()
   @Type(() => Date)
-  createdAt: Date;
+  expiresAt?: Date;
 
   @Expose()
-  @Type(() => Date)
-  updatedAt: Date;
+  permission: SharePermissionType;
 
   @Expose()
-  fileId: string;
+  isPublic: boolean;
+}
 
+export class SharedFileAccessDto {
   @Expose()
   @Type(() => FileMinViewDto)
-  file?: FileMinViewDto;
+  file: FileMinViewDto;
 
   @Expose()
-  sharedWithId: string;
+  permission: SharePermissionType;
 
   @Expose()
-  @Type(() => UserProfileDto)
-  sharedWith?: UserProfileDto;
+  @Type(() => Date)
+  expiresAt?: Date;
 
   @Expose()
-  permission: PermissionType;
-}
+  canDownload: boolean;
 
-export class ShareFileWithUserDto {
-  @IsNotEmpty(ErrorCode.USER_ID_REQUIRED)
-  @IsString(ErrorCode.USER_ID_REQUIRED)
-  userId: string;
-
-  @IsOptional()
-  @IsEnum(PermissionType, { message: 'Permission must be VIEW, EDIT, or COMMENT' })
-  permission?: PermissionType = PermissionType.VIEW;
+  @Expose()
+  canView: boolean;
 }

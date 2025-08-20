@@ -3,7 +3,7 @@ import { Module } from '@nestjs/common';
 import { FolderController } from './folder.controller';
 import { FileController } from './file.controller';
 import { FileShareController } from './file-share.controller';
-import { FileRepository, SharedFileRepository, UserRepository } from '@keepcloud/core/db';
+import { FileRepository } from '@keepcloud/core/db';
 
 @Module({
   controllers: [FolderController, FileController, FileShareController],
@@ -12,8 +12,8 @@ import { FileRepository, SharedFileRepository, UserRepository } from '@keepcloud
     FolderService, 
     FileShareService,
     FileRepository, 
-    SharedFileRepository,
-    UserRepository
+    // SharedFileRepository removed - using token-based sharing
+    // UserRepository removed - not needed for token-based sharing
   ],
 })
 export class FileApiModule {}

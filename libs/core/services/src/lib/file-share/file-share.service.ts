@@ -1,69 +1,22 @@
-import { Injectable, NotFoundException, ForbiddenException, ConflictException } from '@nestjs/common';
-import { SharedFileRepository, FileRepository, UserRepository } from '@keepcloud/core/db';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { FileRepository } from '@keepcloud/core/db';
 import { 
-  CreateFileShareDto, 
-  UpdateFileShareDto, 
-  FileShareResponseDto, 
-  ShareFileWithUserDto,
-  PermissionType 
+  CreateShareLinkDto, 
+  UpdateShareLinkDto, 
+  ShareLinkResponseDto,
+  SharedFileAccessDto,
+  SharePermissionType 
 } from '@keepcloud/commons/dtos';
 import { ErrorCode } from '@keepcloud/commons/constants';
+import { randomBytes } from 'crypto';
 
 @Injectable()
 export class FileShareService {
   constructor(
-    private readonly sharedFileRepository: SharedFileRepository,
     private readonly fileRepository: FileRepository,
-    private readonly userRepository: UserRepository,
   ) {}
 
-  async shareFile(ownerId: string, dto: CreateFileShareDto): Promise<FileShareResponseDto> {
-    // Verify the file exists and user owns it
-    const file = await this.fileRepository.scoped
-      .filterById(dto.fileId)
-      .filterByOwnerId(ownerId)
-      .getOne();
-
-    if (!file) {
-      throw new NotFoundException({
-        message: ErrorCode.FILE_NOT_FOUND,
-      });
-    }
-
-    // Find user by email
-    const targetUser = await this.userRepository.scoped
-      .filterByEmail(dto.sharedWithEmail)
-      .getOne();
-
-    if (!targetUser) {
-      throw new NotFoundException({
-        message: ErrorCode.USER_NOT_FOUND,
-      });
-    }
-
-    // Check if file is already shared with this user
-    const existingShare = await this.sharedFileRepository.findByFileIdAndUserId(
-      dto.fileId,
-      targetUser.id
-    );
-
-    if (existingShare) {
-      throw new ConflictException({
-        message: 'File is already shared with this user',
-      });
-    }
-
-    // Create the share
-    const sharedFile = await this.sharedFileRepository.create({
-      fileId: dto.fileId,
-      sharedWithId: targetUser.id,
-      permission: dto.permission || PermissionType.VIEW,
-    });
-
-    return this.mapToResponseDto(sharedFile);
-  }
-
-  async shareFileWithUser(ownerId: string, fileId: string, dto: ShareFileWithUserDto): Promise<FileShareResponseDto> {
+  async createShareLink(ownerId: string, fileId: string, dto: CreateShareLinkDto): Promise<ShareLinkResponseDto> {
     // Verify the file exists and user owns it
     const file = await this.fileRepository.scoped
       .filterById(fileId)
@@ -76,168 +29,200 @@ export class FileShareService {
       });
     }
 
-    // Verify target user exists
-    const targetUser = await this.userRepository.scoped
-      .filterById(dto.userId)
-      .getOne();
+    // Generate unique share token
+    const shareToken = this.generateShareToken();
+    const expiresAt = dto.expiresAt ? new Date(dto.expiresAt) : null;
 
-    if (!targetUser) {
-      throw new NotFoundException({
-        message: ErrorCode.USER_NOT_FOUND,
-      });
-    }
-
-    // Check if file is already shared with this user
-    const existingShare = await this.sharedFileRepository.findByFileIdAndUserId(
-      fileId,
-      dto.userId
+    // Update file with sharing information
+    await this.fileRepository.update(
+      { id: fileId },
+      {
+        shareToken,
+        isPublic: true,
+        sharePermissions: dto.permission || SharePermissionType.VIEW,
+        shareExpiresAt: expiresAt,
+      }
     );
 
-    if (existingShare) {
-      throw new ConflictException({
-        message: 'File is already shared with this user',
-      });
-    }
-
-    // Create the share
-    const sharedFile = await this.sharedFileRepository.create({
-      fileId: fileId,
-      sharedWithId: dto.userId,
-      permission: dto.permission || PermissionType.VIEW,
-    });
-
-    return this.mapToResponseDto(sharedFile);
-  }
-
-  async updateFileShare(ownerId: string, shareId: string, dto: UpdateFileShareDto): Promise<FileShareResponseDto> {
-    // Find the share and verify ownership
-    const share = await this.sharedFileRepository.scoped
-      .filterById(shareId)
-      .includeFile()
-      .getOne();
-
-    if (!share) {
-      throw new NotFoundException({
-        message: 'File share not found',
-      });
-    }
-
-    // Verify the file owner
-    if (share.file?.ownerId !== ownerId) {
-      throw new ForbiddenException({
-        message: ErrorCode.FORBIDDEN,
-      });
-    }
-
-    // Update the share
-    const updatedShare = await this.sharedFileRepository.update(
-      { id: shareId },
-      { permission: dto.permission }
-    );
-
-    return this.mapToResponseDto(updatedShare);
-  }
-
-  async deleteFileShare(ownerId: string, shareId: string): Promise<void> {
-    // Find the share and verify ownership
-    const share = await this.sharedFileRepository.scoped
-      .filterById(shareId)
-      .includeFile()
-      .getOne();
-
-    if (!share) {
-      throw new NotFoundException({
-        message: 'File share not found',
-      });
-    }
-
-    // Verify the file owner
-    if (share.file?.ownerId !== ownerId) {
-      throw new ForbiddenException({
-        message: ErrorCode.FORBIDDEN,
-      });
-    }
-
-    // Soft delete the share
-    await this.sharedFileRepository.update(
-      { id: shareId },
-      { deletedAt: new Date() }
-    );
-  }
-
-  async getFileShares(ownerId: string, fileId: string): Promise<FileShareResponseDto[]> {
-    // Verify the file exists and user owns it
-    const file = await this.fileRepository.scoped
-      .filterById(fileId)
-      .filterByOwnerId(ownerId)
-      .getOne();
-
-    if (!file) {
-      throw new NotFoundException({
-        message: ErrorCode.FILE_NOT_FOUND,
-      });
-    }
-
-    const shares = await this.sharedFileRepository.findByFileId(fileId);
-    return shares.map(share => this.mapToResponseDto(share));
-  }
-
-  async getSharedWithMe(userId: string): Promise<FileShareResponseDto[]> {
-    const shares = await this.sharedFileRepository.findSharedWithUser(userId);
-    return shares.map(share => this.mapToResponseDto(share));
-  }
-
-  async hasFileAccess(fileId: string, userId: string): Promise<boolean> {
-    // Check if user owns the file
-    const file = await this.fileRepository.scoped
-      .filterById(fileId)
-      .filterByOwnerId(userId)
-      .getOne();
-
-    if (file) {
-      return true;
-    }
-
-    // Check if file is shared with user
-    const share = await this.sharedFileRepository.findByFileIdAndUserId(fileId, userId);
-    return !!share;
-  }
-
-  async getFilePermission(fileId: string, userId: string): Promise<PermissionType | null> {
-    // Check if user owns the file (full access)
-    const file = await this.fileRepository.scoped
-      .filterById(fileId)
-      .filterByOwnerId(userId)
-      .getOne();
-
-    if (file) {
-      return PermissionType.EDIT; // Owner has edit permission
-    }
-
-    // Check shared permission
-    const share = await this.sharedFileRepository.findByFileIdAndUserId(fileId, userId);
-    return share ? (share.permission as PermissionType) : null;
-  }
-
-  private mapToResponseDto(sharedFile: any): FileShareResponseDto {
     return {
-      id: sharedFile.id,
-      createdAt: sharedFile.createdAt,
-      updatedAt: sharedFile.updatedAt,
-      fileId: sharedFile.fileId,
-      file: sharedFile.file ? {
-        id: sharedFile.file.id,
-        name: sharedFile.file.name,
-        isFolder: sharedFile.file.isFolder,
-        size: sharedFile.file.size,
-        contentType: sharedFile.file.contentType,
-        createdAt: sharedFile.file.createdAt,
-        updatedAt: sharedFile.file.updatedAt,
-        owner: sharedFile.file.owner
-      } : undefined,
-      sharedWithId: sharedFile.sharedWithId,
-      sharedWith: sharedFile.sharedWith,
-      permission: sharedFile.permission as PermissionType,
+      shareToken,
+      shareUrl: this.buildShareUrl(shareToken),
+      expiresAt,
+      permission: dto.permission || SharePermissionType.VIEW,
+      isPublic: true,
     };
+  }
+
+  async updateShareLink(ownerId: string, fileId: string, dto: UpdateShareLinkDto): Promise<ShareLinkResponseDto> {
+    // Verify the file exists and user owns it
+    const file = await this.fileRepository.scoped
+      .filterById(fileId)
+      .filterByOwnerId(ownerId)
+      .getOne();
+
+    if (!file) {
+      throw new NotFoundException({
+        message: ErrorCode.FILE_NOT_FOUND,
+      });
+    }
+
+    const updateData: any = {};
+    
+    if (dto.permission !== undefined) {
+      updateData.sharePermissions = dto.permission;
+    }
+    
+    if (dto.expiresAt !== undefined) {
+      updateData.shareExpiresAt = dto.expiresAt ? new Date(dto.expiresAt) : null;
+    }
+    
+    if (dto.isPublic !== undefined) {
+      updateData.isPublic = dto.isPublic;
+      // If making private, remove share token
+      if (!dto.isPublic) {
+        updateData.shareToken = null;
+        updateData.shareExpiresAt = null;
+      }
+    }
+
+    await this.fileRepository.update({ id: fileId }, updateData);
+
+    const updatedFile = await this.fileRepository.scoped
+      .filterById(fileId)
+      .getOneOrFail();
+
+    return {
+      shareToken: updatedFile.shareToken || '',
+      shareUrl: updatedFile.shareToken ? this.buildShareUrl(updatedFile.shareToken) : '',
+      expiresAt: updatedFile.shareExpiresAt,
+      permission: (updatedFile.sharePermissions as SharePermissionType) || SharePermissionType.VIEW,
+      isPublic: updatedFile.isPublic,
+    };
+  }
+
+  async removeShareLink(ownerId: string, fileId: string): Promise<void> {
+    // Verify the file exists and user owns it
+    const file = await this.fileRepository.scoped
+      .filterById(fileId)
+      .filterByOwnerId(ownerId)
+      .getOne();
+
+    if (!file) {
+      throw new NotFoundException({
+        message: ErrorCode.FILE_NOT_FOUND,
+      });
+    }
+
+    // Remove sharing information
+    await this.fileRepository.update(
+      { id: fileId },
+      {
+        shareToken: null,
+        isPublic: false,
+        sharePermissions: null,
+        shareExpiresAt: null,
+      }
+    );
+  }
+
+  async getFileByShareToken(shareToken: string): Promise<SharedFileAccessDto> {
+    const file = await this.fileRepository.prisma.file.findFirst({
+      where: {
+        shareToken,
+        isPublic: true,
+        OR: [
+          { shareExpiresAt: null },
+          { shareExpiresAt: { gt: new Date() } }
+        ]
+      },
+      include: {
+        owner: true
+      }
+    });
+
+    if (!file) {
+      throw new NotFoundException({
+        message: 'Share link not found or expired',
+      });
+    }
+
+    const permission = (file.sharePermissions as SharePermissionType) || SharePermissionType.VIEW;
+
+    return {
+      file: {
+        id: file.id,
+        name: file.name,
+        isFolder: file.isFolder,
+        size: file.size,
+        contentType: file.contentType,
+        createdAt: file.createdAt,
+        updatedAt: file.updatedAt,
+        owner: file.owner
+      },
+      permission,
+      expiresAt: file.shareExpiresAt,
+      canDownload: permission === SharePermissionType.VIEW || permission === SharePermissionType.EDIT,
+      canView: true,
+    };
+  }
+
+  async getShareInfo(ownerId: string, fileId: string): Promise<ShareLinkResponseDto | null> {
+    const file = await this.fileRepository.scoped
+      .filterById(fileId)
+      .filterByOwnerId(ownerId)
+      .getOne();
+
+    if (!file) {
+      throw new NotFoundException({
+        message: ErrorCode.FILE_NOT_FOUND,
+      });
+    }
+
+    if (!file.shareToken || !file.isPublic) {
+      return null;
+    }
+
+    return {
+      shareToken: file.shareToken,
+      shareUrl: this.buildShareUrl(file.shareToken),
+      expiresAt: file.shareExpiresAt,
+      permission: (file.sharePermissions as SharePermissionType) || SharePermissionType.VIEW,
+      isPublic: file.isPublic,
+    };
+  }
+
+  async generateDownloadUrl(shareToken: string): Promise<{ downloadUrl: string }> {
+    const file = await this.fileRepository.prisma.file.findFirst({
+      where: {
+        shareToken,
+        isPublic: true,
+        OR: [
+          { shareExpiresAt: null },
+          { shareExpiresAt: { gt: new Date() } }
+        ]
+      }
+    });
+
+    if (!file) {
+      throw new NotFoundException({
+        message: 'Share link not found or expired',
+      });
+    }
+
+    // This would need to be implemented based on your storage solution
+    // For now, returning the share URL as a placeholder
+    return {
+      downloadUrl: this.buildShareUrl(shareToken) + '/download'
+    };
+  }
+
+  private generateShareToken(): string {
+    return randomBytes(16).toString('hex');
+  }
+
+  private buildShareUrl(shareToken: string): string {
+    // This should be configurable based on your domain
+    const baseUrl = process.env.PUBLIC_BASE_URL || 'https://keepcloud.com';
+    return `${baseUrl}/shared/${shareToken}`;
   }
 }

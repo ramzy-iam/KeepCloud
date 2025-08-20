@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { File, FileRepository, SharedFileRepository, FileType } from '@keepcloud/core/db';
+import { File, FileRepository, FileType } from '@keepcloud/core/db';
 import { PaginationDto, FolderFilterDto } from '@keepcloud/commons/dtos';
 import { ErrorCode, SYSTEM_FILE } from '@keepcloud/commons/constants';
 import {
@@ -14,14 +14,13 @@ import { UserService } from '../user';
 export class StorageService {
   constructor(
     private readonly fileRepository: FileRepository,
-    private readonly sharedFileRepository: SharedFileRepository,
     private readonly queueService: SystemQueueService,
     private readonly userService: UserService,
   ) {}
 
   /**
-   * Check if user has access to a file (owns it or it's shared with them)
-   * This replaces the complex RLS approach with simple application-level filtering
+   * Check if user has access to a file (owns it or has share token access)
+   * Token-based access replaced the old SharedFile table approach
    */
   async hasFileAccess(fileId: string, userId: string): Promise<boolean> {
     // Check if user owns the file
@@ -30,13 +29,7 @@ export class StorageService {
       .filterByOwnerId(userId)
       .getOne();
     
-    if (ownedFile) {
-      return true;
-    }
-
-    // Check if file is shared with user
-    const sharedFile = await this.sharedFileRepository.findByFileIdAndUserId(fileId, userId);
-    return !!sharedFile;
+    return !!ownedFile;
   }
 
   /**
@@ -60,39 +53,12 @@ export class StorageService {
   }
 
   async getSharedWithMe(userId: string, filters: FolderFilterDto): Promise<PaginationDto<File>> {
-    // Get shared files for the current user
-    const sharedFiles = await this.sharedFileRepository.findSharedWithUser(userId);
-    
-    // Extract the file IDs from shared files
-    const fileIds = sharedFiles.map(sf => sf.fileId);
-    
-    if (fileIds.length === 0) {
-      // Return empty result using the repository's pagination method
-      return this.fileRepository.scoped
-        .filterByIds([]) // Empty array will return no results
-        .getManyPaginated(filters.page, filters.pageSize);
-    }
-
-    // Build query for the files
-    let query = this.fileRepository.scoped
-      .filterByIds(fileIds)
-      .filterByNotTrashed()
-      .joinOwner()
-      .orderBy({ isFolder: 'desc' })
-      .orderBy({ name: filters.order });
-
-    // Apply additional filters if provided
-    if (filters.name) {
-      query = query.filterByName(filters.name);
-    }
-    if (filters.type) {
-      query = query.filterByType(filters.type);
-    }
-    if (filters.format) {
-      query = query.filterByFormat(filters.format);
-    }
-
-    return query.getManyPaginated(filters.page, filters.pageSize);
+    // Token-based sharing doesn't require a "shared with me" concept
+    // Files are accessed directly via share tokens
+    // Return empty results for now - this endpoint may be deprecated
+    return this.fileRepository.scoped
+      .filterByIds([]) // Empty array returns no results
+      .getManyPaginated(filters.page, filters.pageSize);
   }
 
   async getTrashedItems(filters: FolderFilterDto) {

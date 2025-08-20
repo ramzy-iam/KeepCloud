@@ -33,7 +33,12 @@ model File {
 
   accessLogs FileAccessLog[] @relation("FileToAccessLog")
 
-  sharedWith SharedFile[]
+  // New sharing fields for token-based sharing
+  shareToken      String?   // Unique token for sharing files publicly
+  isPublic        Boolean   @default(false) // Whether the file is publicly accessible
+  sharePermissions String?  @default("VIEW") // Permission level: VIEW, EDIT, or COMMENT
+  shareExpiresAt  DateTime? // When the share link expires (NULL for never expires)
+
   left       Int
   right      Int
 
