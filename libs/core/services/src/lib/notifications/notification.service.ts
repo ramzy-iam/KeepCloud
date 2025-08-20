@@ -21,7 +21,8 @@ export class NotificationService {
     await this.systemQueueService.enqueueSendEmail({
       templateKey: TemplateKey.WELCOME_EMAIL,
       to: email,
-      subject: 'Welcome to KeepCloud - Your secure cloud storage is ready!',
+      subject:
+        '[KeepCloud] Welcome to KeepCloud - Your secure cloud storage is ready!',
       data: {
         firstName: firstName || 'there',
         dashboardUrl: `${this.frontendUrl}/home`,

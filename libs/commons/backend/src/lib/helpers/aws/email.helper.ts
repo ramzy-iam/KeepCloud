@@ -59,7 +59,7 @@ export class EmailHelper extends AwsServiceHelper {
     bcc,
   }: SendEmailOptions) {
     const mailOptions: Mail.Options = {
-      from: from ?? `[KeepCloud] <${Env.NO_REPLY_EMAIL}>`,
+      from: from ?? `KeepCloud <${Env.NO_REPLY_EMAIL}>`,
       to,
       subject,
       html,
@@ -76,7 +76,6 @@ export class EmailHelper extends AwsServiceHelper {
       cc,
       bcc,
     });
-    console.log(mailOptions.from);
 
     const transporter = nodemailer.createTransport({
       SES: { sesClient: this.sesClient, SendEmailCommand },
