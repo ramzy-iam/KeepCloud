@@ -82,4 +82,35 @@ export class FileScope extends BaseScope<
     this._where.isSystem = isSystem;
     return this;
   }
+
+  filterBySharedWithCurrentUser(userId: string) {
+    this._where.sharedWith = {
+      some: {
+        sharedWithId: userId,
+        deletedAt: null,
+      },
+    };
+    return this;
+  }
+
+  filterByCurrentUserOwned(userId: string) {
+    console.log({ userId });
+    this._where.ownerId = userId;
+    return this;
+  }
+
+  filterByCurrentUserAccessible(userId: string) {
+    this._where.OR = [
+      { ownerId: userId },
+      {
+        sharedWith: {
+          some: {
+            sharedWithId: userId,
+            deletedAt: null,
+          },
+        },
+      },
+    ];
+    return this;
+  }
 }
