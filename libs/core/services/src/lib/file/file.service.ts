@@ -64,7 +64,11 @@ export class FileService extends BaseFileService {
     const createdFile = await this.fileRepository.prisma.$transaction(
       async (tx) => {
         const { left, right } =
-          await this.nestedSetService.allocateNestedSetPosition(parentId, tx);
+          await this.nestedSetService.allocateNestedSetPosition(
+            ownerId,
+            parentId,
+            tx,
+          );
 
         const fileData: Prisma.FileCreateInput = {
           name: filename,
@@ -94,7 +98,7 @@ export class FileService extends BaseFileService {
       fileId: createdFile.id,
     });
 
-    return this.getOne(createdFile.id);
+    return this.getOne(ownerId, createdFile.id);
   }
 
   protected async moveFileInStorage(
@@ -157,7 +161,11 @@ export class FileService extends BaseFileService {
     });
   }
 
-  async generatePresignedGet(id: string): Promise<PresignedGetResultDto> {
+  async generatePresignedGet(
+    userId: string,
+    id: string,
+  ): Promise<PresignedGetResultDto> {
+    await this.getOne(id, userId); // Ensure the file exists and belongs to the user
     return {
       previewUrl: await this.getPresignedGet(id, 'inline'),
       downloadUrl: await this.getPresignedGet(id, 'attachment'),
@@ -242,12 +250,17 @@ export class FileService extends BaseFileService {
     return (slugified + extension).slice(0, 255);
   }
 
-  async getOne(id: string): Promise<File & { ancestors: FileAncestorDto[] }> {
-    const file = await this.fileRepository.scoped
+  async getOne(
+    userId: string,
+    id: string,
+  ): Promise<File & { ancestors: FileAncestorDto[] }> {
+    const scope = this.fileRepository.scoped
       .filterById(id)
       .filterByType(FileType.FILE)
       .joinOwner()
-      .getOne();
+      .filterByOwnerId(userId);
+
+    const file = await scope.getOne();
 
     if (!file) throw new FileNotFoundException(id);
 
