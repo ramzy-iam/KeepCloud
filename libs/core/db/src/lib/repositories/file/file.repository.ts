@@ -17,7 +17,7 @@ export class FileRepository extends BaseRepository<
   Prisma.FileOrderByWithRelationInput
 > {
   constructor(protected readonly prismaService: PrismaService) {
-    super('file');
+    super('file', prismaService);
   }
 
   get scoped(): FileScope {

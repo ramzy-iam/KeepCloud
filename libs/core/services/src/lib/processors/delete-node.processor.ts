@@ -15,7 +15,7 @@ export class DeleteNodeProcessor implements Processor {
     this.logger.info(`Start deleting nodeId=${nodeId} for ownerId=${ownerId}`);
 
     try {
-      await this.nestedSetService.deleteNode(nodeId, ownerId);
+      await this.nestedSetService.deleteNode(ownerId, nodeId);
       // 1. Delete node and subtree in DB (mark deletedAt, update nested set)
 
       this.logger.info(`Node ${nodeId} deleted successfully`);

@@ -3,7 +3,7 @@ import { APP_LOCAL_QUEUES } from '@keepcloud/commons/constants';
 import { OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { Worker, Job, ConnectionOptions } from 'bullmq';
 import { ProcessorProvider } from '../processors';
-import { PrismaService, RLSContextService } from '@keepcloud/core/db';
+import { PrismaService } from '@keepcloud/core/db';
 
 export abstract class QueueWorkerService
   implements OnModuleInit, OnModuleDestroy
@@ -47,14 +47,9 @@ export abstract class QueueWorkerService
           return;
         }
 
-        await RLSContextService.runWithContext(
-          { prisma: this.prismaService.getClient() },
-          async () => {
-            const { data, message } = job.data;
-            const processor = this.processorProvider.getFromMessage(message);
-            await processor.execute(data);
-          },
-        );
+        const { data, message } = job.data;
+        const processor = this.processorProvider.getFromMessage(message);
+        await processor.execute(data);
       },
       {
         connection: this.connection,

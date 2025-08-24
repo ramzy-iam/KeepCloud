@@ -17,7 +17,7 @@ export class MoveNodeProcessor implements Processor {
     );
 
     try {
-      await this.nestedSetService.moveNode(nodeId, newParentId, ownerId);
+      await this.nestedSetService.moveNode(ownerId, nodeId, newParentId);
       this.logger.info(`Node ${nodeId} moved successfully to ${newParentId}`);
     } catch (error: any) {
       this.logger.error(

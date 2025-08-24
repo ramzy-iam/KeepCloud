@@ -29,8 +29,8 @@ export class DeleteFileAndChildrenFromStorageProcessor implements Processor {
     try {
       // Fetch all files under this node (including the node itself)
       const filesToDelete = await this.storageService.getFilesUnderNode(
-        fileId,
         ownerId,
+        fileId,
       );
 
       if (filesToDelete.length === 0) {
