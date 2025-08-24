@@ -7,6 +7,8 @@ import { GlobalExceptionFilter } from '@keepcloud/commons/backend';
 import { ServicesModule } from './services.module';
 import { ProcessorsModule } from '@keepcloud/processors';
 import { ConfigModule } from '@nestjs/config';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import { LoggingInterceptor } from '@keepcloud/core/services';
 
 @Module({
   imports: [
@@ -20,8 +22,12 @@ import { ConfigModule } from '@nestjs/config';
   ],
   providers: [
     {
-      provide: 'APP_FILTER',
+      provide: APP_FILTER,
       useClass: GlobalExceptionFilter,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
     },
   ],
 })
