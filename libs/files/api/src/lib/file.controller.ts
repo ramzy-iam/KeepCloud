@@ -1,10 +1,5 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import {
-  CurrentUser,
-  CurrentUserPipe,
-  FileService,
-  Serialize,
-} from '@keepcloud/core/services';
+import { CurrentUser, FileService, Serialize } from '@keepcloud/core/services';
 import { User } from '@keepcloud/core/db';
 import {
   CreateFileDto,
@@ -19,13 +14,13 @@ export class FileController {
 
   @Post()
   @Serialize(FilePreviewDto)
-  create(@Body() dto: CreateFileDto, @CurrentUser(CurrentUserPipe) user: User) {
+  create(@Body() dto: CreateFileDto, @CurrentUser() user: User) {
     return this.fileService.create(user.id, dto);
   }
 
   @Post('presigned-post')
   getPresignedPost(
-    @CurrentUser(CurrentUserPipe) user: User,
+    @CurrentUser() user: User,
     @Body() payload: CreatePresignedPostBody,
   ) {
     const { filename } = payload;
@@ -34,7 +29,7 @@ export class FileController {
 
   @Get(':fileId/presigned-get')
   @Serialize(PresignedGetResultDto)
-  presignedGet(@Param('fileId') fileId: string) {
-    return this.fileService.generatePresignedGet(fileId);
+  presignedGet(@Param('fileId') fileId: string, @CurrentUser() user: User) {
+    return this.fileService.generatePresignedGet(user.id, fileId);
   }
 }

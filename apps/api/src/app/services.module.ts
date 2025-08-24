@@ -6,7 +6,6 @@ import {
 } from '@keepcloud/core/db';
 import {
   AuthService,
-  CurrentUserPipe,
   SystemQueueService,
   SystemQueueWorkerService,
   UserService,
@@ -34,7 +33,6 @@ const services = [
   FileRepository,
 
   // Miscellaneous
-  CurrentUserPipe,
 
   // Queues
   SystemQueueService,

@@ -8,7 +8,6 @@ import {
   AuthService,
   AuthGuard,
   JwtStrategy,
-  RLSAuthGuard,
 } from '@keepcloud/core/services';
 import { AuthController } from './auth.controller';
 import { UserController } from './user.controller';
@@ -26,10 +25,6 @@ import { UserController } from './user.controller';
     {
       provide: APP_GUARD,
       useClass: AuthGuard,
-    },
-    {
-      provide: APP_GUARD,
-      useClass: RLSAuthGuard,
     },
   ],
 })

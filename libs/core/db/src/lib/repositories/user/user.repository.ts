@@ -16,7 +16,7 @@ export class UserRepository extends BaseRepository<
   Prisma.UserOrderByWithRelationInput
 > {
   constructor(protected readonly prismaService: PrismaService) {
-    super('user');
+    super('user', prismaService);
   }
 
   get scoped() {

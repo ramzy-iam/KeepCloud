@@ -40,7 +40,7 @@ export class CreateFolderDto {
   @IsNotEmpty(ErrorCode.OWNER_ID_REQUIRED)
   @IsString(ErrorCode.OWNER_ID_REQUIRED)
   @IsOptional()
-  ownerId?: string;
+  ownerId: string;
 }
 
 export class RenameFolderDto {

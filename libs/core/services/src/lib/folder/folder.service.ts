@@ -39,7 +39,11 @@ export class FolderService extends BaseFileService {
     const createdFolder = await this.fileRepository.prisma.$transaction(
       async (tx) => {
         const { left, right } =
-          await this.nestedSetService.allocateNestedSetPosition(parentId, tx);
+          await this.nestedSetService.allocateNestedSetPosition(
+            dto.ownerId,
+            parentId,
+            tx,
+          );
 
         const folderData: Prisma.FileCreateInput = {
           name: dto.name,
@@ -62,16 +66,18 @@ export class FolderService extends BaseFileService {
       },
     );
 
-    const { file } = await this.getOne(createdFolder.id);
+    const { file } = await this.getOne(dto.ownerId, createdFolder.id);
     return file;
   }
   async getChildren(
+    userId: string,
     parentId: string,
     filters: FolderFilterDto,
   ): Promise<PaginationDto<File>> {
     const scope = this.fileRepository.scoped
       .filterByParentId(parentId)
       .filterByNotTrashed()
+      .filterByOwnerId(userId)
       .orderBy([{ isFolder: 'desc' }, { name: filters.order }])
       .joinOwner();
 
@@ -83,15 +89,17 @@ export class FolderService extends BaseFileService {
   }
 
   async getOne(
+    userId: string,
     id: string,
     withAncestors = false,
   ): Promise<{ file: File; ancestors?: FileAncestorDto[] }> {
-    const file = await this.fileRepository.scoped
+    const scope = this.fileRepository.scoped
       .filterById(id)
       .filterByType(FileType.FOLDER)
       .joinOwner()
-      .getOne();
+      .filterByOwnerId(userId);
 
+    const file = await scope.getOne();
     if (!file) throw new FolderNotFoundException(id);
 
     await this.checkAndThrowIfTrashed(id);

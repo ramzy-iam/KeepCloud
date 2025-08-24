@@ -1,14 +1,6 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Post,
-  Query,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import {
   CurrentUser,
-  CurrentUserPipe,
   FolderService,
   Serialize,
 } from '@keepcloud/core/services';
@@ -28,10 +20,7 @@ export class FolderController {
 
   @Post()
   @Serialize(FileMinViewDto)
-  create(
-    @Body() dto: CreateFolderDto,
-    @CurrentUser(CurrentUserPipe) user: User,
-  ) {
+  create(@Body() dto: CreateFolderDto, @CurrentUser() user: User) {
     return this.folderService.create({ ...dto, ownerId: user.id });
   }
 
@@ -40,14 +29,20 @@ export class FolderController {
   async getChildren(
     @Param('id') id: string,
     @Query() filters: FolderFilterDto,
+    @CurrentUser() user: User,
   ) {
-    return this.folderService.getChildren(id, filters);
+    return this.folderService.getChildren(user.id, id, filters);
   }
 
   @Get(':id')
   @Serialize(FileDetailsDto)
-  async getOne(@Param('id') id: string, @Query() query: GetOneFolderQueryDto) {
+  async getOne(
+    @Param('id') id: string,
+    @Query() query: GetOneFolderQueryDto,
+    @CurrentUser() user: User,
+  ) {
     const { file, ancestors } = await this.folderService.getOne(
+      user.id,
       id,
       query.withAncestors,
     );
