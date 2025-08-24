@@ -24,6 +24,8 @@ export const envSchema = z.object({
   VITE_GOOGLE_CLIENT_ID: z.string(),
   DATABASE_URL: z.string(),
   LOG_LEVEL: z.enum(['error', 'warn', 'info', 'debug']).default('info'),
+  REQUEST_LOGGING_ENABLED: z.stringbool().default(false),
+
   NO_REPLY_EMAIL: z.string().default('no-reply@heyramzy.com'),
 
   ...awsSchema.shape,

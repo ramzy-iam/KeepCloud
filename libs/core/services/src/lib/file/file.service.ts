@@ -165,7 +165,7 @@ export class FileService extends BaseFileService {
     userId: string,
     id: string,
   ): Promise<PresignedGetResultDto> {
-    await this.getOne(id, userId); // Ensure the file exists and belongs to the user
+    await this.getOne(userId, id); // Ensure the file exists and belongs to the user
     return {
       previewUrl: await this.getPresignedGet(id, 'inline'),
       downloadUrl: await this.getPresignedGet(id, 'attachment'),
