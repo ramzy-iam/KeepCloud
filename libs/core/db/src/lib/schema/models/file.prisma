@@ -25,12 +25,16 @@ model File {
   parent   File?   @relation("FileHierarchy", fields: [parentId], references: [id])
   children File[]  @relation("FileHierarchy")
 
+  // Owner of this specific file/folder (creator or assigned owner)
   ownerId String
   owner   User   @relation("FileOwner", fields: [ownerId], references: [id])
 
-  treeOwnerId String?
-  treeOwner   User? @relation("TreeOwner", fields: [treeOwnerId], references: [id])
+  // Owner of the root folder that controls the entire tree hierarchy
+  // Required for all files/folders to scope nested set operations
+  treeOwnerId String
+  treeOwner   User @relation("TreeOwner", fields: [treeOwnerId], references: [id])
 
+  // User who originally created this file/folder
   createdById String?
   createdBy   User?   @relation("FileCreator", fields: [createdById], references: [id])
 
@@ -38,13 +42,19 @@ model File {
   permissions FilePermission[]
   links FileLink[]
 
+  // Nested set model boundaries - scoped by treeOwnerId
   left       Int
   right      Int
 
-  @@index([left])
-  @@index([right])
-  @@index([createdById])
+  // Critical: Compound index for efficient subtree queries within tree scope
+  @@index([treeOwnerId, left, right])
+  @@index([treeOwnerId, left])
+  @@index([treeOwnerId, right])
   @@index([ownerId])
+  @@index([createdById])
   @@index([parentId])
   @@index([trashedAt])
+  @@index([deletedAt])
+  @@unique([treeOwnerId, left])  // Ensure no duplicate left values within a tree
+  @@unique([treeOwnerId, right]) // Ensure no duplicate right values within a tree
 }
