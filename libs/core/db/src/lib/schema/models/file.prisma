@@ -28,12 +28,16 @@ model File {
   ownerId String
   owner   User   @relation("FileOwner", fields: [ownerId], references: [id])
 
+  treeOwnerId String?
+  treeOwner   User? @relation("TreeOwner", fields: [treeOwnerId], references: [id])
+
   createdById String?
   createdBy   User?   @relation("FileCreator", fields: [createdById], references: [id])
 
   accessLogs FileAccessLog[] @relation("FileToAccessLog")
+  permissions FilePermission[]
+  links FileLink[]
 
-  sharedWith SharedFile[]
   left       Int
   right      Int
 
