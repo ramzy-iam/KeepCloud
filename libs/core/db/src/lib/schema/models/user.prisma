@@ -11,10 +11,14 @@ model User {
 
   planId         String
   plan           SubscriptionPlan @relation(fields: [planId], references: [id])
-  sharedFiles    SharedFile[]     @relation("UserSharedFiles")
   fileAccessLogs FileAccessLog[]  @relation("UserFileAccessLogs")
   ownedFiles     File[]           @relation("FileOwner")
+  TreeOwnedFiles     File[]           @relation("TreeOwner")
   createdFiles   File[]           @relation("FileCreator")
+  
+  // File permissions
+  filePermissions FilePermission[]
+  grantedPermissions FilePermission[] @relation("GrantedBy")
 
   storageUsed BigInt @default(0) //in bytes
 }

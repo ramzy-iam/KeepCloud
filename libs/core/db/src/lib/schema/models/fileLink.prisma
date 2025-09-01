@@ -1,0 +1,11 @@
+model FileLink {
+  id        String   @id @default(dbgenerated("nanoid()"))
+  createdAt DateTime @default(now())
+
+  fileId    String
+  file      File @relation(fields: [fileId], references: [id])
+
+  token     String   @unique // shareable link token
+  role      FilePermissionRole @default(VIEWER)
+  expiresAt DateTime?
+}
