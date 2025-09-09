@@ -7,5 +7,4 @@ model FileLink {
 
   token     String   @unique // shareable link token
   role      FilePermissionRole @default(VIEWER)
-  expiresAt DateTime?
 }

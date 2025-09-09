@@ -261,11 +261,19 @@ export class FileService extends BaseFileService {
     userId: string,
     id: string,
   ): Promise<File & { ancestors: FileAncestorDto[] }> {
+    // First check if user has access through direct permissions or ancestor permissions
+    const hasAccess = await this.fileRepository.hasAncestorAccess(id, userId);
+
+    if (!hasAccess) {
+      throw new FileNotFoundException(id);
+    }
+
     const scope = this.fileRepository.scoped
       .filterById(id)
       .filterByType(FileType.FILE)
+      .filterByNotTrashed()
       .joinOwner()
-      .filterByOwnerId(userId);
+      .joinPermissions();
 
     const file = await scope.getOne();
 
@@ -274,13 +282,22 @@ export class FileService extends BaseFileService {
     let ancestors: FileAncestorDto[] = [];
     ancestors = await this.fileRepository.getAncestors(id);
 
+    // Check if this file is shared with the user (not owned by them)
+    const isSharedWithUser = file.treeOwnerId !== userId;
+
     return {
       ...file,
       ancestors: [
         {
-          id: SYSTEM_FILE.MY_STORAGE.id,
-          name: SYSTEM_FILE.MY_STORAGE.name,
-          code: SYSTEM_FILE.MY_STORAGE.code,
+          id: isSharedWithUser
+            ? SYSTEM_FILE.SHARED_WITH_ME.id
+            : SYSTEM_FILE.MY_STORAGE.id,
+          name: isSharedWithUser
+            ? SYSTEM_FILE.SHARED_WITH_ME.name
+            : SYSTEM_FILE.MY_STORAGE.name,
+          code: isSharedWithUser
+            ? SYSTEM_FILE.SHARED_WITH_ME.code
+            : SYSTEM_FILE.MY_STORAGE.code,
           isSystem: true,
         },
         ...ancestors,

@@ -12,6 +12,7 @@ import {
   CurrentUser,
   Serialize,
   StorageService,
+  FileSharingService,
 } from '@keepcloud/core/services';
 import {
   FileMinViewDto,
@@ -26,7 +27,10 @@ import { UserProfileDto } from '@keepcloud/commons/dtos';
 
 @Controller('storage')
 export class StorageController {
-  constructor(private readonly storageService: StorageService) {}
+  constructor(
+    private readonly storageService: StorageService,
+    private readonly fileSharingService: FileSharingService,
+  ) {}
 
   @Get('my-storage')
   @Serialize(new PaginationDto(FileMinViewDto))

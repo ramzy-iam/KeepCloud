@@ -1,5 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { File, FileRepository, FileType } from '@keepcloud/core/db';
+import {
+  File,
+  FilePermissionRepository,
+  FileRepository,
+  FileType,
+} from '@keepcloud/core/db';
 import { PaginationDto, FolderFilterDto } from '@keepcloud/commons/dtos';
 import { ErrorCode, SYSTEM_FILE } from '@keepcloud/commons/constants';
 import {
@@ -9,6 +14,7 @@ import {
 } from '@keepcloud/commons/backend';
 import { SystemQueueService } from '../queues';
 import { UserService } from '../user';
+import { FileSharingService } from '../file-sharing';
 
 @Injectable()
 export class StorageService {
@@ -16,6 +22,7 @@ export class StorageService {
     private readonly fileRepository: FileRepository,
     private readonly queueService: SystemQueueService,
     private readonly userService: UserService,
+    private readonly filePermissionRepository: FilePermissionRepository,
   ) {}
 
   async getRootItems(
@@ -43,9 +50,16 @@ export class StorageService {
     userId: string,
     filters: FolderFilterDto,
   ): Promise<PaginationDto<File>> {
+    const fileIds =
+      await this.filePermissionRepository.prisma.filePermission.findMany({
+        where: {
+          userId,
+        },
+        select: { fileId: true },
+      });
+
     const scope = this.fileRepository.scoped
-      .filterByNotTrashed()
-      .filterByOwnerId(userId)
+      .filterByIds(fileIds.map((f) => f.fileId))
       .orderBy({ isFolder: 'desc' })
       .orderBy({ name: filters.order })
       .joinOwner();

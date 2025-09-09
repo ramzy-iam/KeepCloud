@@ -22,20 +22,20 @@ export class FolderService extends BaseFileService {
     if (!parentId) {
       const root = await this.fileRepository.getRootFolder(dto.ownerId);
       parentId = root.id;
-
-      parent = await this.fileRepository.scoped
-        .filterById(parentId)
-        .filerByIsFolder()
-        .getOne();
-
-      if (!parent) {
-        throw new BadRequestException({
-          code: ErrorCode.PARENT_FOLDER_NOT_FOUND,
-          message: 'Parent must be a valid folder',
-          field: 'parentId',
-        });
-      }
     }
+    parent = await this.fileRepository.scoped
+      .filterById(parentId)
+      .filerByIsFolder()
+      .getOne();
+
+    if (!parent) {
+      throw new BadRequestException({
+        code: ErrorCode.PARENT_FOLDER_NOT_FOUND,
+        message: 'Parent must be a valid folder',
+        field: 'parentId',
+      });
+    }
+
     const treeOwnerId = parent?.treeOwnerId as string;
 
     const createdFolder = await this.fileRepository.prisma.$transaction(
@@ -76,12 +76,15 @@ export class FolderService extends BaseFileService {
     parentId: string,
     filters: FolderFilterDto,
   ): Promise<PaginationDto<File>> {
+    // First, verify user has access to the parent folder (including ancestor permissions)
+    await this.getOne(userId, parentId);
+
     const scope = this.fileRepository.scoped
       .filterByParentId(parentId)
       .filterByNotTrashed()
-      .filterByOwnerId(userId)
       .orderBy([{ isFolder: 'desc' }, { name: filters.order }])
-      .joinOwner();
+      .joinOwner()
+      .joinPermissions();
 
     if (filters.type) scope.filterByType(filters.type);
     if (filters.name) scope.filterByName(filters.name);
@@ -95,16 +98,25 @@ export class FolderService extends BaseFileService {
     id: string,
     withAncestors = false,
   ): Promise<{ file: File; ancestors?: FileAncestorDto[] }> {
+    // First check if user has access through direct permissions or ancestor permissions
+    const hasAccess = await this.fileRepository.hasAncestorAccess(id, userId);
+
+    if (!hasAccess) {
+      throw new FolderNotFoundException(id);
+    }
+
     const scope = this.fileRepository.scoped
       .filterById(id)
       .filterByType(FileType.FOLDER)
+      .filterByNotTrashed()
       .joinOwner()
-      .filterByOwnerId(userId);
+      .joinPermissions();
 
     const file = await scope.getOne();
     if (!file) throw new FolderNotFoundException(id);
 
-    await this.checkAndThrowIfTrashed(id);
+    // Check if this folder is shared with the user (not owned by them)
+    const isSharedWithUser = file.treeOwnerId !== userId;
 
     let ancestors: FileAncestorDto[] = [];
     if (typeof withAncestors === 'boolean' && withAncestors) {
@@ -114,9 +126,15 @@ export class FolderService extends BaseFileService {
       file,
       ancestors: [
         {
-          id: SYSTEM_FILE.MY_STORAGE.id,
-          name: SYSTEM_FILE.MY_STORAGE.name,
-          code: SYSTEM_FILE.MY_STORAGE.code,
+          id: isSharedWithUser
+            ? SYSTEM_FILE.SHARED_WITH_ME.id
+            : SYSTEM_FILE.MY_STORAGE.id,
+          name: isSharedWithUser
+            ? SYSTEM_FILE.SHARED_WITH_ME.name
+            : SYSTEM_FILE.MY_STORAGE.name,
+          code: isSharedWithUser
+            ? SYSTEM_FILE.SHARED_WITH_ME.code
+            : SYSTEM_FILE.MY_STORAGE.code,
           isSystem: true,
         },
         ...ancestors,

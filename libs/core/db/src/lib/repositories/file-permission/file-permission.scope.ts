@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { FilePermission, Prisma } from '@prisma/client';
+import { FilePermission, FilePermissionRole, Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma';
 import { BaseScope } from '../base/base.scope';
 import { FilePermissionRepository } from './file-permission.repository';
@@ -36,7 +36,7 @@ export class FilePermissionScope extends BaseScope<
     return this;
   }
 
-  filterByRole(role: Prisma.FilePermissionRoleFilter) {
+  filterByRole(role: FilePermissionRole) {
     this._where.role = role;
     return this;
   }
