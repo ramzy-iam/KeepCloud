@@ -1,5 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { File, FileRepository, FileType, Prisma } from '@keepcloud/core/db';
+import {
+  File,
+  FileRepository,
+  FileType,
+  Prisma,
+  FilePermissionRole,
+} from '@keepcloud/core/db';
 import {
   CreateFileDto,
   FileAncestorDto,
@@ -53,6 +59,9 @@ export class FileService extends BaseFileService {
       parentId = root.id;
       parent = root;
     }
+
+    // Verify user has EDITOR role or higher on the parent folder
+    await this.verifyUserRole(parentId, ownerId, FilePermissionRole.EDITOR);
 
     parent = await this.validateParentFolder(parentId);
     await this.validateFileExistsInStorage(dto.storagePath);

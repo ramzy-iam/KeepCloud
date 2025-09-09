@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { File, FileType } from '@keepcloud/core/db';
+import { File, FileType, FilePermissionRole } from '@keepcloud/core/db';
 import {
   CreateFolderDto,
   FileAncestorDto,
@@ -23,6 +23,10 @@ export class FolderService extends BaseFileService {
       const root = await this.fileRepository.getRootFolder(dto.ownerId);
       parentId = root.id;
     }
+
+    // Verify user has EDITOR role or higher on the parent folder
+    await this.verifyUserRole(parentId, dto.ownerId, FilePermissionRole.EDITOR);
+
     parent = await this.fileRepository.scoped
       .filterById(parentId)
       .filerByIsFolder()
