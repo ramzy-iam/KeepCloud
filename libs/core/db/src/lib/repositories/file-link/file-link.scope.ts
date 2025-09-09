@@ -31,20 +31,13 @@ export class FileLinkScope extends BaseScope<
     return this;
   }
 
-  filterByRole(role: Prisma.FilePermissionRoleFilter) {
+  filterByRole(role: Prisma.EnumFilePermissionRoleFilter) {
     this._where.role = role;
     return this;
   }
 
-  filterByNotExpired() {
-    this._where.OR = [{ expiresAt: null }, { expiresAt: { gt: new Date() } }];
-    return this;
-  }
 
-  filterByExpired() {
-    this._where.expiresAt = { lt: new Date() };
-    return this;
-  }
+ 
 
   joinFile(): this {
     this._include.file = true;

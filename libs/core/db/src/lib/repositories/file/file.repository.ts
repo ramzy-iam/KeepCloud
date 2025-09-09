@@ -128,4 +128,65 @@ export class FileRepository extends BaseRepository<
       .filterByIsSystem(true)
       .getOneOrFail();
   }
+
+  /**
+   * Check if user has access to a file/folder through ancestor permissions
+   * This checks if any parent folder in the hierarchy has permissions for the user
+   */
+  async hasAncestorAccess(fileId: string, userId: string): Promise<boolean> {
+    // First check direct access (owner, treeOwner, or direct permissions)
+    const directAccess = await this.prisma.file.findFirst({
+      where: {
+        id: fileId,
+        OR: [
+          { ownerId: userId },
+          { treeOwnerId: userId },
+          {
+            permissions: {
+              some: {
+                userId: userId,
+              },
+            },
+          },
+        ],
+      },
+    });
+
+    if (directAccess) {
+      return true;
+    }
+
+    // Check if any ancestor has permissions for this user
+    const file = await this.prisma.file.findFirst({
+      where: { id: fileId },
+      select: { id: true, left: true, right: true, treeOwnerId: true },
+    });
+
+    if (!file) {
+      return false;
+    }
+
+    // Find all ancestors (parents) of this file using nested set model
+    const ancestors = await this.prisma.file.findMany({
+      where: {
+        treeOwnerId: file.treeOwnerId,
+        left: { lt: file.left },
+        right: { gt: file.right },
+        permissions: {
+          some: {
+            userId: userId,
+          },
+        },
+      },
+      include: {
+        permissions: {
+          where: {
+            userId: userId,
+          },
+        },
+      },
+    });
+
+    return ancestors.length > 0;
+  }
 }

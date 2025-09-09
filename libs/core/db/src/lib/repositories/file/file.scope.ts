@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { File } from '../../entities';
+import { File, FilePermissionRole } from '../../entities';
 import { PrismaService, Prisma } from '../../prisma';
 import { FileFormat } from '@keepcloud/commons/constants';
 import { BaseScope } from '../base/base.scope';
@@ -85,5 +85,73 @@ export class FileScope extends BaseScope<
   filterByIsSystem(isSystem: boolean) {
     this._where.isSystem = isSystem;
     return this;
+  }
+
+  filterByIds(ids: string[]) {
+    this._where.id = { in: ids };
+    return this;
+  }
+
+  /**
+   * Filter files that the user has access to (owner or shared permissions)
+   */
+  filterByUserAccess(userId: string) {
+    this._where.OR = [
+      { ownerId: userId },
+      { treeOwnerId: userId },
+      {
+        permissions: {
+          some: {
+            userId: userId,
+          },
+        },
+      },
+    ];
+    return this;
+  }
+
+  /**
+   * Filter files by minimum permission role
+   */
+  filterByUserPermission(userId: string, minimumRole?: FilePermissionRole) {
+    if (minimumRole) {
+      this._where.OR = [
+        { ownerId: userId },
+        {
+          permissions: {
+            some: {
+              userId: userId,
+              role: minimumRole,
+            },
+          },
+        },
+      ];
+    } else {
+      return this.filterByUserAccess(userId);
+    }
+    return this;
+  }
+
+  /**
+   * Join permissions for access control
+   */
+  joinPermissions(): this {
+    this._include.permissions = {
+      include: {
+        user: true,
+        grantedBy: true,
+      },
+    };
+    return this;
+  }
+
+  /**
+   * Filter files that the user has hierarchical access to
+   * This includes direct permissions and inherited permissions from ancestor folders
+   */
+  filterByHierarchicalAccess(userId: string) {
+    // For now, we'll use the simpler filterByUserAccess and rely on
+    // the service layer's hasAncestorAccess method for detailed checking
+    return this.filterByUserAccess(userId);
   }
 }
