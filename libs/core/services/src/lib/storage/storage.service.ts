@@ -28,6 +28,7 @@ export class StorageService {
       .filterByNotTrashed()
       .orderBy({ isFolder: 'desc' }) //folder first
       .orderBy({ name: filters.order })
+      .filterByTreeOwnerId(userId)
       .filterByOwnerId(userId)
       .joinOwner();
 
@@ -64,7 +65,7 @@ export class StorageService {
       filters.pageSize,
       {
         where: {
-          ownerId: userId, // Filter by current user
+          treeOwnerId: userId, // Filter by current user
           trashedAt: { not: null },
           deletedAt: null,
           OR: [
@@ -115,6 +116,7 @@ export class StorageService {
 
     return this.fileRepository.scoped
       .filterByParentId(root.id)
+      .filterByTreeOwnerId(userId)
       .filterByOwnerId(userId)
       .filterByType(FileType.FOLDER)
       .filterByNotTrashed()
@@ -128,6 +130,7 @@ export class StorageService {
 
     return this.fileRepository.scoped
       .filterByParentId(root.id)
+      .filterByTreeOwnerId(userId)
       .filterByOwnerId(userId)
       .filterByType(FileType.FILE)
       .filterByNotTrashed()
@@ -204,6 +207,7 @@ export class StorageService {
       { id },
       { deletedAt: new Date() },
     );
+    const treeOwnerId = deleted.treeOwnerId;
 
     //mark all files under this node as deleted
     if (this.fileRepository.isFolder(deleted)) {
@@ -211,6 +215,7 @@ export class StorageService {
         where: {
           left: { gte: deleted.left },
           right: { lte: deleted.right },
+          treeOwnerId,
         },
         data: { deletedAt: new Date() },
       });
@@ -218,17 +223,17 @@ export class StorageService {
 
     // delete all files under this node including the node itself
     await this.queueService.enqueueDeleteFileAndChildrenFromStorage({
-      ownerId: deleted.ownerId,
+      treeOwnerId,
       fileId: id,
     });
 
     await this.queueService.enqueueNestedSetDeleteNode({
       nodeId: id,
-      ownerId: deleted.ownerId,
+      treeOwnerId,
     });
 
     // Sync user's storage usage to ensure accuracy
-    await this.userService.syncStorageUsage(deleted.ownerId);
+    await this.userService.syncStorageUsage(treeOwnerId);
 
     return deleted;
   }
@@ -251,7 +256,7 @@ export class StorageService {
 
     await this.fileRepository.prisma.file.updateMany({
       where: {
-        ownerId: restored.ownerId,
+        treeOwnerId: restored.treeOwnerId,
         left: { gt: restored.left },
         right: { lt: restored.right },
       },
@@ -261,9 +266,9 @@ export class StorageService {
     return restored;
   }
 
-  async getFilesUnderNode(ownerId: string, nodeId: string) {
+  async getFilesUnderNode(treeOwnerId: string, nodeId: string) {
     const node = await this.fileRepository.prisma.file.findUnique({
-      where: { id: nodeId, ownerId },
+      where: { id: nodeId, treeOwnerId },
       select: { left: true, right: true },
     });
 
@@ -274,7 +279,7 @@ export class StorageService {
 
     const files = await this.fileRepository.prisma.file.findMany({
       where: {
-        ownerId,
+        treeOwnerId,
         left: { gte: node.left },
         right: { lte: node.right },
         type: 'FILE',
@@ -283,6 +288,7 @@ export class StorageService {
       select: {
         id: true,
         ownerId: true,
+        treeOwnerId: true,
         storagePath: true,
       },
     });
@@ -319,7 +325,7 @@ export class StorageService {
     const fileStats = await this.fileRepository.prisma.file.groupBy({
       by: ['contentType'],
       where: {
-        ownerId: userId,
+        treeOwnerId: userId,
         type: 'FILE',
         deletedAt: null,
       },

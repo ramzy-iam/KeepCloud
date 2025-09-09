@@ -3,29 +3,29 @@ export interface Processor {
 }
 
 export interface UpdateFileTagInStorageData {
-  ownerId: string;
+  treeOwnerId: string;
   sourcePath: string;
   fileId: string;
 }
 
 export interface DeleteNodeData {
-  ownerId: string;
+  treeOwnerId: string;
   nodeId: string;
 }
 export interface MoveNodeData {
-  ownerId: string;
+  treeOwnerId: string;
   nodeId: string;
   newParentId: string;
 }
 
 export interface DeleteFileFromStorageData {
-  ownerId: string;
+  treeOwnerId: string;
   fileId: string;
   storagePath: string;
 }
 
 export interface DeleteFileAndChildrenFromStorageData {
-  ownerId: string;
+  treeOwnerId: string;
   fileId: string;
 }
 
