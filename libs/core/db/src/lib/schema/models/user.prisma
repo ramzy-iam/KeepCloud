@@ -14,7 +14,6 @@ model User {
   fileAccessLogs FileAccessLog[]  @relation("UserFileAccessLogs")
   ownedFiles     File[]           @relation("FileOwner")
   TreeOwnedFiles     File[]           @relation("TreeOwner")
-  createdFiles   File[]           @relation("FileCreator")
   
   // File permissions
   filePermissions FilePermission[]
