@@ -14,7 +14,6 @@ import {
 } from '@keepcloud/commons/backend';
 import { SystemQueueService } from '../queues';
 import { UserService } from '../user';
-import { FileSharingService } from '../file-sharing';
 
 @Injectable()
 export class StorageService {

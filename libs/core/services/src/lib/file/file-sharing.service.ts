@@ -285,7 +285,6 @@ export class FileSharingService {
         [
           FilePermissionRole.EDITOR,
           FilePermissionRole.OWNER,
-          FilePermissionRole.TREE_OWNER,
         ] as FilePermissionRole[]
       ).includes(link.role),
     };
@@ -376,10 +375,8 @@ export class FileSharingService {
 
     const roleHierarchy = {
       [FilePermissionRole.VIEWER]: 1,
-      [FilePermissionRole.COMMENTER]: 2,
-      [FilePermissionRole.EDITOR]: 3,
-      [FilePermissionRole.OWNER]: 4,
-      [FilePermissionRole.TREE_OWNER]: 5,
+      [FilePermissionRole.EDITOR]: 2,
+      [FilePermissionRole.OWNER]: 3,
     };
 
     return roleHierarchy[permission.role] >= roleHierarchy[minimumRole];

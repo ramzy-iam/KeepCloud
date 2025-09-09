@@ -1,9 +1,7 @@
 enum FilePermissionRole {
-  TREE_OWNER  // full control of tree structure (restructure, move, delete entire subtrees)
   OWNER       // full control of specific file/folder (delete, manage permissions)
   EDITOR      // can create/update/delete files inside folder, cannot restructure tree
   VIEWER      // read-only access
-  COMMENTER   // read + comment (optional)
 }
 
 
