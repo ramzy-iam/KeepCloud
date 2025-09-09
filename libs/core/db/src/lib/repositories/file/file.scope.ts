@@ -22,6 +22,10 @@ export class FileScope extends BaseScope<
     super(prismaService, repository);
   }
 
+  filterByTreeOwnerId(id: string) {
+    this._where.treeOwnerId = id;
+    return this;
+  }
   filterByOwnerId(id: string) {
     this._where.ownerId = id;
     return this;
@@ -80,37 +84,6 @@ export class FileScope extends BaseScope<
 
   filterByIsSystem(isSystem: boolean) {
     this._where.isSystem = isSystem;
-    return this;
-  }
-
-  filterBySharedWithCurrentUser(userId: string) {
-    this._where.sharedWith = {
-      some: {
-        sharedWithId: userId,
-        deletedAt: null,
-      },
-    };
-    return this;
-  }
-
-  filterByCurrentUserOwned(userId: string) {
-    console.log({ userId });
-    this._where.ownerId = userId;
-    return this;
-  }
-
-  filterByCurrentUserAccessible(userId: string) {
-    this._where.OR = [
-      { ownerId: userId },
-      {
-        sharedWith: {
-          some: {
-            sharedWithId: userId,
-            deletedAt: null,
-          },
-        },
-      },
-    ];
     return this;
   }
 }

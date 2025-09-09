@@ -47,12 +47,14 @@ export class FileService extends BaseFileService {
     dto: CreateFileDto,
   ): Promise<File & { ancestors: FileAncestorDto[] }> {
     let parentId = dto.parentId || null;
+    let parent: File | null = null;
     if (!parentId || FileHelper.isSystemFile(parentId)) {
-      const root = await this.fileRepository.getRootFolder();
+      const root = await this.fileRepository.getRootFolder(ownerId);
       parentId = root.id;
+      parent = root;
     }
 
-    await this.validateParentFolder(parentId);
+    parent = await this.validateParentFolder(parentId);
     await this.validateFileExistsInStorage(dto.storagePath);
 
     const { name, format } = FileHelper.splitNameAndFormat(dto.filename);
@@ -73,6 +75,7 @@ export class FileService extends BaseFileService {
         const fileData: Prisma.FileCreateInput = {
           name: filename,
           owner: { connect: { id: ownerId } },
+          treeOwner: { connect: { id: parent?.treeOwnerId } },
           contentType: FileHelper.getContentType(dto.storagePath),
           size,
           type: FileType.FILE,
@@ -90,10 +93,11 @@ export class FileService extends BaseFileService {
         return file;
       },
     );
+    const treeOwnerId = createdFile.treeOwnerId;
 
-    await this.userService.updateStorageUsed(ownerId, size);
+    await this.userService.updateStorageUsed(treeOwnerId, size);
     await this.systemQueueService.enqueueUpdateFileTagInStorage({
-      ownerId,
+      treeOwnerId,
       sourcePath: dto.storagePath,
       fileId: createdFile.id,
     });
@@ -172,8 +176,10 @@ export class FileService extends BaseFileService {
     };
   }
 
-  private async validateParentFolder(parentId?: string | null): Promise<void> {
-    if (!parentId) return;
+  private async validateParentFolder(
+    parentId?: string | null,
+  ): Promise<File | null> {
+    if (!parentId) return null;
 
     const parent = await this.fileRepository.scoped
       .filterById(parentId)
@@ -183,6 +189,7 @@ export class FileService extends BaseFileService {
     if (!parent) {
       throw new FolderNotFoundException(parentId);
     }
+    return parent;
   }
 
   private async validateFileExistsInStorage(

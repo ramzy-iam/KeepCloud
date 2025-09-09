@@ -18,11 +18,12 @@ import { BaseFileService } from '../file/base-file-service';
 export class FolderService extends BaseFileService {
   async create(dto: CreateFolderDto): Promise<File> {
     let parentId = dto.parentId;
+    let parent: File | null = null;
     if (!parentId) {
-      const root = await this.fileRepository.getRootFolder();
+      const root = await this.fileRepository.getRootFolder(dto.ownerId);
       parentId = root.id;
 
-      const parent = await this.fileRepository.scoped
+      parent = await this.fileRepository.scoped
         .filterById(parentId)
         .filerByIsFolder()
         .getOne();
@@ -35,12 +36,13 @@ export class FolderService extends BaseFileService {
         });
       }
     }
+    const treeOwnerId = parent?.treeOwnerId as string;
 
     const createdFolder = await this.fileRepository.prisma.$transaction(
       async (tx) => {
         const { left, right } =
           await this.nestedSetService.allocateNestedSetPosition(
-            dto.ownerId,
+            treeOwnerId,
             parentId,
             tx,
           );
@@ -48,7 +50,7 @@ export class FolderService extends BaseFileService {
         const folderData: Prisma.FileCreateInput = {
           name: dto.name,
           owner: { connect: { id: dto.ownerId } },
-          createdBy: { connect: { id: dto.ownerId } },
+          treeOwner: { connect: { id: treeOwnerId } },
           contentType: 'folder',
           isFolder: true,
           size: BigInt(0),

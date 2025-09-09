@@ -120,12 +120,9 @@ export class FileRepository extends BaseRepository<
     return file.isFolder;
   }
 
-  getRootFolder(userId?: string): Promise<File> {
-    const scope = this.scoped;
-    if (userId) {
-      scope.filterByOwnerId(userId);
-    }
-    return scope
+  getRootFolder(userId: string): Promise<File> {
+    return this.scoped
+      .filterByOwnerId(userId)
       .filterByParentId(null)
       .filterByExactName(SYSTEM_FILE.MY_STORAGE.code)
       .filterByIsSystem(true)

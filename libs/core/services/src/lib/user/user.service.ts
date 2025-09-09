@@ -47,6 +47,9 @@ export class UserService {
               owner: {
                 connect: { email },
               },
+              treeOwner: {
+                connect: { email },
+              },
               contentType: 'folder',
               isFolder: true,
               size: BigInt(0),
@@ -114,7 +117,7 @@ export class UserService {
     // Get actual storage usage from files (including trashed files, excluding permanently deleted files)
     const result = await this.userRepository.prisma.file.aggregate({
       where: {
-        ownerId: userId,
+        treeOwnerId: userId,
         type: 'FILE',
         deletedAt: null, // Exclude permanently deleted files
         size: { gte: 0 },

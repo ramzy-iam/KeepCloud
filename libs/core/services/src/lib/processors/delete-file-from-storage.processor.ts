@@ -13,9 +13,9 @@ export class DeleteFileFromStorageProcessor implements Processor {
   }
 
   async execute(data: DeleteFileFromStorageData) {
-    const { ownerId, fileId, storagePath } = data;
+    const { treeOwnerId, fileId, storagePath } = data;
     this.logger.info(
-      `Deleting file for ownerId=${ownerId}, fileId=${fileId}, key=${storagePath}`,
+      `Deleting file for treeOwnerId=${treeOwnerId}, fileId=${fileId}, key=${storagePath}`,
     );
 
     try {
