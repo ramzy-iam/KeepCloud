@@ -1,5 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { File, FileType, FilePermissionRole } from '@keepcloud/core/db';
+import {
+  File,
+  FileType,
+  FilePermissionRole,
+  FileRepository,
+} from '@keepcloud/core/db';
 import {
   CreateFolderDto,
   FileAncestorDto,
@@ -12,10 +17,16 @@ import {
 } from '@keepcloud/commons/backend';
 import { ErrorCode, SYSTEM_FILE } from '@keepcloud/commons/constants';
 import { Prisma } from '@prisma/client';
-import { BaseFileService } from '../file/base-file-service';
+import { FilePermissionService } from '../file';
+import { NestedSetService } from '../storage';
 
 @Injectable()
-export class FolderService extends BaseFileService {
+export class FolderService {
+  constructor(
+    protected readonly fileRepository: FileRepository,
+    protected readonly nestedSetService: NestedSetService,
+    protected readonly filePermissionService: FilePermissionService,
+  ) {}
   async create(dto: CreateFolderDto): Promise<File> {
     let parentId = dto.parentId;
     let parent: File | null = null;
@@ -25,7 +36,11 @@ export class FolderService extends BaseFileService {
     }
 
     // Verify user has EDITOR role or higher on the parent folder
-    await this.verifyUserRole(parentId, dto.ownerId, FilePermissionRole.EDITOR);
+    await this.filePermissionService.verifyUserRole(
+      parentId,
+      dto.ownerId,
+      FilePermissionRole.EDITOR,
+    );
 
     parent = await this.fileRepository.scoped
       .filterById(parentId)
