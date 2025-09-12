@@ -9,6 +9,7 @@ export * from './use-file-action-menu';
 export * from './storage.hook';
 export * from './folder.hook';
 export * from './file.hook';
+export * from './user.hook';
 export * from './use-dialog.hook';
 export * from './upload-trigger.hook';
 export * from './use-file-icon.hook';

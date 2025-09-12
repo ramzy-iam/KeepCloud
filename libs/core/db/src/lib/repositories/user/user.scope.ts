@@ -35,7 +35,7 @@ export class UserScope extends BaseScope<
         { email: { contains: keyword, mode: 'insensitive' } },
       );
     }
-    this._where.OR = searchConditions;
+    if (searchConditions.length > 0) this._where.OR = searchConditions;
     return this;
   }
 

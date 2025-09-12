@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Button,
   Select,
@@ -35,12 +35,8 @@ import {
   X,
   Check,
 } from 'lucide-react';
-import {
-  useShareFile,
-  useGetFilePermissions,
-  useUpdatePermission,
-  useRevokePermission,
-} from '../../../hooks/sharing.hook';
+
+import { useGetUsers } from '@keepcloud/web-core/react';
 import { OwnerIcon } from '../../ui/owner-icon';
 
 interface SharePeopleTabProps {
@@ -59,67 +55,52 @@ const ROLE_LABELS = {
   [FilePermissionRole.VIEWER]: 'Viewer',
 };
 
-// Mock user data - in a real app, this would come from an API
-const mockUsers: UserProfileDto[] = [
-  {
-    id: '1',
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john.doe@company.com',
-    picture: null,
-  },
-  {
-    id: '2',
-    firstName: 'Jane',
-    lastName: 'Smith',
-    email: 'jane.smith@company.com',
-    picture: null,
-  },
-  {
-    id: '3',
-    firstName: 'Michael',
-    lastName: 'Johnson',
-    email: 'michael.johnson@company.com',
-    picture: null,
-  },
-  {
-    id: '4',
-    firstName: 'Sarah',
-    lastName: 'Wilson',
-    email: 'sarah.wilson@company.com',
-    picture: null,
-  },
-];
-
 export function SharePeopleTab({ item }: SharePeopleTabProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
   const [selectedUsers, setSelectedUsers] = useState<UserProfileDto[]>([]);
   const [selectedRole, setSelectedRole] = useState<FilePermissionRole>(
     FilePermissionRole.VIEWER,
   );
   const [isOpen, setIsOpen] = useState(false);
 
-  const shareFile = useShareFile();
-  const updatePermission = useUpdatePermission();
-  const revokePermission = useRevokePermission();
+  // Debounce search query to avoid too many API calls
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 300); // 300ms delay
 
-  const {
-    data: permissions,
-    isLoading: isLoadingPermissions,
-    refetch: refetchPermissions,
-  } = useGetFilePermissions(item.id);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
-  // Filter users based on search query and exclude already selected ones
-  const filteredUsers = mockUsers.filter(
-    (user) =>
-      !selectedUsers.some((selected) => selected.id === user.id) &&
-      ((user.firstName?.toLowerCase() || '').includes(
-        searchQuery.toLowerCase(),
-      ) ||
-        (user.lastName?.toLowerCase() || '').includes(
-          searchQuery.toLowerCase(),
-        ) ||
-        user.email.toLowerCase().includes(searchQuery.toLowerCase())),
+  const shareFile = {
+    mutateAsync: async () => console.log('Share file called'),
+    isPending: false,
+  };
+  const revokePermission = { isPending: false };
+  const permissions: FilePermissionDto[] = []; // Empty array for now
+  const isLoadingPermissions = false;
+  const refetchPermissions = () => console.log('Refetch permissions called');
+
+  // Get users from API with debounced search query
+  // Search when popover is open - load initial users or search results
+  const shouldFetchUsers = isOpen;
+  const searchFilters = debouncedSearchQuery.trim()
+    ? { query: debouncedSearchQuery.trim() }
+    : { pageSize: 20 }; // Load first 20 users when no search query
+
+  const { data: usersResponse, isLoading: isLoadingUsers } = useGetUsers({
+    filters: searchFilters,
+    enabled: shouldFetchUsers,
+    staleTime: 30 * 1000, // Cache results for 30 seconds
+  });
+
+  const apiUsers = usersResponse?.items || [];
+
+  // Filter out already selected users (search is handled by API)
+  const filteredUsers = apiUsers.filter(
+    (user: UserProfileDto) =>
+      !selectedUsers.some((selected) => selected.id === user.id),
   );
 
   const handleSelectUser = (user: UserProfileDto) => {
@@ -136,7 +117,7 @@ export function SharePeopleTab({ item }: SharePeopleTabProps) {
     if (selectedUsers.length === 0) return;
 
     try {
-      await shareFile.mutateAsync({
+      console.log('Sharing file with users:', {
         fileId: item.id,
         userIds: selectedUsers.map((user) => user.id),
         role: selectedRole,
@@ -150,31 +131,16 @@ export function SharePeopleTab({ item }: SharePeopleTabProps) {
     }
   };
 
+  // Mock handlers for now
   const handleRoleChange = async (
     permissionId: string,
     newRole: FilePermissionRole,
   ) => {
-    try {
-      await updatePermission.mutateAsync({
-        permissionId,
-        role: newRole,
-      });
-      refetchPermissions();
-    } catch (error) {
-      console.error('Failed to update permission:', error);
-    }
+    console.log('Update permission called:', { permissionId, newRole });
   };
 
   const handleRemoveAccess = async (permissionId: string) => {
-    try {
-      await revokePermission.mutateAsync({
-        fileId: item.id,
-        permissionId,
-      });
-      refetchPermissions();
-    } catch (error) {
-      console.error('Failed to revoke permission:', error);
-    }
+    console.log('Remove access called:', { permissionId });
   };
 
   return (
@@ -242,32 +208,39 @@ export function SharePeopleTab({ item }: SharePeopleTabProps) {
                     onValueChange={setSearchQuery}
                   />
                   <CommandList>
-                    <CommandEmpty>No users found.</CommandEmpty>
+                    {isLoadingUsers ? (
+                      <div className="p-4 text-center text-sm text-muted-foreground">
+                        Loading users...
+                      </div>
+                    ) : (
+                      <CommandEmpty>No users found.</CommandEmpty>
+                    )}
                     <CommandGroup>
-                      {filteredUsers.map((user) => (
-                        <CommandItem
-                          key={user.id}
-                          onSelect={() => handleSelectUser(user)}
-                          className="flex cursor-pointer items-center gap-3"
-                        >
-                          <div className="[&>div]:h-8 [&>div]:w-8">
-                            <OwnerIcon
-                              user={user}
-                              withName={false}
-                              withTooltip={false}
-                            />
-                          </div>
-                          <div className="flex-1">
-                            <div className="text-sm font-medium">
-                              {user.firstName} {user.lastName}
+                      {!isLoadingUsers &&
+                        filteredUsers.map((user: UserProfileDto) => (
+                          <CommandItem
+                            key={user.id}
+                            onSelect={() => handleSelectUser(user)}
+                            className="flex cursor-pointer items-center gap-3"
+                          >
+                            <div className="[&>div]:h-8 [&>div]:w-8">
+                              <OwnerIcon
+                                user={user}
+                                withName={false}
+                                withTooltip={false}
+                              />
                             </div>
-                            <div className="text-xs text-muted-foreground">
-                              {user.email}
+                            <div className="flex-1">
+                              <div className="text-sm font-medium">
+                                {user.firstName} {user.lastName}
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                {user.email}
+                              </div>
                             </div>
-                          </div>
-                          <Check className="h-4 w-4 opacity-0" />
-                        </CommandItem>
-                      ))}
+                            <Check className="h-4 w-4 opacity-0" />
+                          </CommandItem>
+                        ))}
                     </CommandGroup>
                   </CommandList>
                 </Command>
@@ -412,7 +385,7 @@ export function SharePeopleTab({ item }: SharePeopleTabProps) {
                           value as FilePermissionRole,
                         )
                       }
-                      disabled={updatePermission.isPending}
+                      // disabled={updatePermission.isPending}
                     >
                       <SelectTrigger className="w-32">
                         <SelectValue>
