@@ -21,28 +21,28 @@ import {
   Logger,
   S3Helper,
 } from '@keepcloud/commons/backend';
-import { BaseFileService } from './base-file-service';
 import { FileHelper } from '@keepcloud/commons/helpers';
 import { UserService } from '../user';
 import { FileUploadStatus, SYSTEM_FILE } from '@keepcloud/commons/constants';
 import { SystemQueueService } from '../queues';
 import { DispositionType } from '@keepcloud/commons/types';
 import { NestedSetService } from '../storage';
+import { FilePermissionService } from './file-permission.service';
 
 @Injectable()
-export class FileService extends BaseFileService {
+export class FileService {
   protected readonly s3helper: S3Helper;
   protected readonly bucket: string;
   protected logger: Logger;
 
   constructor(
-    protected override readonly fileRepository: FileRepository,
-    private readonly userService: UserService,
-    private readonly systemQueueService: SystemQueueService,
-    protected override readonly nestedSetService: NestedSetService,
+    protected readonly fileRepository: FileRepository,
+    protected readonly nestedSetService: NestedSetService,
+    protected readonly queueService: SystemQueueService,
+    protected readonly userService: UserService,
     protected readonly configService: AppConfigService,
+    protected readonly filePermissionService: FilePermissionService,
   ) {
-    super(fileRepository, nestedSetService);
     this.s3helper = S3Helper.getInstance();
     this.bucket = this.configService.env.FILE_BUCKET;
     this.logger = new Logger(FileService.name);
@@ -61,7 +61,11 @@ export class FileService extends BaseFileService {
     }
 
     // Verify user has EDITOR role or higher on the parent folder
-    await this.verifyUserRole(parentId, ownerId, FilePermissionRole.EDITOR);
+    await this.filePermissionService.verifyUserRole(
+      parentId,
+      ownerId,
+      FilePermissionRole.EDITOR,
+    );
 
     parent = await this.validateParentFolder(parentId);
     await this.validateFileExistsInStorage(dto.storagePath);
@@ -105,7 +109,7 @@ export class FileService extends BaseFileService {
     const treeOwnerId = createdFile.treeOwnerId;
 
     await this.userService.updateStorageUsed(treeOwnerId, size);
-    await this.systemQueueService.enqueueUpdateFileTagInStorage({
+    await this.queueService.enqueueUpdateFileTagInStorage({
       treeOwnerId,
       sourcePath: dto.storagePath,
       fileId: createdFile.id,

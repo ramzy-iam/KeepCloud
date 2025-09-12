@@ -1,41 +1,20 @@
-import {
-  FileTrashedException,
-  FolderTrashedException,
-  ParentFolderTrashedException,
-  ForbiddenException,
-} from '@keepcloud/commons/backend';
-import { FileRepository, File, FilePermissionRole } from '@keepcloud/core/db';
 import { Injectable } from '@nestjs/common';
-import { NestedSetService } from '../storage';
+import { FileRepository, FilePermissionRole } from '@keepcloud/core/db';
+import {
+  ForbiddenException,
+  FileNotFoundException,
+} from '@keepcloud/commons/backend';
 import { ErrorCode } from '@keepcloud/commons/constants';
 
 @Injectable()
-export abstract class BaseFileService {
-  constructor(
-    protected readonly fileRepository: FileRepository,
-    protected readonly nestedSetService: NestedSetService,
-  ) {}
+export class FilePermissionService {
+  constructor(private readonly fileRepository: FileRepository) {}
 
-  abstract create(...dto: unknown[]): Promise<File>;
-
-  async checkAndThrowIfTrashed(fileId: string): Promise<void> {
-    const { trashedBy, isFolder } = await this.fileRepository.isTrashed(fileId);
-
-    if (!trashedBy) {
-      // Not trashed at all, just return
-      return;
-    }
-
-    switch (trashedBy) {
-      case 'self':
-        if (isFolder) {
-          throw new FolderTrashedException();
-        } else {
-          throw new FileTrashedException();
-        }
-      case 'parent':
-        throw new ParentFolderTrashedException();
-    }
+  /**
+   * Check if user has access to a file through ownership or permissions
+   */
+  async hasAccess(fileId: string, userId: string): Promise<boolean> {
+    return this.fileRepository.hasAncestorAccess(fileId, userId);
   }
 
   /**
@@ -47,10 +26,7 @@ export abstract class BaseFileService {
     minimumRole: FilePermissionRole,
   ): Promise<void> {
     // First check if user has access at all
-    const hasAccess = await this.fileRepository.hasAncestorAccess(
-      fileId,
-      userId,
-    );
+    const hasAccess = await this.hasAccess(fileId, userId);
 
     if (!hasAccess) {
       throw new ForbiddenException({
@@ -63,10 +39,7 @@ export abstract class BaseFileService {
     const file = await this.fileRepository.scoped.filterById(fileId).getOne();
 
     if (!file) {
-      throw new ForbiddenException({
-        code: ErrorCode.INSUFFICIENT_PERMISSIONS,
-        message: 'File not found',
-      });
+      throw new FileNotFoundException(fileId);
     }
 
     // Check if user is owner or tree owner (automatically has all permissions)
@@ -95,7 +68,7 @@ export abstract class BaseFileService {
   /**
    * Get the effective role for a user on a file (including inherited from ancestors)
    */
-  private async getUserEffectiveRole(
+  async getUserEffectiveRole(
     fileId: string,
     userId: string,
   ): Promise<FilePermissionRole | null> {
@@ -153,5 +126,28 @@ export abstract class BaseFileService {
     }
 
     return highestRole;
+  }
+
+  /**
+   * Check if user can perform a specific action on a file
+   */
+  async canPerformAction(
+    fileId: string,
+    userId: string,
+    action: 'read' | 'write' | 'delete' | 'share',
+  ): Promise<boolean> {
+    try {
+      const roleMap = {
+        read: FilePermissionRole.VIEWER,
+        write: FilePermissionRole.EDITOR,
+        delete: FilePermissionRole.OWNER,
+        share: FilePermissionRole.EDITOR,
+      };
+
+      await this.verifyUserRole(fileId, userId, roleMap[action]);
+      return true;
+    } catch {
+      return false;
+    }
   }
 }

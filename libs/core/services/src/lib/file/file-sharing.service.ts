@@ -10,9 +10,8 @@ import {
 } from '@keepcloud/core/db';
 import {
   ShareFileWithUserDto,
-  CreateShareableLinkDto,
   UpdateFilePermissionDto,
-  BulkShareDto,
+  ShareFileDto,
 } from '@keepcloud/commons/dtos';
 import {
   FileNotFoundException,
@@ -21,7 +20,6 @@ import {
   BadRequestException,
 } from '@keepcloud/commons/backend';
 import { ErrorCode } from '@keepcloud/commons/constants';
-import { nanoid } from 'nanoid';
 
 @Injectable()
 export class FileSharingService {
@@ -31,18 +29,13 @@ export class FileSharingService {
     private readonly fileLinkRepository: FileLinkRepository,
   ) {}
 
-  /**
-   * Share a file with a specific user (like Google Drive sharing)
-   */
   private async shareFileWithUser(
     fileId: string,
     currentUserId: string,
     dto: ShareFileWithUserDto,
   ) {
-    // Validate file and permissions
     await this.validateSharingPermissions(fileId, currentUserId);
 
-    // Prevent self-sharing
     if (dto.userId === currentUserId) {
       throw new BadRequestException({
         code: ErrorCode.INVALID_INPUT,
@@ -76,20 +69,16 @@ export class FileSharingService {
     return this.getPermissionDetails(permission.id);
   }
 
-  /**
-   * Remove user access from a file
-   */
-  async removeUserAccess(
+  async revokePermission(
     fileId: string,
-    userId: string,
+    permissionId: string,
     currentUserId: string,
   ): Promise<void> {
-    // Validate file and permissions
     await this.validateSharingPermissions(fileId, currentUserId);
 
     const permission = await this.filePermissionRepository.scoped
       .filterByFileId(fileId)
-      .filterByUserId(userId)
+      .filterById(permissionId)
       .getOne();
 
     if (!permission) {
@@ -102,87 +91,7 @@ export class FileSharingService {
     await this.filePermissionRepository.delete({ id: permission.id });
   }
 
-  /**
-   * Create a shareable link (like Google Drive link sharing)
-   */
-  async createShareableLink(
-    fileId: string,
-    currentUserId: string,
-    dto: CreateShareableLinkDto,
-  ) {
-    // Validate file and permissions
-    await this.validateSharingPermissions(fileId, currentUserId);
-
-    // Generate unique token
-    const token = nanoid(32);
-
-    const link = await this.fileLinkRepository.create({
-      file: { connect: { id: fileId } },
-      token,
-      role: dto.role || FilePermissionRole.VIEWER,
-    });
-
-    return this.getLinkDetails(link.id);
-  }
-
-  /**
-   * Remove/delete a shareable link
-   */
-  async removeShareableLink(
-    linkId: string,
-    currentUserId: string,
-  ): Promise<void> {
-    const link = await this.fileLinkRepository.scoped
-      .filterById(linkId)
-      .joinFile()
-      .getOne();
-
-    if (!link) {
-      throw new NotFoundException({
-        code: ErrorCode.LINK_NOT_FOUND,
-        message: 'Shareable link not found',
-      });
-    }
-
-    // Validate permissions on the file
-    await this.validateSharingPermissions(link.fileId, currentUserId);
-
-    await this.fileLinkRepository.delete({ id: linkId });
-  }
-
-  /**
-   * Get complete sharing information for a file
-   */
-  async getFileSharingInfo(fileId: string, currentUserId: string) {
-    // Validate file exists and user has access
-    await this.validateFileAccess(fileId, currentUserId);
-
-    const [permissions, activeLinks] = await Promise.all([
-      this.filePermissionRepository.scoped
-        .filterByFileId(fileId)
-        .joinUser()
-        .joinGrantedBy()
-        .getMany(),
-      this.fileLinkRepository.scoped.filterByFileId(fileId).getMany(),
-    ]);
-
-    return {
-      permissions: permissions,
-      links: activeLinks,
-      isShared: permissions.length > 0 || activeLinks.length > 0,
-      totalSharedWith: permissions.length,
-    };
-  }
-
-  /**
-   * Bulk share file with multiple users at once
-   */
-  async bulkShareFile(
-    fileId: string,
-    currentUserId: string,
-    dto: BulkShareDto,
-  ) {
-    // Validate file and permissions
+  async shareFile(fileId: string, currentUserId: string, dto: ShareFileDto) {
     await this.validateSharingPermissions(fileId, currentUserId);
 
     const results: FilePermission[] = [];
@@ -207,14 +116,9 @@ export class FileSharingService {
       }
     }
 
-    // If there were errors but some succeeded, we'll return the successes
-    // The controller can handle reporting partial failures
     return results;
   }
 
-  /**
-   * Update permission role for an existing share
-   */
   async updatePermissionRole(
     permissionId: string,
     currentUserId: string,
@@ -290,19 +194,6 @@ export class FileSharingService {
     };
   }
 
-  /**
-   * Get files shared with a user
-   */
-  async getSharedWithUser(userId: string, page = 1, limit = 20) {
-    return this.filePermissionRepository.scoped
-      .filterByUserId(userId)
-      .joinFile()
-      .joinGrantedBy()
-      .getManyPaginated(page, limit);
-  }
-
-  // Private helper methods
-
   private async validateSharingPermissions(
     fileId: string,
     userId: string,
@@ -320,7 +211,7 @@ export class FileSharingService {
     const canShare =
       file.ownerId === userId ||
       file.treeOwnerId === userId ||
-      (await this.hasMinimumRole(fileId, userId, FilePermissionRole.OWNER));
+      (await this.hasMinimumRole(fileId, userId, FilePermissionRole.EDITOR));
 
     if (!canShare) {
       throw new ForbiddenException({
@@ -399,13 +290,6 @@ export class FileSharingService {
       .filterById(permissionId)
       .joinUser()
       .joinGrantedBy()
-      .joinFile()
-      .getOneOrFail();
-  }
-
-  private async getLinkDetails(linkId: string) {
-    return this.fileLinkRepository.scoped
-      .filterById(linkId)
       .joinFile()
       .getOneOrFail();
   }

@@ -82,8 +82,12 @@ export class StorageController {
 
   @Patch('resources/:id/rename')
   @Serialize(FileMinViewDto)
-  rename(@Param('id') id: string, @Body() dto: RenameFolderDto) {
-    return this.storageService.rename(id, dto.name);
+  rename(
+    @Param('id') id: string,
+    @Body() dto: RenameFolderDto,
+    @CurrentUser() user: UserProfileDto,
+  ) {
+    return this.storageService.rename(user.id, id, dto.name);
   }
 
   @Post('resources/:id/restore')

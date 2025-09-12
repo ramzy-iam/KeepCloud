@@ -2,7 +2,6 @@ import {
   IsNotEmpty,
   IsString,
   IsEnum,
-  IsOptional,
   IsArray,
   ArrayNotEmpty,
 } from '../validators';
@@ -21,13 +20,6 @@ export class ShareFileWithUserDto {
 
   @IsEnum(FilePermissionRole, ErrorCode.INVALID_PERMISSION_ROLE)
   role: FilePermissionRole;
-}
-
-// DTO for creating a shareable link
-export class CreateShareableLinkDto {
-  @IsEnum(FilePermissionRole, ErrorCode.INVALID_PERMISSION_ROLE)
-  @IsOptional()
-  role?: FilePermissionRole = FilePermissionRole.VIEWER;
 }
 
 // DTO for updating file permission
@@ -110,7 +102,7 @@ export class FileSharingInfoDto {
 }
 
 // DTO for bulk sharing operations
-export class BulkShareDto {
+export class ShareFileDto {
   @IsArray()
   @ArrayNotEmpty()
   @IsString(ErrorCode.INVALID_STRING, { each: true })
@@ -118,11 +110,4 @@ export class BulkShareDto {
 
   @IsEnum(FilePermissionRole, ErrorCode.INVALID_PERMISSION_ROLE)
   role: FilePermissionRole;
-}
-
-// DTO for accessing shared files via link
-export class AccessSharedFileDto {
-  @IsNotEmpty()
-  @IsString()
-  token: string;
 }

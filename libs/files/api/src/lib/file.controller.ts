@@ -20,9 +20,8 @@ import {
   CreatePresignedPostBody,
   FilePreviewDto,
   PresignedGetResultDto,
-  CreateShareableLinkDto,
   UpdateFilePermissionDto,
-  BulkShareDto,
+  ShareFileDto,
 } from '@keepcloud/commons/dtos';
 
 @Controller('files')
@@ -53,78 +52,29 @@ export class FileController {
     return this.fileService.generatePresignedGet(user.id, fileId);
   }
 
-  // ===== SHARING OPERATIONS =====
-
-  /**
-   * Share a file with multiple users (bulk sharing by default)
-   */
-  @Post(':fileId/share/users')
+  @Post(':fileId/share')
   async shareFileWithUsers(
     @Param('fileId') fileId: string,
     @CurrentUser() currentUser: User,
-    @Body() dto: BulkShareDto,
+    @Body() dto: ShareFileDto,
   ) {
-    return this.fileSharingService.bulkShareFile(fileId, currentUser.id, dto);
+    return this.fileSharingService.shareFile(fileId, currentUser.id, dto);
   }
 
-  /**
-   * Remove user access from a file
-   */
-  @Delete(':fileId/share/users/:userId')
-  async removeUserAccess(
+  @Delete(':fileId/permission/:permissionId')
+  async revokePermission(
     @Param('fileId') fileId: string,
-    @Param('userId') userId: string,
+    @Param('permissionId') permissionId: string,
     @CurrentUser() currentUser: User,
   ): Promise<void> {
-    return this.fileSharingService.removeUserAccess(
+    return this.fileSharingService.revokePermission(
       fileId,
-      userId,
+      permissionId,
       currentUser.id,
     );
   }
 
-  /**
-   * Create a shareable link for a file
-   */
-  @Post(':fileId/share/links')
-  async createShareableLink(
-    @Param('fileId') fileId: string,
-    @CurrentUser() currentUser: User,
-    @Body() dto: CreateShareableLinkDto,
-  ) {
-    return this.fileSharingService.createShareableLink(
-      fileId,
-      currentUser.id,
-      dto,
-    );
-  }
-
-  /**
-   * Remove a shareable link
-   */
-  @Delete('share/links/:linkId')
-  async removeShareableLink(
-    @Param('linkId') linkId: string,
-    @CurrentUser() currentUser: User,
-  ): Promise<void> {
-    return this.fileSharingService.removeShareableLink(linkId, currentUser.id);
-  }
-
-  /**
-   * Get complete sharing information for a file
-   */
-  @Get(':fileId/share')
-  async getFileSharingInfo(
-    @Param('fileId') fileId: string,
-    @CurrentUser() currentUser: User,
-  ) {
-    return this.fileSharingService.getFileSharingInfo(fileId, currentUser.id);
-  }
-
-  /**
-   * Update permission role for an existing share
-   */
-  @Put('share/permissions/:permissionId')
+  @Put(':fileId/permissions/:permissionId')
   async updatePermissionRole(
     @Param('permissionId') permissionId: string,
     @CurrentUser() currentUser: User,
@@ -135,14 +85,5 @@ export class FileController {
       currentUser.id,
       dto,
     );
-  }
-
-  /**
-   * Access file via shareable link (public endpoint)
-   */
-  @PublicRoute()
-  @Get('link/:token')
-  async accessFileByLink(@Param('token') token: string) {
-    return this.fileSharingService.accessFileByLink(token);
   }
 }

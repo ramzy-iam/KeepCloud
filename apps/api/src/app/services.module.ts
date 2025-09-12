@@ -16,6 +16,7 @@ import {
   MailService,
   NotificationService,
   FileSharingService,
+  FilePermissionService,
 } from '@keepcloud/core/services';
 import { Global, Module } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -30,6 +31,7 @@ const services = [
   MailService,
   NotificationService,
   FileSharingService,
+  FilePermissionService,
 
   // Repositories
   UserRepository,
