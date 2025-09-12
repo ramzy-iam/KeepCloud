@@ -69,6 +69,9 @@ export class FileLinkDto {
   createdAt: Date;
 
   @Expose()
+  updatedAt: Date;
+
+  @Expose()
   fileId: string;
 
   @Expose()
@@ -78,11 +81,48 @@ export class FileLinkDto {
   role: FilePermissionRole;
 
   @Expose()
+  access: 'restricted' | 'anyone';
+
+  @Expose()
   expiresAt: Date | null;
+
+  @Expose()
+  accessCount: number;
 
   @Expose()
   @Type(() => FileMinViewDto)
   file?: FileMinViewDto;
+}
+
+// Alias for backwards compatibility and semantic clarity
+export class ShareLinkDto extends FileLinkDto {}
+
+// DTO for creating share links
+export class CreateShareLinkDto {
+  @IsNotEmpty()
+  @IsString()
+  fileId: string;
+
+  @IsEnum(FilePermissionRole, ErrorCode.INVALID_PERMISSION_ROLE)
+  role: FilePermissionRole;
+
+  access?: 'restricted' | 'anyone' = 'restricted';
+
+  expiresAt?: Date | null;
+}
+
+// DTO for updating share links
+export class UpdateShareLinkDto {
+  @IsNotEmpty()
+  @IsString()
+  linkId: string;
+
+  @IsEnum(FilePermissionRole, ErrorCode.INVALID_PERMISSION_ROLE)
+  role?: FilePermissionRole;
+
+  access?: 'restricted' | 'anyone';
+
+  expiresAt?: Date | null;
 }
 
 export class FileSharingInfoDto {

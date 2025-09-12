@@ -8,6 +8,7 @@ import {
   FolderNotFoundDialog,
   RenameResourceDialog,
   ResourceTrashedDialog,
+  ShareFileDialog,
 } from '../dialogs';
 import { useEffect } from 'react';
 
@@ -47,6 +48,9 @@ export const AppDialogs = () => {
 
     case 'fileInfo':
       return <FileInfoDialog />;
+
+    case 'shareFile':
+      return <ShareFileDialog />;
 
     default:
       return null;

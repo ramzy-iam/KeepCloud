@@ -27,3 +27,6 @@ export * from './sonner';
 export * from './hover-card';
 export * from './alert-dialog';
 export * from './progress';
+export * from './switch';
+export * from './card';
+export * from './badge';
