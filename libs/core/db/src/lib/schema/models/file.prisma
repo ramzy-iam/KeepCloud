@@ -50,6 +50,4 @@ model File {
   @@index([parentId])
   @@index([trashedAt])
   @@index([deletedAt])
-  @@unique([treeOwnerId, left])  // Ensure no duplicate left values within a tree
-  @@unique([treeOwnerId, right]) // Ensure no duplicate right values within a tree
 }
