@@ -134,18 +134,9 @@ export function SharePeopleTab({ item }: SharePeopleTabProps) {
                         key={user.id}
                         value={user.id}
                         badgeLabel={
-                          <div className="flex items-center gap-1">
-                            <div className="[&>div]:h-4 [&>div]:w-4 [&>div>img]:h-4 [&>div>img]:w-4">
-                              <OwnerIcon
-                                user={user}
-                                withName={false}
-                                withTooltip={false}
-                              />
-                            </div>
-                            <span>
-                              {user.firstName} {user.lastName}
-                            </span>
-                          </div>
+                          <span>
+                            {user.firstName} {user.lastName}
+                          </span>
                         }
                       >
                         <div className="flex items-center gap-3">
