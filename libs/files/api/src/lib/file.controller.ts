@@ -22,6 +22,7 @@ import {
   UpdateFilePermissionDto,
   ShareFileDto,
   FilePermissionDto,
+  FileDetailsDto,
 } from '@keepcloud/commons/dtos';
 
 @Controller('files')
@@ -51,6 +52,7 @@ export class FileController {
   presignedGet(@Param('fileId') fileId: string, @CurrentUser() user: User) {
     return this.fileService.generatePresignedGet(user.id, fileId);
   }
+
   @Post(':fileId/share')
   async shareFile(
     @Param('fileId') fileId: string,
@@ -107,5 +109,10 @@ export class FileController {
       userId,
       currentUser.id,
     );
+  }
+  @Get(':id')
+  @Serialize(FileDetailsDto)
+  async getOne(@Param('id') id: string, @CurrentUser() user: User) {
+    return this.fileService.getOne(user.id, id);
   }
 }

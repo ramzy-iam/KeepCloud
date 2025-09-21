@@ -5,6 +5,7 @@ import {
   FileMinViewDto,
   PresignedGetResultDto,
   PresignedPostResultDto,
+  FileDetailsDto,
 } from '@keepcloud/commons/dtos';
 import { ApiError, FileService } from '../services';
 import { toast } from 'sonner';
@@ -159,5 +160,19 @@ export const useGeneratePresignedGet = ({
     enabled: Boolean(fileId) && enabled,
     retry: false,
     staleTime: 60_000,
+  });
+};
+
+interface GetFileProps {
+  id: string;
+  enabled?: boolean;
+}
+
+export const useGetFile = ({ id, enabled = true }: GetFileProps) => {
+  return useQuery<FileDetailsDto, ApiError>({
+    queryKey: ['file', id],
+    queryFn: () => FileService.getOne(id),
+    enabled: enabled && !!id,
+    retry: false,
   });
 };

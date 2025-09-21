@@ -39,7 +39,7 @@ export const OwnerIcon = ({
     <div className="flex items-center gap-2">
       <Avatar className={cn('h-[24px] w-[24px]')}>
         <AvatarImage src={user.picture as string} />
-        <AvatarFallback>
+        <AvatarFallback className="h-[24px] w-[24px]">
           {NameFormatterHelper.format(
             [user.firstName, user.lastName],
             'initials',

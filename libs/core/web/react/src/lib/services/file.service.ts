@@ -4,6 +4,7 @@ import {
   CreatePresignedPostBody,
   PresignedPostResultDto,
   PresignedGetResultDto,
+  FileDetailsDto,
 } from '@keepcloud/commons/dtos';
 import { BaseHttpService } from './base.service';
 
@@ -12,6 +13,10 @@ class FileService extends BaseHttpService {
 
   create(dto: CreateFileDto) {
     return this.post<FileMinViewDto, CreateFileDto>('', dto);
+  }
+
+  getOne(id: string) {
+    return this.get<FileDetailsDto>(`/${id}`);
   }
 
   getPresignedPost(dto: CreatePresignedPostBody) {
