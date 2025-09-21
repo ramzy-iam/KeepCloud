@@ -343,10 +343,8 @@ export class FileSharingService {
     await this.filePermissionRepository.delete({ id: permission.id });
 
     // If this was a folder permission, also remove inherited permissions from descendants
-    const file = await this.fileRepository.scoped
-      .filterById(fileId)
-      .getOne();
-    
+    const file = await this.fileRepository.scoped.filterById(fileId).getOne();
+
     if (file && file.type === 'FOLDER') {
       await this.removeInheritedPermissions(fileId, userId);
     }
@@ -458,7 +456,7 @@ export class FileSharingService {
         userId,
         isInherited: true,
         fileId: {
-          in: descendants.map(d => d.id),
+          in: descendants.map((d) => d.id),
         },
       },
     });
