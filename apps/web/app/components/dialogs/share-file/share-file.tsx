@@ -10,7 +10,6 @@ import {
   TabsTrigger,
   TabsContent,
   dialogAtom,
-  useFileIcon,
 } from '@keepcloud/web-core/react';
 import { useAtom } from 'jotai';
 import { FileMinViewDto } from '@keepcloud/commons/dtos';
@@ -22,7 +21,6 @@ export function ShareFileDialog() {
   const [dialogState, setDialogState] = useAtom(dialogAtom);
   const { isOpen, context } = dialogState;
   const item = context?.item as FileMinViewDto | undefined;
-  const FileIconComponent = useFileIcon(item);
 
   const closeDialog = () =>
     setDialogState({ isOpen: false, type: null, context: {} });
@@ -36,16 +34,18 @@ export function ShareFileDialog() {
         if (!open) closeDialog();
       }}
     >
-      <DialogContent className="flex flex-col overflow-hidden p-0 sm:max-w-2xl">
-        <DialogHeader className="border-b px-6 py-4">
+      <DialogContent
+        hideCloseButton={true}
+        className="flex flex-col overflow-hidden p-0 sm:max-w-2xl"
+      >
+        <DialogHeader className="px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              {FileIconComponent && <FileIconComponent />}
               <div>
                 <DialogTitle className="text-left text-lg font-semibold">
-                  Share "{item.name}"
+                  Share {item.isFolder ? 'Folder' : 'File'} "{item.name}"
                 </DialogTitle>
-                <DialogDescription className="text-sm text-muted-foreground">
+                <DialogDescription className="sr-only text-sm text-muted-foreground">
                   {item.isFolder ? 'Folder' : 'File'} • Owned by{' '}
                   {item.owner.firstName} {item.owner.lastName}
                 </DialogDescription>
