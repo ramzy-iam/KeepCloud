@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   Button,
   Select,
@@ -9,15 +9,12 @@ import {
   Separator,
   Badge,
   Skeleton,
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
+  MultiSelect,
+  MultiSelectTrigger,
+  MultiSelectValue,
+  MultiSelectContent,
+  MultiSelectItem,
+  MultiSelectGroup,
 } from '@keepcloud/web-core/react';
 import {
   FileMinViewDto,
@@ -25,16 +22,7 @@ import {
   UserProfileDto,
 } from '@keepcloud/commons/dtos';
 import { FilePermissionRole } from '@prisma/client';
-import {
-  Search,
-  UserPlus,
-  Crown,
-  Edit,
-  Eye,
-  Trash2,
-  X,
-  Check,
-} from 'lucide-react';
+import { UserPlus, Crown, Edit, Eye, Trash2 } from 'lucide-react';
 
 import { useGetUsers } from '@keepcloud/web-core/react';
 import { OwnerIcon } from '../../ui/owner-icon';
@@ -56,22 +44,10 @@ const ROLE_LABELS = {
 };
 
 export function SharePeopleTab({ item }: SharePeopleTabProps) {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
-  const [selectedUsers, setSelectedUsers] = useState<UserProfileDto[]>([]);
+  const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
   const [selectedRole, setSelectedRole] = useState<FilePermissionRole>(
     FilePermissionRole.VIEWER,
   );
-  const [isOpen, setIsOpen] = useState(false);
-
-  // Debounce search query to avoid too many API calls
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearchQuery(searchQuery);
-    }, 300); // 300ms delay
-
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
 
   const shareFile = {
     mutateAsync: async () => console.log('Share file called'),
@@ -82,48 +58,29 @@ export function SharePeopleTab({ item }: SharePeopleTabProps) {
   const isLoadingPermissions = false;
   const refetchPermissions = () => console.log('Refetch permissions called');
 
-  // Get users from API with debounced search query
-  // Search when popover is open - load initial users or search results
-  const shouldFetchUsers = isOpen;
-  const searchFilters = debouncedSearchQuery.trim()
-    ? { query: debouncedSearchQuery.trim() }
-    : { pageSize: 20 }; // Load first 20 users when no search query
-
+  // Get users from API - load initial users for the dropdown
   const { data: usersResponse, isLoading: isLoadingUsers } = useGetUsers({
-    filters: searchFilters,
-    enabled: shouldFetchUsers,
+    filters: { pageSize: 50 }, // Load first 50 users for selection
     staleTime: 30 * 1000, // Cache results for 30 seconds
   });
 
   const apiUsers = usersResponse?.items || [];
 
-  // Filter out already selected users (search is handled by API)
-  const filteredUsers = apiUsers.filter(
-    (user: UserProfileDto) =>
-      !selectedUsers.some((selected) => selected.id === user.id),
-  );
-
-  const handleSelectUser = (user: UserProfileDto) => {
-    setSelectedUsers((prev) => [...prev, user]);
-    setSearchQuery('');
-    setIsOpen(false);
-  };
-
-  const handleRemoveUser = (userId: string) => {
-    setSelectedUsers((prev) => prev.filter((user) => user.id !== userId));
+  const handleValuesChange = (userIds: string[]) => {
+    setSelectedUserIds(userIds);
   };
 
   const handleShare = async () => {
-    if (selectedUsers.length === 0) return;
+    if (selectedUserIds.length === 0) return;
 
     try {
       console.log('Sharing file with users:', {
         fileId: item.id,
-        userIds: selectedUsers.map((user) => user.id),
+        userIds: selectedUserIds,
         role: selectedRole,
       });
 
-      setSelectedUsers([]);
+      setSelectedUserIds([]);
       setSelectedRole(FilePermissionRole.VIEWER);
       refetchPermissions();
     } catch (error) {
@@ -149,103 +106,71 @@ export function SharePeopleTab({ item }: SharePeopleTabProps) {
       <div className="space-y-4">
         <div className="flex items-start gap-2">
           <div className="relative flex-1">
-            <Popover open={isOpen} onOpenChange={setIsOpen}>
-              <PopoverTrigger asChild>
-                <div className="relative min-h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
-                  <div className="flex flex-wrap items-center gap-1">
-                    {/* Display selected users as pills */}
-                    {selectedUsers.map((user) => (
-                      <Badge
+            <MultiSelect
+              values={selectedUserIds}
+              onValuesChange={handleValuesChange}
+            >
+              <MultiSelectTrigger className="w-full">
+                <MultiSelectValue
+                  placeholder="Add people by name or email"
+                  clickToRemove={true}
+                  overflowBehavior="wrap-when-open"
+                />
+              </MultiSelectTrigger>
+              <MultiSelectContent
+                search={{
+                  placeholder: 'Search people...',
+                  emptyMessage: 'No users found.',
+                }}
+              >
+                <MultiSelectGroup>
+                  {isLoadingUsers ? (
+                    <div className="p-4 text-center text-sm text-muted-foreground">
+                      Loading users...
+                    </div>
+                  ) : (
+                    apiUsers.map((user: UserProfileDto) => (
+                      <MultiSelectItem
                         key={user.id}
-                        variant="secondary"
-                        className="flex items-center gap-1 px-2 py-1 text-xs"
-                      >
-                        <div className="[&>div]:h-4 [&>div]:w-4 [&>div>img]:h-4 [&>div>img]:w-4">
-                          <OwnerIcon
-                            user={user}
-                            withName={false}
-                            withTooltip={false}
-                          />
-                        </div>
-                        <span>
-                          {user.firstName} {user.lastName}
-                        </span>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleRemoveUser(user.id);
-                          }}
-                          className="ml-1 rounded-full p-0.5 hover:bg-muted"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </Badge>
-                    ))}
-
-                    {/* Input for searching */}
-                    <input
-                      placeholder={
-                        selectedUsers.length === 0
-                          ? 'Add people by name or email'
-                          : 'Add more people...'
-                      }
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      onFocus={() => setIsOpen(true)}
-                      className="min-w-32 flex-1 bg-transparent outline-none placeholder:text-muted-foreground"
-                    />
-
-                    <Search className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                </div>
-              </PopoverTrigger>
-
-              <PopoverContent className="w-80 p-0" align="start">
-                <Command>
-                  <CommandInput
-                    placeholder="Search people..."
-                    value={searchQuery}
-                    onValueChange={setSearchQuery}
-                  />
-                  <CommandList>
-                    {isLoadingUsers ? (
-                      <div className="p-4 text-center text-sm text-muted-foreground">
-                        Loading users...
-                      </div>
-                    ) : (
-                      <CommandEmpty>No users found.</CommandEmpty>
-                    )}
-                    <CommandGroup>
-                      {!isLoadingUsers &&
-                        filteredUsers.map((user: UserProfileDto) => (
-                          <CommandItem
-                            key={user.id}
-                            onSelect={() => handleSelectUser(user)}
-                            className="flex cursor-pointer items-center gap-3"
-                          >
-                            <div className="[&>div]:h-8 [&>div]:w-8">
+                        value={user.id}
+                        badgeLabel={
+                          <div className="flex items-center gap-1">
+                            <div className="[&>div]:h-4 [&>div]:w-4 [&>div>img]:h-4 [&>div>img]:w-4">
                               <OwnerIcon
                                 user={user}
                                 withName={false}
                                 withTooltip={false}
                               />
                             </div>
-                            <div className="flex-1">
-                              <div className="text-sm font-medium">
-                                {user.firstName} {user.lastName}
-                              </div>
-                              <div className="text-xs text-muted-foreground">
-                                {user.email}
-                              </div>
+                            <span>
+                              {user.firstName} {user.lastName}
+                            </span>
+                          </div>
+                        }
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="[&>div]:h-8 [&>div]:w-8">
+                            <OwnerIcon
+                              user={user}
+                              withName={false}
+                              withTooltip={false}
+                            />
+                          </div>
+                          <div className="flex-1">
+                            <div className="text-sm font-medium">
+                              {user.firstName} {user.lastName}
                             </div>
-                            <Check className="h-4 w-4 opacity-0" />
-                          </CommandItem>
-                        ))}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
+                            <div className="text-xs text-muted-foreground">
+                              {user.email}
+                            </div>
+                          </div>
+                        </div>
+                      </MultiSelectItem>
+                    ))
+                  )}
+                </MultiSelectGroup>
+              </MultiSelectContent>
+            </MultiSelect>
           </div>
 
           <Select
@@ -275,7 +200,7 @@ export function SharePeopleTab({ item }: SharePeopleTabProps) {
 
           <Button
             onClick={handleShare}
-            disabled={selectedUsers.length === 0 || shareFile.isPending}
+            disabled={selectedUserIds.length === 0 || shareFile.isPending}
             className="shrink-0"
           >
             <UserPlus className="mr-2 h-4 w-4" />
@@ -284,18 +209,18 @@ export function SharePeopleTab({ item }: SharePeopleTabProps) {
         </div>
 
         <p className="text-sm text-muted-foreground">
-          {selectedUsers.length > 0 && (
+          {selectedUserIds.length > 0 && (
             <>
-              {selectedUsers.length}{' '}
-              {selectedUsers.length === 1 ? 'person' : 'people'} selected. They
-              will be able to{' '}
+              {selectedUserIds.length}{' '}
+              {selectedUserIds.length === 1 ? 'person' : 'people'} selected.
+              They will be able to{' '}
               {selectedRole === FilePermissionRole.EDITOR
                 ? 'view and edit'
                 : 'view'}{' '}
               this {item.isFolder ? 'folder' : 'file'}.
             </>
           )}
-          {selectedUsers.length === 0 && (
+          {selectedUserIds.length === 0 && (
             <>
               Search and select people to share this{' '}
               {item.isFolder ? 'folder' : 'file'} with.
