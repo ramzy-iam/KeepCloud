@@ -82,13 +82,11 @@ export function ShareFileDialog() {
                 </Button>
               )}
               <div>
-                {isLoading ? (
-                  <Skeleton className="h-7 w-64" />
-                ) : (
-                  <DialogTitle className="text-left text-lg font-semibold">
-                    {`Share ${item.isFolder ? 'Folder' : 'File'} "${item.name}"`}
-                  </DialogTitle>
-                )}
+                <DialogTitle className="text-left text-lg font-semibold">
+                  {isLoading
+                    ? 'Loading...'
+                    : `Share ${item.isFolder ? 'Folder' : 'File'} "${item.name}"`}
+                </DialogTitle>
                 <DialogDescription className="sr-only">
                   {item.isFolder ? 'Folder' : 'File'} • Owned by{' '}
                   {item.owner.firstName} {item.owner.lastName}
