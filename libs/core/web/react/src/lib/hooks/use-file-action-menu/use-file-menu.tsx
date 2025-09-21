@@ -5,6 +5,7 @@ import {
   TextCursorInput as RenameIcon,
   Eye as PreviewIcon,
   History,
+  Share,
 } from 'lucide-react';
 import { MenuItem, useDialog, useMoveToTrash, useRestoreResource } from '../';
 import { iconClassName, itemClassName } from './config';
@@ -41,6 +42,16 @@ export const useFileMenuItems = (file: FileMinViewDto): MenuItem[] => {
       onClick: () =>
         openDialog({
           type: 'rename',
+          item: file,
+        }),
+      className: itemClassName,
+    },
+    {
+      label: 'Share',
+      icon: <Share className={iconClassName} />,
+      onClick: () =>
+        openDialog({
+          type: 'shareFile',
           item: file,
         }),
       className: itemClassName,

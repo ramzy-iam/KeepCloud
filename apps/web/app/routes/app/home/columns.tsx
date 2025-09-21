@@ -26,11 +26,12 @@ const NameColumn = ({ row }: { row: Row<FileMinViewDto> }) => {
   const handleClick = () => {
     if (isFolder) {
       navigate(url);
+    } else {
+      openDialog({
+        type: 'previewFile',
+        item: file,
+      });
     }
-    openDialog({
-      type: 'previewFile',
-      item: file,
-    });
   };
   return (
     <TooltipProviderWrapper content={file.name} sideOffset={0}>

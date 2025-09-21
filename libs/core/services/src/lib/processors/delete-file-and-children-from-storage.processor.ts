@@ -20,22 +20,22 @@ export class DeleteFileAndChildrenFromStorageProcessor implements Processor {
   }
 
   async execute(data: DeleteFileAndChildrenFromStorageData) {
-    const { ownerId, fileId } = data;
+    const { treeOwnerId, fileId } = data;
 
     this.logger.info(
-      `Fetching and deleting files for ownerId=${ownerId}, fileId=${fileId}`,
+      `Fetching and deleting files for treeOwnerId=${treeOwnerId}, fileId=${fileId}`,
     );
 
     try {
       // Fetch all files under this node (including the node itself)
       const filesToDelete = await this.storageService.getFilesUnderNode(
-        ownerId,
+        treeOwnerId,
         fileId,
       );
 
       if (filesToDelete.length === 0) {
         this.logger.info(
-          `No files found to delete for fileId=${fileId}, ownerId=${ownerId}`,
+          `No files found to delete for fileId=${fileId}, treeOwnerId=${treeOwnerId}`,
         );
         return;
       }
@@ -95,11 +95,11 @@ export class DeleteFileAndChildrenFromStorageProcessor implements Processor {
       }
 
       this.logger.info(
-        `Delete operation completed for ownerId=${ownerId}, fileId=${fileId}, processed ${filesWithStorage.length} files`,
+        `Delete operation completed for treeOwnerId=${treeOwnerId}, fileId=${fileId}, processed ${filesWithStorage.length} files`,
       );
     } catch (error: unknown) {
       this.logger.error(
-        `Failed to delete files and children for fileId=${fileId}, ownerId=${ownerId}: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Failed to delete files and children for fileId=${fileId}, treeOwnerId=${treeOwnerId}: ${error instanceof Error ? error.message : 'Unknown error'}`,
         error instanceof Error ? error.stack : undefined,
       );
       throw error;
