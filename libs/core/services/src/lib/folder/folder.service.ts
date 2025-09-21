@@ -145,8 +145,37 @@ export class FolderService {
 
     let ancestors: FileAncestorDto[] = [];
     if (typeof withAncestors === 'boolean' && withAncestors) {
-      ancestors = await this.fileRepository.getAncestors(id);
+      if (isSharedWithUser) {
+        // For shared folders, only load ancestors up to where user has access
+        const hasDirectPermission =
+          await this.filePermissionService.hasDirectPermission(id, userId);
+        if (hasDirectPermission) {
+          // User has direct permission on this folder, don't load ancestors
+          ancestors = [];
+        } else {
+          // Load ancestors only up to the folder where user has direct access
+          const accessibleAncestorIds =
+            await this.filePermissionService.getAccessibleAncestors(id, userId);
+          if (accessibleAncestorIds.length > 0) {
+            // Get ancestor details for accessible ancestors only
+            const accessibleAncestors =
+              await this.fileRepository.prisma.file.findMany({
+                where: { id: { in: accessibleAncestorIds } },
+                select: { id: true, name: true, left: true },
+                orderBy: { left: 'asc' },
+              });
+            ancestors = accessibleAncestors.map((a) => ({
+              id: a.id,
+              name: a.name,
+            }));
+          }
+        }
+      } else {
+        // Not shared, load all ancestors normally
+        ancestors = await this.fileRepository.getAncestors(id);
+      }
     }
+
     return {
       file,
       ancestors: [
