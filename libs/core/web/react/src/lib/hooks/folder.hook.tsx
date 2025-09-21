@@ -94,7 +94,7 @@ export const useCreateFolder = ({ parentId }: CreateFolderProps) => {
 
 export const useGetFolderChildren = ({
   id,
-  filters = {},
+  filters = {} as FolderFilterDto,
   enabled = true,
 }: GetChildrenProps) => {
   return useInfiniteListQuery<FileMinViewDto>({
