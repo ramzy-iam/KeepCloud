@@ -12,13 +12,16 @@ import {
 } from '@keepcloud/web-core/react';
 import { useAtom } from 'jotai';
 import { FileMinViewDto } from '@keepcloud/commons/dtos';
-import { SharePeopleTab } from './share-people-tab';
-import { X } from 'lucide-react';
+import { ShareFile } from './share-file';
+import { X, ArrowLeft } from 'lucide-react';
+import { useState } from 'react';
 
 export function ShareFileDialog() {
   const [dialogState, setDialogState] = useAtom(dialogAtom);
   const { isOpen, context } = dialogState;
   const item = context?.item as FileMinViewDto | undefined;
+  const [hasUserSelection, setHasUserSelection] = useState(false);
+  const [clearSelectionTrigger, setClearSelectionTrigger] = useState(0);
 
   // Fetch detailed information based on whether it's a folder or file
   const {
@@ -46,6 +49,11 @@ export function ShareFileDialog() {
   const closeDialog = () =>
     setDialogState({ isOpen: false, type: null, context: {} });
 
+  const handleClearSelection = () => {
+    setHasUserSelection(false);
+    setClearSelectionTrigger((prev) => prev + 1); // Trigger clearing in child component
+  };
+
   if (!item || dialogState.type !== 'shareFile') return null;
 
   return (
@@ -62,10 +70,25 @@ export function ShareFileDialog() {
         <DialogHeader className="px-6 pt-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
+              {/* Show back button when users are selected */}
+              {hasUserSelection && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleClearSelection}
+                  className="-ml-2 flex items-center gap-2 border-0 p-2"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
+              )}
               <div>
-                <DialogTitle className="text-left text-lg font-semibold">
-                  Share {item.isFolder ? 'Folder' : 'File'} "{item.name}"
-                </DialogTitle>
+                {isLoading ? (
+                  <Skeleton className="h-7 w-64" />
+                ) : (
+                  <DialogTitle className="text-left text-lg font-semibold">
+                    {`Share ${item.isFolder ? 'Folder' : 'File'} "${item.name}"`}
+                  </DialogTitle>
+                )}
                 <DialogDescription className="sr-only">
                   {item.isFolder ? 'Folder' : 'File'} • Owned by{' '}
                   {item.owner.firstName} {item.owner.lastName}
@@ -100,7 +123,12 @@ export function ShareFileDialog() {
               <p className="text-sm text-gray-500">Please try again later</p>
             </div>
           ) : detailedItem ? (
-            <SharePeopleTab item={detailedItem} />
+            <ShareFile
+              item={detailedItem}
+              onSelectionChange={setHasUserSelection}
+              onClearSelection={handleClearSelection}
+              clearSelectionTrigger={clearSelectionTrigger}
+            />
           ) : null}
         </div>
       </DialogContent>
