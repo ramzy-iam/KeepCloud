@@ -150,4 +150,51 @@ export class FilePermissionService {
       return false;
     }
   }
+
+  /**
+   * Create inherited permission for tree owner when a file/folder is created in a shared folder
+   */
+  async createInheritedPermissionForTreeOwner(
+    fileId: string,
+    creatorId: string,
+  ): Promise<void> {
+    const file = await this.fileRepository.scoped.filterById(fileId).getOne();
+
+    if (!file) {
+      throw new FileNotFoundException(fileId);
+    }
+
+    // Check if the creator is different from the tree owner (meaning it's in a shared folder)
+    if (file.treeOwnerId === creatorId) {
+      // Creator is the tree owner, no need to create inherited permission
+      return;
+    }
+
+    // Check if tree owner already has explicit permission for this file
+    const existingPermission =
+      await this.fileRepository.prisma.filePermission.findUnique({
+        where: {
+          fileId_userId: {
+            fileId: fileId,
+            userId: file.treeOwnerId,
+          },
+        },
+      });
+
+    if (existingPermission) {
+      // Permission already exists, no need to create another one
+      return;
+    }
+
+    // Create inherited permission for the tree owner with OWNER role
+    await this.fileRepository.prisma.filePermission.create({
+      data: {
+        fileId: fileId,
+        userId: file.treeOwnerId,
+        role: FilePermissionRole.EDITOR,
+        grantedById: creatorId,
+        isInherited: true,
+      },
+    });
+  }
 }
