@@ -12,16 +12,6 @@ import { FilePermissionRole } from '@prisma/client';
 import { UserProfileDto } from './user.dto';
 import { FileMinViewDto } from './file.dto';
 
-// DTO for sharing a file with a user
-export class ShareFileWithUserDto {
-  @IsNotEmpty()
-  @IsString()
-  userId: string;
-
-  @IsEnum(FilePermissionRole, ErrorCode.INVALID_PERMISSION_ROLE)
-  role: FilePermissionRole;
-}
-
 // DTO for updating file permission
 export class UpdateFilePermissionDto {
   @IsEnum(FilePermissionRole, ErrorCode.INVALID_PERMISSION_ROLE)
@@ -47,6 +37,9 @@ export class FilePermissionDto {
 
   @Expose()
   grantedById: string;
+
+  @Expose()
+  isInherited: boolean;
 
   @Expose()
   @Type(() => UserProfileDto)
@@ -150,4 +143,18 @@ export class ShareFileDto {
 
   @IsEnum(FilePermissionRole, ErrorCode.INVALID_PERMISSION_ROLE)
   role: FilePermissionRole;
+}
+
+// DTO for recursive folder sharing response
+export class RecursiveFolderSharingDto {
+  @Expose()
+  @Type(() => FilePermissionDto)
+  folderPermissions: FilePermissionDto[];
+
+  @Expose()
+  @Type(() => FilePermissionDto)
+  descendants: FilePermissionDto[];
+
+  @Expose()
+  totalShared: number;
 }

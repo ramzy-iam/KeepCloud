@@ -56,6 +56,8 @@ export class StorageService {
     const fileIds = await this.fileRepository.prisma.filePermission.findMany({
       where: {
         userId,
+        isInherited: false,
+        file: { trashedAt: null, deletedAt: null },
       },
       select: { fileId: true },
       skip: (filters.page - 1) * filters.pageSize,
