@@ -87,6 +87,12 @@ export class FolderService {
       },
     );
 
+    // Create inherited permission for tree owner if folder is created in a shared folder
+    await this.filePermissionService.createInheritedPermissionForTreeOwner(
+      createdFolder.id,
+      dto.ownerId,
+    );
+
     const { file } = await this.getOne(dto.ownerId, createdFolder.id);
     return file;
   }

@@ -108,6 +108,12 @@ export class FileService {
     );
     const treeOwnerId = createdFile.treeOwnerId;
 
+    // Create inherited permission for tree owner if file is created in a shared folder
+    await this.filePermissionService.createInheritedPermissionForTreeOwner(
+      createdFile.id,
+      ownerId,
+    );
+
     await this.userService.updateStorageUsed(treeOwnerId, size);
     await this.queueService.enqueueUpdateFileTagInStorage({
       treeOwnerId,
