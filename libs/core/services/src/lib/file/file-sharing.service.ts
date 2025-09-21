@@ -123,7 +123,7 @@ export class FileSharingService {
       }
     }
 
-    return results;
+    return { results, errors };
   }
 
   async updatePermissionRole(
@@ -293,12 +293,23 @@ export class FileSharingService {
   }
 
   private async getPermissionDetails(permissionId: string) {
-    return this.filePermissionRepository.scoped
+    const permission = (await this.filePermissionRepository.scoped
       .filterById(permissionId)
       .joinUser()
       .joinGrantedBy()
       .joinFile()
-      .getOneOrFail();
+      .getOneOrFail()) as FilePermission & { file: File };
+
+    return {
+      ...permission,
+      file: permission.file
+        ? {
+            id: permission.file.id,
+            name: permission.file.name,
+            type: permission.file.type,
+          }
+        : undefined,
+    };
   }
 
   /**

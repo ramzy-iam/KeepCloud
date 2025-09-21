@@ -59,7 +59,6 @@ export class FileController {
     @CurrentUser() currentUser: User,
     @Body() dto: ShareFileDto,
   ) {
-    // Service will automatically determine if recursive sharing is needed based on file type
     return this.fileSharingService.shareFile(fileId, currentUser.id, dto);
   }
 
