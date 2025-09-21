@@ -152,6 +152,98 @@ export class FilePermissionService {
   }
 
   /**
+   * Check if user has direct (non-inherited) permission on a specific file/folder
+   */
+  async hasDirectPermission(fileId: string, userId: string): Promise<boolean> {
+    const file = await this.fileRepository.scoped.filterById(fileId).getOne();
+
+    if (!file) return false;
+
+    // If user is the tree owner, they don't have "direct sharing" - they own the whole tree
+    if (file.treeOwnerId === userId) {
+      return false;
+    }
+
+    // If user created this file but it's in someone else's tree, they have direct access to the file
+    // but should still show the shared folder hierarchy
+    if (file.ownerId === userId && file.treeOwnerId !== userId) {
+      return false; // Show ancestors even for files they created in shared folders
+    }
+
+    // Check if user has direct (non-inherited) permission on this specific file
+    const directPermission =
+      await this.fileRepository.prisma.filePermission.findFirst({
+        where: {
+          fileId: fileId,
+          userId: userId,
+          isInherited: false,
+        },
+      });
+
+    return !!directPermission;
+  }
+
+  /**
+   * Get ancestors up to the folder where user has direct access
+   * This stops at the highest folder the user was actually granted permission to
+   */
+  async getAccessibleAncestors(
+    fileId: string,
+    userId: string,
+  ): Promise<string[]> {
+    const file = await this.fileRepository.scoped.filterById(fileId).getOne();
+    if (!file) return [];
+
+    // Get all ancestors using nested set model
+    const allAncestors = await this.fileRepository.prisma.file.findMany({
+      where: {
+        treeOwnerId: file.treeOwnerId,
+        left: { lt: file.left },
+        right: { gt: file.right },
+      },
+      select: {
+        id: true,
+        left: true,
+        name: true,
+        permissions: {
+          where: {
+            userId: userId,
+            isInherited: false, // Only direct permissions
+          },
+        },
+      },
+      orderBy: {
+        left: 'desc', // From closest to root (deepest to shallowest)
+      },
+    });
+
+    // Find the deepest ancestor where user has direct access
+    let accessibleAncestorIds: string[] = [];
+
+    for (const ancestor of allAncestors) {
+      if (ancestor.permissions.length > 0) {
+        // This is the deepest folder the user has direct access to
+        // Get all ancestors from this access point down to the current file
+        const ancestorsFromAccessPoint =
+          await this.fileRepository.prisma.file.findMany({
+            where: {
+              treeOwnerId: file.treeOwnerId,
+              left: { gte: ancestor.left, lt: file.left },
+              right: { gt: file.right },
+            },
+            select: { id: true, left: true },
+            orderBy: { left: 'asc' },
+          });
+
+        accessibleAncestorIds = ancestorsFromAccessPoint.map((a) => a.id);
+        break; // Stop at the first (deepest) ancestor with direct access
+      }
+    }
+
+    return accessibleAncestorIds;
+  }
+
+  /**
    * Create inherited permission for tree owner when a file/folder is created in a shared folder
    */
   async createInheritedPermissionForTreeOwner(
