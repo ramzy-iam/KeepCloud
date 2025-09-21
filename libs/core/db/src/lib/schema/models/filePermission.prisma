@@ -23,7 +23,11 @@ model FilePermission {
   grantedById String
   grantedBy   User @relation("GrantedBy", fields: [grantedById], references: [id])
 
+  // whether this permission is inherited from a parent folder
+  isInherited Boolean @default(false)
+
   @@unique([fileId, userId]) // one permission per user per file
   @@index([fileId])
   @@index([userId])
+  @@index([isInherited])
 }

@@ -8,11 +8,7 @@ import {
   FileLink,
   FilePermissionRole,
 } from '@keepcloud/core/db';
-import {
-  ShareFileWithUserDto,
-  UpdateFilePermissionDto,
-  ShareFileDto,
-} from '@keepcloud/commons/dtos';
+import { UpdateFilePermissionDto, ShareFileDto } from '@keepcloud/commons/dtos';
 import {
   FileNotFoundException,
   ForbiddenException,
@@ -29,14 +25,16 @@ export class FileSharingService {
     private readonly fileLinkRepository: FileLinkRepository,
   ) {}
 
-  private async shareFileWithUser(
+  private async _shareFileWithUser(
     fileId: string,
     currentUserId: string,
-    dto: ShareFileWithUserDto,
+    userId: string,
+    role: FilePermissionRole,
+    isInherited = false,
   ) {
     await this.validateSharingPermissions(fileId, currentUserId);
 
-    if (dto.userId === currentUserId) {
+    if (userId === currentUserId) {
       throw new BadRequestException({
         code: ErrorCode.INVALID_INPUT,
         message: 'Cannot share file with yourself',
@@ -46,14 +44,14 @@ export class FileSharingService {
     // Check if permission already exists
     const existingPermission = await this.filePermissionRepository.scoped
       .filterByFileId(fileId)
-      .filterByUserId(dto.userId)
+      .filterByUserId(userId)
       .getOne();
 
     if (existingPermission) {
       // Update existing permission
       const updated = await this.filePermissionRepository.update(
         { id: existingPermission.id },
-        { role: dto.role },
+        { role, isInherited },
       );
       return this.getPermissionDetails(updated.id);
     }
@@ -61,9 +59,10 @@ export class FileSharingService {
     // Create new permission
     const permission = await this.filePermissionRepository.create({
       file: { connect: { id: fileId } },
-      user: { connect: { id: dto.userId } },
+      user: { connect: { id: userId } },
       grantedBy: { connect: { id: currentUserId } },
-      role: dto.role,
+      role,
+      isInherited,
     });
 
     return this.getPermissionDetails(permission.id);
@@ -92,8 +91,14 @@ export class FileSharingService {
   }
 
   async shareFile(fileId: string, currentUserId: string, dto: ShareFileDto) {
-    await this.validateSharingPermissions(fileId, currentUserId);
+    const file = await this.validateSharingPermissions(fileId, currentUserId);
 
+    // Check if it's a folder and apply recursive sharing automatically
+    if (file.type === 'FOLDER') {
+      return this.shareFolderRecursively(fileId, currentUserId, dto);
+    }
+
+    // Handle regular file sharing
     const results: FilePermission[] = [];
     const errors: string[] = [];
 
@@ -104,10 +109,12 @@ export class FileSharingService {
           continue;
         }
 
-        const permission = await this.shareFileWithUser(fileId, currentUserId, {
+        const permission = await this._shareFileWithUser(
+          fileId,
+          currentUserId,
           userId,
-          role: dto.role,
-        });
+          dto.role,
+        );
         results.push(permission);
       } catch (error: unknown) {
         const message =
@@ -292,5 +299,168 @@ export class FileSharingService {
       .joinGrantedBy()
       .joinFile()
       .getOneOrFail();
+  }
+
+  /**
+   * Get list of collaborators for a file
+   */
+  async getFilePermissions(
+    fileId: string,
+    currentUserId: string,
+  ): Promise<FilePermission[]> {
+    await this.validateFileAccess(fileId, currentUserId);
+
+    return this.filePermissionRepository.scoped
+      .filterByFileId(fileId)
+      .joinUser()
+      .joinGrantedBy()
+      .getMany();
+  }
+
+  /**
+   * Remove collaborator from file
+   */
+  async removeCollaborator(
+    fileId: string,
+    userId: string,
+    currentUserId: string,
+  ): Promise<void> {
+    await this.validateSharingPermissions(fileId, currentUserId);
+
+    const permission = await this.filePermissionRepository.scoped
+      .filterByFileId(fileId)
+      .filterByUserId(userId)
+      .getOne();
+
+    if (!permission) {
+      throw new NotFoundException({
+        code: ErrorCode.PERMISSION_NOT_FOUND,
+        message: 'User does not have access to this file',
+      });
+    }
+
+    // Remove the main permission
+    await this.filePermissionRepository.delete({ id: permission.id });
+
+    // If this was a folder permission, also remove inherited permissions from descendants
+    const file = await this.fileRepository.scoped
+      .filterById(fileId)
+      .getOne();
+    
+    if (file && file.type === 'FOLDER') {
+      await this.removeInheritedPermissions(fileId, userId);
+    }
+  }
+
+  /**
+   * Share folder recursively (applies permissions to all children)
+   */
+  private async shareFolderRecursively(
+    folderId: string,
+    currentUserId: string,
+    dto: ShareFileDto,
+  ) {
+    // Get folder info (validation already done in shareFile method)
+    const folder = await this.fileRepository.scoped
+      .filterById(folderId)
+      .filterByNotTrashed()
+      .getOneOrFail();
+
+    // Share the folder itself with all users
+    const folderPermissions = [];
+    for (const userId of dto.userIds) {
+      try {
+        const permission = await this._shareFileWithUser(
+          folderId,
+          currentUserId,
+          userId,
+          dto.role,
+        );
+        folderPermissions.push(permission);
+      } catch (error) {
+        console.error(`Failed to share folder with user ${userId}:`, error);
+      }
+    }
+
+    // Get all descendants of this folder using nested set model
+    const descendants = await this.fileRepository.prisma.file.findMany({
+      where: {
+        treeOwnerId: folder.treeOwnerId,
+        left: { gt: folder.left },
+        right: { lt: folder.right },
+      },
+      select: {
+        id: true,
+        name: true,
+        type: true,
+      },
+    });
+
+    // Apply permissions to all descendants for all users (mark as inherited)
+    const descendantPermissions = [];
+    for (const descendant of descendants) {
+      for (const userId of dto.userIds) {
+        try {
+          const permission = await this._shareFileWithUser(
+            descendant.id,
+            currentUserId,
+            userId,
+            dto.role,
+            true, // Mark as inherited
+          );
+          descendantPermissions.push(permission);
+        } catch (error) {
+          // Log error but continue with other files
+          console.error(
+            `Failed to share descendant ${descendant.id} with user ${userId}:`,
+            error,
+          );
+        }
+      }
+    }
+
+    return {
+      folderPermissions,
+      descendants: descendantPermissions,
+      totalShared: folderPermissions.length + descendantPermissions.length,
+    };
+  }
+
+  /**
+   * Remove inherited permissions for all descendants when a folder permission is removed
+   */
+  private async removeInheritedPermissions(
+    folderId: string,
+    userId: string,
+  ): Promise<void> {
+    const folder = await this.fileRepository.scoped
+      .filterById(folderId)
+      .filterByNotTrashed()
+      .getOne();
+
+    if (!folder || folder.type !== 'FOLDER') {
+      return;
+    }
+
+    // Get all descendant file IDs using nested set model
+    const descendants = await this.fileRepository.prisma.file.findMany({
+      where: {
+        treeOwnerId: folder.treeOwnerId,
+        left: { gt: folder.left },
+        right: { lt: folder.right },
+      },
+      select: { id: true },
+    });
+
+    // Remove inherited permissions for this user from all descendants
+    await this.filePermissionRepository.prisma.filePermission.deleteMany({
+      where: {
+        userId,
+        isInherited: true,
+        fileId: {
+          in: descendants.map(d => d.id),
+        },
+      },
+    });
   }
 }
