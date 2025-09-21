@@ -1,4 +1,4 @@
-export enum ContentType {
+  export enum ContentType {
   FOLDER = 'folder',
   PDF = 'application/pdf',
   JPEG = 'image/jpeg',

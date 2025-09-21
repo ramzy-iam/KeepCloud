@@ -31,3 +31,4 @@ export * from './switch';
 export * from './card';
 export * from './badge';
 export * from './multi-select';
+export * from './textarea';
