@@ -153,7 +153,7 @@ export function ShareFile({
         <div className="grid grid-cols-5 items-start gap-2">
           <div
             className={cn(
-              'relative col-span-3',
+              'relative col-span-3 md:col-span-4',
               selectedUserIds.length === 0 && 'col-span-full',
             )}
           >
@@ -217,7 +217,7 @@ export function ShareFile({
 
           {/* Show role selector when users are selected */}
           {selectedUserIds.length > 0 && (
-            <div className="col-span-2 flex items-center justify-end">
+            <div className="col-span-2 flex items-center justify-end md:col-span-1">
               <Select
                 value={selectedRole}
                 onValueChange={(value) =>
@@ -329,67 +329,76 @@ export function ShareFile({
                   <span className="text-12">owner</span>
                 </div>
 
-                {/* Shared users */}
-                {item.permissions?.map((permission: FilePermissionDto) => {
-                  return (
-                    <div
-                      key={permission.id}
-                      className="flex items-center justify-between gap-12"
-                    >
-                      <div className="flex items-center gap-3">
-                        <OwnerIcon
-                          user={permission.user}
-                          withName={false}
-                          withTooltip={false}
-                        />
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium">
-                              {permission.user.firstName}{' '}
-                              {permission.user.lastName}
-                            </span>
-                          </div>
-                          <p className="text-xs text-muted-foreground">
-                            {permission.user.email}
-                          </p>
-                        </div>
-                      </div>
-                      <Select
-                        value={permission.role}
-                        onValueChange={(value) => {
-                          if (value === 'REVOKE') {
-                            handleRemoveAccess(permission.id);
-                          } else {
-                            handleRoleChange(
-                              permission.id,
-                              value as FilePermissionRole,
-                            );
-                          }
-                        }}
+                {/* Shared users - exclude the owner from permissions list */}
+                {item.permissions
+                  ?.filter(
+                    (permission: FilePermissionDto) =>
+                      permission.user.id !== item.owner.id,
+                  )
+                  .map((permission: FilePermissionDto) => {
+                    return (
+                      <div
+                        key={permission.id}
+                        className="flex items-center justify-between gap-12"
                       >
-                        <SelectTrigger className="w-32 border-0! bg-transparent! text-12 dark:hover:bg-input/50!">
-                          <SelectValue>
+                        <div className="flex items-center gap-3">
+                          <OwnerIcon
+                            user={permission.user}
+                            withName={false}
+                            withTooltip={false}
+                          />
+                          <div className="flex-1">
                             <div className="flex items-center gap-2">
-                              <span className="text-12">
-                                {ROLE_LABELS[permission.role]}
+                              <span className="text-sm font-medium">
+                                {permission.user.firstName}{' '}
+                                {permission.user.lastName}
+                                {currentUser.id === permission.user.id &&
+                                  ' (You)'}
                               </span>
                             </div>
-                          </SelectValue>
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value={FilePermissionRole.VIEWER}>
-                            Viewer
-                          </SelectItem>
-                          <SelectItem value={FilePermissionRole.EDITOR}>
-                            Editor
-                          </SelectItem>
-                          <Separator />
-                          <SelectItem value="REVOKE">Revoke access</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  );
-                })}
+                            <p className="text-xs text-muted-foreground">
+                              {permission.user.email}
+                            </p>
+                          </div>
+                        </div>
+                        <Select
+                          value={permission.role}
+                          onValueChange={(value) => {
+                            if (value === 'REVOKE') {
+                              handleRemoveAccess(permission.id);
+                            } else {
+                              handleRoleChange(
+                                permission.id,
+                                value as FilePermissionRole,
+                              );
+                            }
+                          }}
+                        >
+                          <SelectTrigger className="w-32 border-0! bg-transparent! text-12 dark:hover:bg-input/50!">
+                            <SelectValue>
+                              <div className="flex items-center gap-2">
+                                <span className="text-12">
+                                  {ROLE_LABELS[permission.role]}
+                                </span>
+                              </div>
+                            </SelectValue>
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value={FilePermissionRole.VIEWER}>
+                              Viewer
+                            </SelectItem>
+                            <SelectItem value={FilePermissionRole.EDITOR}>
+                              Editor
+                            </SelectItem>
+                            <Separator />
+                            <SelectItem value="REVOKE">
+                              Revoke access
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    );
+                  })}
               </div>
             )}
           </div>
