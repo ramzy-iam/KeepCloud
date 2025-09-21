@@ -1,9 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { SubscriptionPlanRepository, UserRepository } from '@keepcloud/core/db';
+import {
+  SubscriptionPlanRepository,
+  User,
+  UserRepository,
+} from '@keepcloud/core/db';
 import { TokenPayload } from 'google-auth-library';
-import { User } from '@prisma/client';
 import { UserNotFoundException } from '@keepcloud/commons/backend';
 import { SYSTEM_FILE } from '@keepcloud/commons/constants';
+import { UserFilterDto, PaginationDto } from '@keepcloud/commons/dtos';
 
 @Injectable()
 export class UserService {
@@ -45,6 +49,9 @@ export class UserService {
             data: {
               name: SYSTEM_FILE.MY_STORAGE.code,
               owner: {
+                connect: { email },
+              },
+              treeOwner: {
                 connect: { email },
               },
               contentType: 'folder',
@@ -114,7 +121,7 @@ export class UserService {
     // Get actual storage usage from files (including trashed files, excluding permanently deleted files)
     const result = await this.userRepository.prisma.file.aggregate({
       where: {
-        ownerId: userId,
+        treeOwnerId: userId,
         type: 'FILE',
         deletedAt: null, // Exclude permanently deleted files
         size: { gte: 0 },
@@ -133,5 +140,17 @@ export class UserService {
         storageUsed: actualStorageUsed,
       },
     );
+  }
+
+  async findAll(
+    filters: UserFilterDto,
+    currentUserId: string,
+  ): Promise<PaginationDto<User>> {
+    const { query, page, pageSize } = filters;
+
+    return this.userRepository.scoped
+      .searchByNameOrEmail(query)
+      .filterNotById(currentUserId)
+      .getManyPaginated(page, pageSize);
   }
 }

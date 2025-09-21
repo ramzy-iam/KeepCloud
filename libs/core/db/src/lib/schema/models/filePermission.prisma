@@ -1,0 +1,33 @@
+enum FilePermissionRole {
+  OWNER       // full control of specific file/folder (delete, manage permissions)
+  EDITOR      // can create/update/delete files inside folder, cannot restructure tree
+  VIEWER      // read-only access
+}
+
+
+model FilePermission {
+  id         String   @id @default(dbgenerated("nanoid()"))
+  createdAt  DateTime @default(now())
+
+  // the file/folder being shared
+  fileId     String
+  file       File @relation(fields: [fileId], references: [id])
+
+  // the user receiving access
+  userId     String
+  user       User @relation(fields: [userId], references: [id])
+
+  role       FilePermissionRole
+
+  // who granted access
+  grantedById String
+  grantedBy   User @relation("GrantedBy", fields: [grantedById], references: [id])
+
+  // whether this permission is inherited from a parent folder
+  isInherited Boolean @default(false)
+
+  @@unique([fileId, userId]) // one permission per user per file
+  @@index([fileId])
+  @@index([userId])
+  @@index([isInherited])
+}

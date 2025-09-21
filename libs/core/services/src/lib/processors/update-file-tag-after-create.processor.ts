@@ -17,9 +17,9 @@ export class UpdateFileTagInAfterCreateProcessor
   );
 
   async execute(data: UpdateFileTagInStorageData) {
-    const { ownerId, sourcePath, fileId } = data;
+    const { treeOwnerId, sourcePath, fileId } = data;
     this.logger.info(
-      `Start changing the upload tag fileId=${fileId} for ownerId=${ownerId}`,
+      `Start changing the upload tag fileId=${fileId} for treeOwnerId=${treeOwnerId}`,
     );
 
     try {

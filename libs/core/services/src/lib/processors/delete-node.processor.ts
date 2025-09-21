@@ -10,12 +10,14 @@ export class DeleteNodeProcessor implements Processor {
   constructor(private readonly nestedSetService: NestedSetService) {}
 
   async execute(data: DeleteNodeData) {
-    const { ownerId, nodeId } = data;
+    const { treeOwnerId, nodeId } = data;
 
-    this.logger.info(`Start deleting nodeId=${nodeId} for ownerId=${ownerId}`);
+    this.logger.info(
+      `Start deleting nodeId=${nodeId} for treeOwnerId=${treeOwnerId}`,
+    );
 
     try {
-      await this.nestedSetService.deleteNode(ownerId, nodeId);
+      await this.nestedSetService.deleteNode(treeOwnerId, nodeId);
       // 1. Delete node and subtree in DB (mark deletedAt, update nested set)
 
       this.logger.info(`Node ${nodeId} deleted successfully`);

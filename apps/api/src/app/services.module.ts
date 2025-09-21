@@ -1,5 +1,7 @@
 import { ConfigModule } from '@keepcloud/commons/backend';
 import {
+  FileLinkRepository,
+  FilePermissionRepository,
   FileRepository,
   SubscriptionPlanRepository,
   UserRepository,
@@ -13,6 +15,8 @@ import {
   StorageService,
   MailService,
   NotificationService,
+  FileSharingService,
+  FilePermissionService,
 } from '@keepcloud/core/services';
 import { Global, Module } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -26,11 +30,15 @@ const services = [
   NestedSetService,
   MailService,
   NotificationService,
+  FileSharingService,
+  FilePermissionService,
 
   // Repositories
   UserRepository,
   SubscriptionPlanRepository,
   FileRepository,
+  FilePermissionRepository,
+  FileLinkRepository,
 
   // Miscellaneous
 

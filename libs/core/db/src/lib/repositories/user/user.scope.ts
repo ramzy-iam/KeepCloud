@@ -26,6 +26,19 @@ export class UserScope extends BaseScope<
     return this;
   }
 
+  searchByNameOrEmail(keyword?: string | null) {
+    const searchConditions: Prisma.UserWhereInput[] = [];
+    if (keyword) {
+      searchConditions.push(
+        { firstName: { contains: keyword, mode: 'insensitive' } },
+        { lastName: { contains: keyword, mode: 'insensitive' } },
+        { email: { contains: keyword, mode: 'insensitive' } },
+      );
+    }
+    if (searchConditions.length > 0) this._where.OR = searchConditions;
+    return this;
+  }
+
   joinSubscriptionPlan() {
     this._include.plan = true;
     return this;

@@ -12,6 +12,7 @@ import {
   CurrentUser,
   Serialize,
   StorageService,
+  FileSharingService,
 } from '@keepcloud/core/services';
 import {
   FileMinViewDto,
@@ -26,7 +27,10 @@ import { UserProfileDto } from '@keepcloud/commons/dtos';
 
 @Controller('storage')
 export class StorageController {
-  constructor(private readonly storageService: StorageService) {}
+  constructor(
+    private readonly storageService: StorageService,
+    private readonly fileSharingService: FileSharingService,
+  ) {}
 
   @Get('my-storage')
   @Serialize(new PaginationDto(FileMinViewDto))
@@ -78,8 +82,12 @@ export class StorageController {
 
   @Patch('resources/:id/rename')
   @Serialize(FileMinViewDto)
-  rename(@Param('id') id: string, @Body() dto: RenameFolderDto) {
-    return this.storageService.rename(id, dto.name);
+  rename(
+    @Param('id') id: string,
+    @Body() dto: RenameFolderDto,
+    @CurrentUser() user: UserProfileDto,
+  ) {
+    return this.storageService.rename(user.id, id, dto.name);
   }
 
   @Post('resources/:id/restore')

@@ -2,7 +2,11 @@ import { atom } from 'jotai';
 import { FileMinViewDto } from '@keepcloud/commons/dtos';
 import { ErrorCode } from '@keepcloud/commons/constants';
 
-type CommonDialogType = 'rename' | 'resourceTrashed' | 'deletePermanently';
+type CommonDialogType =
+  | 'rename'
+  | 'resourceTrashed'
+  | 'deletePermanently'
+  | 'shareFile';
 type FolderDialogType =
   | 'createFolder'
   | 'folderTrashed'

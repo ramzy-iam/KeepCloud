@@ -2,7 +2,9 @@ export {
   User,
   SubscriptionPlan,
   File,
-  SharedFile,
   FileAccessLog,
   FileType,
+  FilePermission,
+  FilePermissionRole,
+  FileLink,
 } from '@prisma/client';
