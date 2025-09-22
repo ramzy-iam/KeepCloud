@@ -1,4 +1,4 @@
-import { User } from '../../entities';
+import { User } from '../../models';
 import { Prisma } from '../../prisma';
 import { GenericPrismaModel } from '../base/model';
 

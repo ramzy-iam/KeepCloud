@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { File, FilePermissionRole } from '../../entities';
+import { File, FilePermissionRole } from '../../models';
 import { PrismaService, Prisma } from '../../prisma';
 import { FileFormat } from '@keepcloud/commons/constants';
 import { BaseScope } from '../base/base.scope';

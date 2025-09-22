@@ -1,4 +1,4 @@
-import { SubscriptionPlan } from '../../entities';
+import { SubscriptionPlan } from '../../models';
 import { GenericPrismaModel } from '../base/model';
 import { Prisma } from '../../prisma';
 
