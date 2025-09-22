@@ -24,7 +24,7 @@ import {
   FilePermissionDto,
   UserProfileDto,
 } from '@keepcloud/commons/dtos';
-import { FilePermissionRole } from '@prisma/client';
+import { FilePermissionRole } from '@keepcloud/commons/types';
 
 import { useGetUsers } from '@keepcloud/web-core/react';
 import { OwnerIcon } from '../../ui/owner-icon';
