@@ -17,11 +17,11 @@ DECLARE
   alphabet_len int := length(alphabet);
 
   -- Generate hash from current timestamp (up to microseconds)
-  time_hash bytea := digest(now()::text, 'sha256');
+  time_hash bytea := public.digest(now()::text, 'sha256');
   hash_part text := '';
 
   -- Generate random bytes for nanoid portion
-  random_bytes bytea := gen_random_bytes(nano_size);
+  random_bytes bytea := public.gen_random_bytes(nano_size);
   nano_part text := '';
 
   -- Temporary variables for shuffling
