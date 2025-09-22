@@ -1,5 +1,5 @@
 -- Generate nanoid with timestamp hash
-CREATE EXTENSION IF NOT EXISTS pgcrypto;
+CREATE EXTENSION IF NOT EXISTS pgcrypto SCHEMA public;
 
 
 
