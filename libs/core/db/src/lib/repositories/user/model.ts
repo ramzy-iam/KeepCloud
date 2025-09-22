@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client';
 import { GenericPrismaModel } from '../base/model';
-import { File } from '../../entities';
+import { File } from '../../models';
 
 export type FileModel = GenericPrismaModel<
   File,
