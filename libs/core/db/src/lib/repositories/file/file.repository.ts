@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { File } from '../../entities';
+import { File } from '../../models';
 import { BaseRepository } from '../base';
 import { PrismaService, Prisma } from '../../prisma';
 import { FileAncestorDto } from '@keepcloud/commons/dtos';

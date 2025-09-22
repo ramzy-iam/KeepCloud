@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma';
 import { BaseRepository } from '../base';
-import { SubscriptionPlan } from '../../entities';
+import { SubscriptionPlan } from '../../models';
 import { Prisma } from '../../prisma';
 import { SubscriptionPlanScope } from './plan.scope';
 
