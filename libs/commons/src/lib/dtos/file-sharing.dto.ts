@@ -8,7 +8,7 @@ import {
 
 import { ErrorCode } from '../constants';
 import { Expose, Type } from 'class-transformer';
-import { FilePermissionRole } from '@prisma/client';
+import { FilePermissionRole } from '../types/file-permissions';
 import { UserProfileDto } from './user.dto';
 import { FileMinViewDto } from './file.dto';
 
