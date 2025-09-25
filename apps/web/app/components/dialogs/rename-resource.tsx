@@ -18,6 +18,7 @@ import {
   FormMessage,
   dialogAtom,
   useRenameResource,
+  useDialogFocus,
 } from '@keepcloud/web-core/react';
 import { useAtom } from 'jotai';
 import { useEffect } from 'react';
@@ -42,7 +43,7 @@ export const RenameResourceDialog = () => {
   });
 
   const renameResource = useRenameResource({
-    parentId: file.parentId,
+    parentId: file.parentId as string,
   });
 
   const onSubmit = (data: FormInput) => {
@@ -68,7 +69,17 @@ export const RenameResourceDialog = () => {
         name: context.item.name,
       });
     }
-  }, [context.item]);
+  }, [context.item, form]);
+
+  // Use the reusable hook for dialog focus
+  useDialogFocus({
+    isOpen,
+    dialogType: type,
+    expectedType: 'rename',
+    form,
+    fieldName: 'name',
+    shouldSelect: true,
+  });
 
   if (!isOpen || type !== 'rename' || !context.item) return null;
 
