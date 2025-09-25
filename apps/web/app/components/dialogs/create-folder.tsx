@@ -20,6 +20,7 @@ import {
   useGetActiveFolder,
   dialogAtom,
   authAtom,
+  useDialogFocus,
 } from '@keepcloud/web-core/react';
 import { useAtom, useAtomValue } from 'jotai';
 import { FileHelper } from '@keepcloud/commons/helpers';
@@ -61,6 +62,16 @@ export function CreateFolderDialog() {
       },
     );
   };
+
+  // Use the reusable hook for dialog focus
+  useDialogFocus({
+    isOpen,
+    dialogType: type,
+    expectedType: 'createFolder',
+    form,
+    fieldName: 'name',
+    shouldSelect: true,
+  });
 
   if (!isOpen || type !== 'createFolder') return null;
 
