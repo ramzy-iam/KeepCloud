@@ -6,7 +6,7 @@ import { FileMinViewDto, PaginationDto } from '@keepcloud/commons/dtos';
 import { ApiErrorData } from '../services';
 
 interface UseInfiniteListQueryOptions<T extends FileMinViewDto> {
-  queryKey: unknown[];
+  queryKey: readonly unknown[];
   enabled?: boolean;
   fetchFn: (page: number, pageSize?: number) => Promise<PaginationDto<T>>;
   listKey: string;

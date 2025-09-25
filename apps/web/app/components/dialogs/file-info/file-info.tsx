@@ -45,7 +45,7 @@ export function FileInfoDialog() {
         <div className="border-b px-6 py-4">
           <div className="flex items-center space-x-3">
             {FileIconComponent && <FileIconComponent />}
-            <div className="max-w-[calc(100%-40px)] truncate text-base font-medium">
+            <div className="max-w-[calc(100%-40px)] truncate text-base font-medium text-heading">
               {item.name}
             </div>
           </div>

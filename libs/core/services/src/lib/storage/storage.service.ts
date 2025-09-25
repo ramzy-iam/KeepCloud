@@ -53,6 +53,7 @@ export class StorageService {
   }
 
   async getSharedWithMe(userId: string, filters: FolderFilterDto) {
+    const { page, pageSize } = filters;
     const fileIds = await this.fileRepository.prisma.filePermission.findMany({
       where: {
         userId,
@@ -60,8 +61,8 @@ export class StorageService {
         file: { trashedAt: null, deletedAt: null },
       },
       select: { fileId: true },
-      skip: (filters.page - 1) * filters.pageSize,
-      take: filters.pageSize,
+      skip: ((page as number) - 1) * (pageSize as number),
+      take: pageSize,
     });
 
     const scope = this.fileRepository.scoped
@@ -225,6 +226,7 @@ export class StorageService {
       .filterById(fileId)
       .filterByOwnerId(userId)
       .filterByIsSystem(false)
+      .filterByNotTrashed()
       .getOneOrFail();
 
     if (resource.trashedAt) {
@@ -298,7 +300,8 @@ export class StorageService {
       .filterById(fileId)
       .filterByOwnerId(userId)
       .filterByIsSystem(false)
-      .filterByOwnerId(userId);
+      .filterByOwnerId(userId)
+      .filterByTrashed();
 
     const resource = await scope.getOneOrFail();
 

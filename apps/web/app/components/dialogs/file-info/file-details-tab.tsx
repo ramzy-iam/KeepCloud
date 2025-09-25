@@ -36,7 +36,7 @@ function DetailRow({ label, value, icon, className = '' }: DetailRowProps) {
         {icon}
         <span>{label}</span>
       </div>
-      <div className="max-w-[50%] flex-shrink-0 text-right text-sm">
+      <div className="max-w-[50%] flex-shrink-0 text-right text-sm text-heading">
         {value}
       </div>
     </div>
@@ -137,7 +137,7 @@ export function FileDetailsTab({ item, closeDialog }: FileDetailsTabProps) {
           value={
             <div className="text-right">
               <div>{DayjsHelper.new(item.createdAt).format('DD MMM YYYY')}</div>
-              <div className="text-xs text-muted-foreground">
+              <div className="text-xs">
                 {DayjsHelper.new(item.createdAt).format('HH:mm')}
               </div>
             </div>

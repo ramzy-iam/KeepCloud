@@ -41,7 +41,7 @@ export const GridView = ({
     );
   }
 
-  let itemsToDisplay: FileMinViewDto[] = onlyFolders
+  const itemsToDisplay: FileMinViewDto[] = onlyFolders
     ? data.filter((item) => !item.format)
     : data;
 

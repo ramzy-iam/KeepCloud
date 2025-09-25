@@ -21,6 +21,8 @@ import { FolderViewMode } from '@keepcloud/commons/types';
 import { useFileListUpdater } from './use-file-list-updater.hook';
 import { FileHelper } from '@keepcloud/commons/helpers';
 import { useInfiniteListQuery } from './use-infinite-list-query.hook';
+import { queryKeys } from '../query-keys';
+import { useRefreshSuggestions } from './storage.hook';
 
 interface GetFolderProps {
   id: string;
@@ -77,6 +79,7 @@ export const useInitializeFolderViewMode = () => {
 
 export const useCreateFolder = ({ parentId }: CreateFolderProps) => {
   const finalParentId = FileHelper.getValidParentId(parentId);
+  const refetchSuggestedFiles = useRefreshSuggestions();
 
   const { insertItem } = useFileListUpdater(finalParentId);
 
@@ -88,6 +91,7 @@ export const useCreateFolder = ({ parentId }: CreateFolderProps) => {
 
     onSuccess: (data: FileMinViewDto) => {
       insertItem(data, 'start');
+      refetchSuggestedFiles();
     },
   });
 };
@@ -98,7 +102,7 @@ export const useGetFolderChildren = ({
   enabled = true,
 }: GetChildrenProps) => {
   return useInfiniteListQuery<FileMinViewDto>({
-    queryKey: ['folder', id, 'children'],
+    queryKey: queryKeys.folder.children(id),
     listKey: id,
     enabled: enabled && !!id,
     fetchFn: async (page) =>
@@ -112,7 +116,7 @@ export const useGetFolder = ({
   enabled = true,
 }: GetFolderProps) => {
   return useQuery<FileDetailsDto, ApiError>({
-    queryKey: ['folder', id, query.withAncestors],
+    queryKey: queryKeys.folder.detail(id, query),
     queryFn: () => {
       return FolderService.getOne(id, query);
     },
