@@ -3,6 +3,9 @@ import { FileRepository, FilePermissionRole } from '@keepcloud/core/db';
 import {
   ForbiddenException,
   FileNotFoundException,
+  FolderTrashedException,
+  FileTrashedException,
+  ParentFolderTrashedException,
 } from '@keepcloud/commons/backend';
 import { ErrorCode } from '@keepcloud/commons/constants';
 
@@ -288,5 +291,25 @@ export class FilePermissionService {
         isInherited: true,
       },
     });
+  }
+
+  async checkAndThrowIfTrashed(fileId: string): Promise<void> {
+    const { trashedBy, isFolder } = await this.fileRepository.isTrashed(fileId);
+
+    if (!trashedBy) {
+      // Not trashed at all, just return
+      return;
+    }
+
+    switch (trashedBy) {
+      case 'self':
+        if (isFolder) {
+          throw new FolderTrashedException();
+        } else {
+          throw new FileTrashedException();
+        }
+      case 'parent':
+        throw new ParentFolderTrashedException();
+    }
   }
 }

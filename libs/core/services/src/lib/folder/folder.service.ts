@@ -130,6 +130,8 @@ export class FolderService {
       throw new FolderNotFoundException(id);
     }
 
+    await this.filePermissionService.checkAndThrowIfTrashed(id);
+
     const scope = this.fileRepository.scoped
       .filterById(id)
       .filterByType(FileType.FOLDER)

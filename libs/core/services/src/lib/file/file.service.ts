@@ -287,6 +287,8 @@ export class FileService {
       throw new FileNotFoundException(id);
     }
 
+    await this.filePermissionService.checkAndThrowIfTrashed(id);
+
     const scope = this.fileRepository.scoped
       .filterById(id)
       .filterByType(FileType.FILE)
