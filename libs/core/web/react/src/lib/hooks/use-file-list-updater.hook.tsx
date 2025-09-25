@@ -58,3 +58,22 @@ export function updateFileEverywhere(
     }
   }
 }
+
+export function removeFileEverywhere(
+  fileId: string,
+  excludeListIds: string[] = [],
+) {
+  for (const [listId, atom] of Object.entries(fileListAtoms)) {
+    // Skip removal if this listId is in the exclude array
+    if (excludeListIds.includes(listId)) {
+      continue;
+    }
+
+    const current = store.get(atom);
+    const next = current.filter((f) => f.id !== fileId);
+
+    if (current.length !== next.length) {
+      store.set(atom, next);
+    }
+  }
+}

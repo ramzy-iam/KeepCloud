@@ -19,8 +19,9 @@ import {
   useCreateFolder,
   useGetActiveFolder,
   dialogAtom,
+  authAtom,
 } from '@keepcloud/web-core/react';
-import { useAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { FileHelper } from '@keepcloud/commons/helpers';
 
 const schema = z.object({
@@ -33,6 +34,7 @@ export function CreateFolderDialog() {
   const [dialogState, setDialogState] = useAtom(dialogAtom);
   const { activeFolder } = useGetActiveFolder();
   const { isOpen, type, context } = dialogState;
+  const auth = useAtomValue(authAtom);
   const form = useForm<FormInput>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -49,6 +51,7 @@ export function CreateFolderDialog() {
       {
         name: data.name,
         parentId,
+        ownerId: auth?.user?.id as string,
       },
       {
         onSuccess: () => {

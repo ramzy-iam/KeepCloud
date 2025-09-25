@@ -93,7 +93,7 @@ export class StorageController {
   @Post('resources/:id/restore')
   @Serialize(FileMinViewDto)
   restore(@Param('id') id: string, @CurrentUser() user: UserProfileDto) {
-    return this.storageService.restore(id, user.id);
+    return this.storageService.restore(user.id, id);
   }
 
   @Post('resources/:id/trash')

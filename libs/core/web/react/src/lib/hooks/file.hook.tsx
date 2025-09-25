@@ -12,7 +12,8 @@ import { toast } from 'sonner';
 import { useGetActiveFolder } from './folder.hook';
 import { useFileListUpdater } from './use-file-list-updater.hook';
 import { FileHelper } from '@keepcloud/commons/helpers';
-import { useRefreshStorageData } from './storage.hook';
+import { useRefreshStorageData, useRefreshSuggestions } from './storage.hook';
+import { queryKeys } from '../query-keys';
 
 interface UploadFileProps {
   onProgress?: (progress: number, file: File) => void;
@@ -23,7 +24,6 @@ export const useUploadFile = ({ onProgress }: UploadFileProps) => {
   const { mutateAsync: createFile } = useCreateFile();
   const { activeFolder } = useGetActiveFolder();
   const parentId = activeFolder.id;
-  const refreshStorageData = useRefreshStorageData();
 
   const finalParentId = FileHelper.getValidParentId(parentId);
   const { insertItem } = useFileListUpdater(finalParentId);
@@ -124,7 +124,6 @@ export const useUploadFile = ({ onProgress }: UploadFileProps) => {
     },
     onSuccess: (data, variables) => {
       insertItem(data, 'start');
-      refreshStorageData();
     },
 
     onError: (error, variables) => {
@@ -139,10 +138,18 @@ const useGetPresignedPost = () =>
     mutationFn: (dto) => FileService.getPresignedPost(dto),
   });
 
-const useCreateFile = () =>
-  useMutation<FileMinViewDto, ApiError, CreateFileDto>({
+const useCreateFile = () => {
+  const refreshStorageData = useRefreshStorageData();
+  const refetchSuggestedFiles = useRefreshSuggestions();
+
+  return useMutation<FileMinViewDto, ApiError, CreateFileDto>({
     mutationFn: (dto) => FileService.create(dto),
+    onSuccess: () => {
+      refetchSuggestedFiles();
+      refreshStorageData();
+    },
   });
+};
 
 interface UseGeneratePresignedGetProps {
   fileId?: string;
@@ -153,7 +160,7 @@ export const useGeneratePresignedGet = ({
   enabled = true,
 }: UseGeneratePresignedGetProps) => {
   return useQuery<PresignedGetResultDto, ApiError>({
-    queryKey: ['file', fileId, 'presigned-get'],
+    queryKey: queryKeys.file.presignedGet(fileId as string),
     queryFn: async () => {
       return FileService.generatePresignedGet(fileId as string);
     },
@@ -170,7 +177,7 @@ interface GetFileProps {
 
 export const useGetFile = ({ id, enabled = true }: GetFileProps) => {
   return useQuery<FileDetailsDto, ApiError>({
-    queryKey: ['file', id],
+    queryKey: queryKeys.file.detail(id),
     queryFn: () => FileService.getOne(id),
     enabled: enabled && !!id,
     retry: false,

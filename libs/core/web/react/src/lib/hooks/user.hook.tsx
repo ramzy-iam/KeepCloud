@@ -6,6 +6,7 @@ import {
   UserFilterDto,
 } from '@keepcloud/commons/dtos';
 import { ApiErrorData } from '../services';
+import { queryKeys } from '../query-keys';
 
 interface UseGetUsersOptions {
   filters?: UserFilterDto;
@@ -19,7 +20,7 @@ export const useGetUsers = ({
   staleTime,
 }: UseGetUsersOptions = {}) => {
   return useQuery<PaginationDto<UserProfileDto>, ApiErrorData>({
-    queryKey: ['users', filters],
+    queryKey: queryKeys.user.list(filters),
     queryFn: () => UserService.findAll(filters),
     enabled,
     staleTime,

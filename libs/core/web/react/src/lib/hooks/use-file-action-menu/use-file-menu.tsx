@@ -5,7 +5,6 @@ import {
   TextCursorInput as RenameIcon,
   Eye as PreviewIcon,
   History,
-  Share,
 } from 'lucide-react';
 import { MenuItem, useDialog, useMoveToTrash, useRestoreResource } from '../';
 import { iconClassName, itemClassName } from './config';

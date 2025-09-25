@@ -38,7 +38,7 @@ export class BaseFilterDto {
   )
   @IsOptional()
   @Min(PAGINATION.DEFAULT_PAGE, ErrorCode.PAGE_INVALID)
-  page: number = PAGINATION.DEFAULT_PAGE;
+  page?: number = PAGINATION.DEFAULT_PAGE;
 
   @Transform(({ value }) =>
     CastHelper.toNumber(value, {
@@ -50,7 +50,7 @@ export class BaseFilterDto {
   @IsOptional()
   @Min(1, ErrorCode.PAGE_SIZE_INVALID)
   @Max(PAGINATION.DEFAULT_MAX_PAGE_SIZE + 1, ErrorCode.PAGE_SIZE_INVALID)
-  pageSize: number = PAGINATION.DEFAULT_PAGE_SIZE;
+  pageSize?: number = PAGINATION.DEFAULT_PAGE_SIZE;
 
   @Transform(({ value }) => CastHelper.toOrder(value))
   @IsOptional()
