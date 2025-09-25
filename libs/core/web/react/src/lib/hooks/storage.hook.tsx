@@ -11,10 +11,12 @@ import { useGetActiveFolder } from './folder.hook';
 import {
   updateFileEverywhere,
   useFileListUpdater,
+  removeFileEverywhere,
 } from './use-file-list-updater.hook';
 import { useAtomValue } from 'jotai';
 import { authAtom } from '../atoms';
 import { useInfiniteListQuery } from './use-infinite-list-query.hook';
+import { queryKeys, getActiveFolderInvalidationKey } from '../query-keys';
 
 interface StorageQueryProps {
   filters?: FolderFilterDto;
@@ -35,7 +37,7 @@ export const useGetRootItems = ({
     throw new Error('User root folder is not available');
   }
   return useInfiniteListQuery<FileMinViewDto>({
-    queryKey: [SYSTEM_FILE.MY_STORAGE.invalidationKey],
+    queryKey: queryKeys.storage.myStorage,
     listKey: authState.user.root,
     enabled: enabled && !!authState.user.root,
     fetchFn: async (page) => {
@@ -49,7 +51,7 @@ export const useGetSharedWithMe = ({
   enabled = true,
 }: StorageQueryProps = {}) => {
   return useInfiniteListQuery<FileMinViewDto>({
-    queryKey: [SYSTEM_FILE.SHARED_WITH_ME.invalidationKey],
+    queryKey: queryKeys.storage.sharedWithMe,
     listKey: SYSTEM_FILE.SHARED_WITH_ME.id,
     enabled,
     fetchFn: async (page) => {
@@ -63,7 +65,7 @@ export const useGetTrashedItems = ({
   enabled = true,
 }: StorageQueryProps = {}) => {
   return useInfiniteListQuery<FileMinViewDto>({
-    queryKey: [SYSTEM_FILE.TRASH.invalidationKey],
+    queryKey: queryKeys.storage.trash,
     listKey: SYSTEM_FILE.TRASH.id,
     enabled,
     fetchFn: async (page) => {
@@ -74,7 +76,7 @@ export const useGetTrashedItems = ({
 
 export const useGetSuggestedFolders = () => {
   return useInfiniteListQuery<FileMinViewDto>({
-    queryKey: ['storage', 'suggested-folders'],
+    queryKey: queryKeys.storage.suggestedFolders,
     listKey: SYSTEM_FILE.SUGGESTED_FOLDERS.id,
     enabled: true,
     fetchFn: async (page) => StorageService.getSuggestedFolders({ page }),
@@ -83,7 +85,7 @@ export const useGetSuggestedFolders = () => {
 
 export const useGetSuggestedFiles = () => {
   return useInfiniteListQuery<FileMinViewDto>({
-    queryKey: ['storage', 'suggested-files'],
+    queryKey: queryKeys.storage.suggestedFiles,
     listKey: SYSTEM_FILE.SUGGESTED_FILES.id,
     enabled: true,
     fetchFn: async (page) => StorageService.getSuggestedFiles({ page }),
@@ -92,10 +94,7 @@ export const useGetSuggestedFiles = () => {
 
 export const useGetKeyToInvalidateBasedOnActiveFolder = () => {
   const { activeFolder } = useGetActiveFolder();
-  if (activeFolder.isSystem) {
-    return [activeFolder.invalidationKey as string];
-  }
-  return ['folder', activeFolder.id, 'children'];
+  return getActiveFolderInvalidationKey(activeFolder);
 };
 
 export const useGetFoldersForTree = ({
@@ -104,7 +103,7 @@ export const useGetFoldersForTree = ({
   staleTime,
 }: StorageQueryProps = {}) => {
   return useInfiniteListQuery<FileMinViewDto>({
-    queryKey: ['storage', 'tree', filters],
+    queryKey: queryKeys.storage.tree,
     listKey: `tree-${filters.parentId}`,
     enabled,
     fetchFn: async (page) =>
@@ -115,10 +114,14 @@ export const useGetFoldersForTree = ({
 
 export const useRenameResource = ({ parentId }: RenameResourceProps) => {
   const { updateItemName } = useFileListUpdater(parentId);
+  const queryClient = useQueryClient();
 
   return useMutation<FileMinViewDto, ApiError, { id: string; name: string }>({
     mutationFn: ({ id, name }) => StorageService.rename(id, name),
-    onSuccess: (data) => {
+    onSuccess: (data, { id: fileId }) => {
+      queryClient.refetchQueries({
+        queryKey: queryKeys.file.presignedGet(fileId),
+      });
       updateItemName(data.id, data.name);
       updateFileEverywhere(data.id, (file) => ({
         ...file,
@@ -129,24 +132,20 @@ export const useRenameResource = ({ parentId }: RenameResourceProps) => {
 };
 
 export const useMoveToTrash = ({ parentId }: { parentId: string }) => {
-  const { removeItem } = useFileListUpdater(parentId);
-
   return useMutation<FileMinViewDto, ApiError, string>({
     mutationFn: (id) => StorageService.moveToTrash(id),
     onSuccess: (_, id) => {
-      removeItem(id);
+      removeFileEverywhere(id);
     },
   });
 };
 
 export const useRestoreResource = () => {
   const { removeItem } = useFileListUpdater(SYSTEM_FILE.TRASH.id);
-  const refreshStorageData = useRefreshStorageData();
   return useMutation<FileMinViewDto, ApiError, string>({
     mutationFn: (id) => StorageService.restore(id),
     onSuccess: (_, id) => {
       removeItem(id);
-      refreshStorageData();
     },
   });
 };
@@ -166,7 +165,7 @@ export const useDeletePermanently = () => {
 
 export const useGetUserStorage = () => {
   return useQuery<UserStorageDto, ApiError>({
-    queryKey: ['storage', 'usage'],
+    queryKey: queryKeys.storage.usage,
     queryFn: () => StorageService.getUserStorage(),
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,
@@ -175,7 +174,7 @@ export const useGetUserStorage = () => {
 
 export const useGetStorageBreakdown = () => {
   return useQuery<StorageBreakdownDto, ApiError>({
-    queryKey: ['storage', 'breakdown'],
+    queryKey: queryKeys.storage.breakdown,
     queryFn: () => StorageService.getStorageBreakdown(),
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,
@@ -186,7 +185,18 @@ export const useRefreshStorageData = () => {
   const queryClient = useQueryClient();
 
   return () => {
-    queryClient.invalidateQueries({ queryKey: ['storage', 'usage'] });
-    queryClient.invalidateQueries({ queryKey: ['storage', 'breakdown'] });
+    queryClient.refetchQueries({ queryKey: queryKeys.storage.usage });
+    queryClient.refetchQueries({ queryKey: queryKeys.storage.breakdown });
+  };
+};
+
+export const useRefreshSuggestions = () => {
+  const queryClient = useQueryClient();
+
+  return () => {
+    queryClient.refetchQueries({ queryKey: queryKeys.storage.suggestedFiles });
+    queryClient.refetchQueries({
+      queryKey: queryKeys.storage.suggestedFolders,
+    });
   };
 };

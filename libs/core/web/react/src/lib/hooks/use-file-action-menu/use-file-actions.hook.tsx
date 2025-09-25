@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { FileMinViewDto, TrashedFileDto } from '@keepcloud/commons/dtos';
+import { FileMinViewDto } from '@keepcloud/commons/dtos';
 import { useGetMenuItems, useGetMenuTrashedItems } from './use-get-menu';
-import { MenuItem, useContextMenu } from '@keepcloud/web-core/react';
+import { useContextMenu } from '../use-context-menu.hook';
+import { MenuItem } from '../../components';
 
 interface UseFileMenuProps {
   file: FileMinViewDto;

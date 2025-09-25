@@ -19,16 +19,9 @@ import {
   AppDialogsWrapper,
   AppSidebar,
   GlobalSearch,
-  QuickActionButtons,
   UserProfileIcon,
 } from '../../components';
 import ScreenLoader from './loader';
-
-const LocalSidebarTrigger = () => {
-  const { open, openMobile, isMobile } = useSidebar();
-  if ((open && !isMobile) || (openMobile && isMobile)) return null;
-  return <SidebarTrigger />;
-};
 
 const ProfileIcon = ({ user }: { user: UserProfileDto }) => {
   const { isMobile } = useSidebar();
@@ -124,7 +117,7 @@ export default function BaseLayout() {
         <main className="flex h-full w-full flex-col border-0 border-x border-section-border">
           <div className="flex h-[72px] items-center justify-between border-b border-section-border px-2 py-5 md:px-8">
             <div className="flex items-center gap-2.5 text-14">
-              <LocalSidebarTrigger />
+              <SidebarTrigger />
               <GlobalSearch />
             </div>
             <div className="flex items-center gap-2.5">

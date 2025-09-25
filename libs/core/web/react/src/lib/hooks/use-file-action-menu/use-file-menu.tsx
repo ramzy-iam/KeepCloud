@@ -5,13 +5,19 @@ import {
   TextCursorInput as RenameIcon,
   Eye as PreviewIcon,
   History,
-  Share,
 } from 'lucide-react';
-import { MenuItem, useDialog, useMoveToTrash, useRestoreResource } from '../';
+import {
+  MenuItem,
+  useDialog,
+  useMoveToTrash,
+  useRestoreResource,
+  useGeneratePresignedGet,
+} from '../';
 import { iconClassName, itemClassName } from './config';
 import { FileMinViewDto } from '@keepcloud/commons/dtos';
 import { cn } from '../../helpers';
 import { FileHelper } from '@keepcloud/commons/helpers';
+import { toast } from 'sonner';
 
 export const useFileMenuItems = (file: FileMinViewDto): MenuItem[] => {
   const { openDialog } = useDialog();
@@ -19,6 +25,26 @@ export const useFileMenuItems = (file: FileMinViewDto): MenuItem[] => {
   const moveToTrash = useMoveToTrash({
     parentId: FileHelper.getValidParentId(file.parentId),
   });
+
+  const { refetch: getPresignedUrls } = useGeneratePresignedGet({
+    fileId: file.id,
+    enabled: false,
+  });
+
+  const handleDownload = async () => {
+    try {
+      const { data: presignedData } = await getPresignedUrls();
+
+      if (presignedData?.downloadUrl) {
+        window.open(presignedData.downloadUrl, '_blank');
+      } else {
+        throw new Error('No download URL received');
+      }
+    } catch (error) {
+      console.error('Download error:', error);
+      toast.error(`Failed to download ${file.name}`);
+    }
+  };
   return [
     {
       label: 'Preview',
@@ -33,7 +59,7 @@ export const useFileMenuItems = (file: FileMinViewDto): MenuItem[] => {
     {
       label: 'Download',
       icon: <Download className={iconClassName} />,
-      onClick: () => console.log(`Download ${file.name}`),
+      onClick: handleDownload,
       className: itemClassName,
     },
     {

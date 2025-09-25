@@ -78,10 +78,10 @@ export class NestedSetService {
         }),
       ]);
       this.logger.info(`Node deleted successfully`);
-    } catch (err: any) {
+    } catch (err: unknown) {
       this.logger.error(
-        `Failed to delete node ${id}: ${err.message}`,
-        err.stack,
+        `Failed to delete node ${id}: ${(err as Error).message}`,
+        (err as Error).stack,
       );
       throw new InternalServerErrorException({
         message: 'Failed to delete node and update tree structure',
@@ -191,8 +191,11 @@ export class NestedSetService {
         data: { parentId: newParentId },
       });
       this.logger.info(`Node ${id} moved successfully`);
-    } catch (err: any) {
-      this.logger.error(`Failed to move node ${id}: ${err.message}`, err.stack);
+    } catch (err: unknown) {
+      this.logger.error(
+        `Failed to move node ${id}: ${(err as Error).message}`,
+        (err as Error).stack,
+      );
       throw new InternalServerErrorException({
         message: 'Failed to move node',
       });
@@ -202,7 +205,7 @@ export class NestedSetService {
   async rebuildTree(treeOwnerId: string): Promise<void> {
     this.logger.info(`Rebuilding nested set tree for userId=${treeOwnerId}`);
     const nodes = await this.prisma.file.findMany({
-      where: { treeOwnerId, deletedAt: null },
+      where: { treeOwnerId },
       select: { id: true, parentId: true },
     });
 
@@ -238,8 +241,11 @@ export class NestedSetService {
         ),
       );
       this.logger.info(`Tree rebuilt successfully for userId=${treeOwnerId}`);
-    } catch (err: any) {
-      this.logger.error(`Failed to rebuild tree: ${err.message}`, err.stack);
+    } catch (err: unknown) {
+      this.logger.error(
+        `Failed to rebuild tree: ${(err as Error).message}`,
+        (err as Error).stack,
+      );
       throw new InternalServerErrorException({
         message: 'Failed to rebuild nested set tree',
       });

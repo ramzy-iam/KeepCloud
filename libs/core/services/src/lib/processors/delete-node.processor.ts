@@ -21,10 +21,10 @@ export class DeleteNodeProcessor implements Processor {
       // 1. Delete node and subtree in DB (mark deletedAt, update nested set)
 
       this.logger.info(`Node ${nodeId} deleted successfully`);
-    } catch (error: any) {
+    } catch (error: unknown) {
       this.logger.error(
-        `Error deleting nodeId=${nodeId}: ${error.message}`,
-        error.stack,
+        `Error deleting nodeId=${nodeId}: ${(error as Error).message}`,
+        (error as Error).stack,
       );
       throw error;
     }

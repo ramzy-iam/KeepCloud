@@ -20,7 +20,6 @@ export function FolderNotFoundDialog() {
   const navigate = useNavigate();
 
   const code = context?.code;
-  console.log({ dialogState });
 
   if (!isOpen || type !== 'folderNotFound') return null;
 

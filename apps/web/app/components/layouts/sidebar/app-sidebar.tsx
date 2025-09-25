@@ -123,11 +123,13 @@ export function AppSidebar({ user }: Readonly<AppSidebarProps>) {
                     <span className="text-12-medium">More</span>
                   </div>
                 </div>
-                {(open || openMobile) && <SidebarTrigger />}
               </div>
 
               <div className="relative flex h-full w-[267px] flex-col items-start gap-8 border-0 border-x border-section-border pt-6">
-                <UserProfileIcon user={user} className="px-6" />
+                <div className="flex w-full items-center justify-between">
+                  <UserProfileIcon user={user} className="px-6" />
+                  {openMobile && <SidebarTrigger className="mr-2" />}
+                </div>
                 <div className="flex h-full flex-col justify-between overflow-auto">
                   <div className="px-6">{activeContent}</div>
                   <StorageWidget
