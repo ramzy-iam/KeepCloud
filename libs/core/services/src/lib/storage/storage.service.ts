@@ -9,11 +9,8 @@ import { PaginationDto, FolderFilterDto } from '@keepcloud/commons/dtos';
 import { ErrorCode, SYSTEM_FILE } from '@keepcloud/commons/constants';
 import {
   FileNotFoundException,
-  FileTrashedException,
   FolderNotFoundException,
-  FolderTrashedException,
   NotFoundException,
-  ParentFolderTrashedException,
 } from '@keepcloud/commons/backend';
 import { FilePermissionService } from '../file';
 import { NestedSetService } from './nested-set.service';
@@ -183,26 +180,6 @@ export class StorageService {
       .getManyPaginated(1, 15);
   }
 
-  async checkAndThrowIfTrashed(fileId: string): Promise<void> {
-    const { trashedBy, isFolder } = await this.fileRepository.isTrashed(fileId);
-
-    if (!trashedBy) {
-      // Not trashed at all, just return
-      return;
-    }
-
-    switch (trashedBy) {
-      case 'self':
-        if (isFolder) {
-          throw new FolderTrashedException();
-        } else {
-          throw new FileTrashedException();
-        }
-      case 'parent':
-        throw new ParentFolderTrashedException();
-    }
-  }
-
   async rename(userId: string, fileId: string, newName: string): Promise<File> {
     await this.filePermissionService.verifyUserRole(
       fileId,
@@ -210,7 +187,7 @@ export class StorageService {
       FilePermissionRole.EDITOR,
     );
 
-    await this.checkAndThrowIfTrashed(fileId);
+    await this.filePermissionService.checkAndThrowIfTrashed(fileId);
 
     return this.fileRepository.update({ id: fileId }, { name: newName });
   }
