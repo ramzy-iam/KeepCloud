@@ -11,6 +11,7 @@ import {
   FileAncestorDto,
   PresignedGetResultDto,
 } from '@keepcloud/commons/dtos';
+import * as qs from 'querystring'; // or use encodeURIComponent
 import {
   AppConfigService,
   FileKeyInvalidException,
@@ -148,6 +149,13 @@ export class FileService {
     });
   }
 
+  buildContentDisposition(disposition: string, filename: string): string {
+    const asciiFallback = filename.replace(/[^\x20-\x7E]/g, '_');
+    const utf8Filename = encodeURIComponent(filename);
+
+    return `${disposition}; filename="${asciiFallback}"; filename*=UTF-8''${utf8Filename}`;
+  }
+
   private async getPresignedGet(
     fileId: string,
     disposition: DispositionType = 'inline',
@@ -176,7 +184,10 @@ export class FileService {
       }
     }
 
-    const contentDisposition = `${disposition}; filename="${finalFilename}"`;
+    const contentDisposition = this.buildContentDisposition(
+      disposition,
+      finalFilename,
+    );
 
     return this.s3helper.createPresignedGet(file.storagePath, {
       bucket: this.bucket,
@@ -264,7 +275,9 @@ export class FileService {
     const hasExtension = parts.length > 1;
 
     const baseName = hasExtension ? parts.slice(0, -1).join('.') : filename;
-    const extension = hasExtension ? '.' + parts.at(-1) : '';
+    const extension = hasExtension
+      ? '.' + (parts.at(-1) as string).toLowerCase()
+      : '';
 
     const slugified = baseName
       .normalize('NFKD') // Normalize accents
