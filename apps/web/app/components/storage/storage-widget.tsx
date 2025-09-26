@@ -35,11 +35,13 @@ export function StorageWidget({
     return <StorageWidgetSkeleton className={className} />;
   }
 
-  const usagePercentage = Math.round((usedStorage / totalStorage) * 100);
-  const { used, total } = FileHelper.formatStorageConsistent(
+  const usagePercentage = FileHelper.calculateUsagePercentage(
     usedStorage,
     totalStorage,
-    usedStorage >= FileHelper.convertToBytes(10, 'MB') ? 0 : 1,
+  );
+  const { used, total } = FileHelper.formatStorageConsistentAuto(
+    usedStorage,
+    totalStorage,
   );
 
   return (
