@@ -7,6 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
   dialogAtom,
   useFilePreviewer,
   TooltipProviderWrapper,
@@ -38,6 +39,9 @@ export const FilePreviewDialog = () => {
         className="w-full gap-0 overflow-auto md:h-[95svh] md:max-w-[80svw]!"
       >
         <DialogHeader className="flex h-auto w-full max-w-full flex-row items-center justify-between gap-0 overflow-x-hidden text-left text-heading">
+          <DialogDescription className="sr-only">
+            Preview of the selected document.
+          </DialogDescription>
           <TooltipProviderWrapper content={file.name} sideOffset={-12}>
             <DialogTitle className="w-min max-w-full truncate p-4">
               {file.name ?? 'File Preview'}
