@@ -13,15 +13,22 @@ interface GridViewProps {
     file: FileMinViewDto;
     selectionMode?: boolean;
     isSelected?: boolean;
-    onSelectionChange?: (id: string, selected: boolean) => void;
+    onSelectionChange?: (
+      id: string,
+      selected: boolean,
+      addToSelection?: boolean,
+    ) => void;
   }>;
   hasNextPage?: boolean;
   fetchNextPage?: () => void;
   isFetchingNextPage?: boolean;
-  // Selection props
   selectionMode?: boolean;
   selectedItems?: Set<string>;
-  onSelectionChange?: (id: string, selected: boolean) => void;
+  onSelectionChange?: (
+    id: string,
+    selected: boolean,
+    addToSelection?: boolean,
+  ) => void;
 }
 
 export const GridView = ({

@@ -7,7 +7,7 @@ import {
   cn,
   useFolderViewMode,
 } from '@keepcloud/web-core/react';
-import { LayoutGrid, StretchHorizontal, CheckSquare } from 'lucide-react';
+import { LayoutGrid, StretchHorizontal } from 'lucide-react';
 import { FileMainCategory, FolderViewMode } from '@keepcloud/commons/types';
 import { FileAncestorDto, FileMinViewDto } from '@keepcloud/commons/dtos';
 import { ColumnDef } from '@tanstack/react-table';
@@ -34,18 +34,18 @@ interface FolderViewProps {
     file: FileMinViewDto;
     selectionMode?: boolean;
     isSelected?: boolean;
-    onSelectionChange?: (id: string, selected: boolean) => void;
+    onSelectionChange?: (
+      id: string,
+      selected: boolean,
+      addToSelection?: boolean,
+    ) => void;
   }>;
-  /**
-   * Current folder id to subscribe to atom.
-   */
   currentId: string;
 
   hasNextPage?: boolean;
   fetchNextPage?: () => void;
   isFetchingNextPage?: boolean;
 
-  // Selection props
   enableSelection?: boolean;
   onBulkAction?: (action: BulkAction, items: FileMinViewDto[]) => void;
   availableBulkActions?: BulkAction[];
@@ -127,9 +127,22 @@ export const FolderView = ({
     }
   }, [selectedCount, selectionMode]);
 
-  const handleSelectionChange = (id: string, selected: boolean) => {
+  const handleSelectionChange = (
+    id: string,
+    selected: boolean,
+    addToSelection = false,
+  ) => {
     if (!enableSelection) return;
-    toggleItem(id);
+
+    if (addToSelection) {
+      toggleItem(id);
+    } else {
+      clearSelection();
+      if (selected) {
+        toggleItem(id);
+      }
+    }
+
     if (!selectionMode && selected) {
       setSelectionMode(true);
     }
@@ -150,26 +163,14 @@ export const FolderView = ({
     selectedItems: FileMinViewDto[],
   ) => {
     onBulkAction?.(action, selectedItems);
-    // Optionally clear selection after action
     if (action === 'trash' || action === 'delete') {
       clearSelection();
       setSelectionMode(false);
     }
   };
 
-  const toggleSelectionMode = () => {
-    if (!enableSelection) return;
-    if (selectionMode) {
-      clearSelection();
-      setSelectionMode(false);
-    } else {
-      setSelectionMode(true);
-    }
-  };
-
   return (
     <div className={cn('mb-8 flex h-full flex-col gap-3', className)}>
-      {/* Bulk Operation Menu */}
       {enableSelection && (
         <BulkOperationMenu
           selectedItems={getSelectedItems(filteredItems)}
