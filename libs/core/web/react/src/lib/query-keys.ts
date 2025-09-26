@@ -3,7 +3,7 @@ import { FolderFilterDto, GetOneFolderQueryDto } from '@keepcloud/commons/dtos';
 
 const createQueryKey = (
   domain: string,
-  ...rest: (string | number | boolean | object)[]
+  ...rest: (string | number | boolean | object | null | undefined)[]
 ) => [domain, ...rest];
 
 /**
@@ -34,7 +34,8 @@ export const storageKeys = {
 
   suggestedFolders: ['storage', 'suggested-folders'],
   suggestedFiles: ['storage', 'suggested-files'],
-  tree: ['storage', 'tree'],
+  tree: (parentId?: string | null) =>
+    createQueryKey('storage', 'tree', parentId),
   usage: ['storage', 'usage'],
   breakdown: ['storage', 'breakdown'],
 } as const;
