@@ -69,7 +69,7 @@ export const useFilePreviewer = ({ file }: UseFilePreviewerProps) => {
       return <TextPreview url={previewUrl} />;
     }
 
-    if (['doc', 'docx', 'xls', 'xlsx'].includes(format)) {
+    if (['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'].includes(format)) {
       return <OfficePreview url={previewUrl} />;
     }
 
