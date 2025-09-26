@@ -67,7 +67,6 @@ export const FileSystemItem = ({
   };
 
   const {
-    isLongPressed,
     handleClick,
     handleDoubleClick,
     handleTouchStart,
@@ -89,7 +88,6 @@ export const FileSystemItem = ({
         'flex h-[38px] w-full items-center justify-between gap-2 px-3 py-1 sm:w-[150px] md:w-[194px]',
         'cursor-pointer transition-all duration-200 select-none',
         isSelected && 'border-2 border-primary/40! shadow-lg',
-        isLongPressed && 'scale-95', // Visual feedback during long press
         className,
       )}
       onClick={handleClick}
