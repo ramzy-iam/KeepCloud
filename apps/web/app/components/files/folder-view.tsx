@@ -186,55 +186,57 @@ export const FolderView = ({
 
   return (
     <div className={cn('mb-8 flex h-full flex-col gap-3', className)}>
-      {enableSelection && (
-        <BulkOperationMenu
-          selectedItems={getSelectedItems(filteredItems)}
-          selectedCount={selectedCount}
-          onSelectAll={handleSelectAll}
-          onClearSelection={handleClearSelection}
-          isAllSelected={isAllSelected}
-          isIndeterminate={isIndeterminate}
-          onBulkAction={handleBulkAction}
-          availableActions={availableBulkActions}
-        />
-      )}
-
-      <div className="sticky -top-[1px] z-[1] flex h-12 items-center justify-between bg-background p-1.5 pl-0">
-        {internalLoading && (
-          <div className="flex items-center gap-2 py-4">
-            <Skeleton className="h-[30px] w-[200px]" />
-          </div>
-        )}
-        {!internalLoading && title && !folder && (
-          <h3 className="text-20-medium text-heading">{title}</h3>
-        )}
-
-        {folder && !internalLoading && (
-          <FolderBreadcrumb
-            folder={folder}
-            onBreadcrumbClick={onBreadcrumbClick}
+      <div className="sticky top-0 z-[3] bg-background">
+        {enableSelection && (
+          <BulkOperationMenu
+            selectedItems={getSelectedItems(filteredItems)}
+            selectedCount={selectedCount}
+            onSelectAll={handleSelectAll}
+            onClearSelection={handleClearSelection}
+            isAllSelected={isAllSelected}
+            isIndeterminate={isIndeterminate}
+            onBulkAction={handleBulkAction}
+            availableActions={availableBulkActions}
           />
         )}
 
-        <div className="flex items-center gap-2">
-          {!fixedView && !internalLoading && (
-            <Tabs
-              defaultValue={viewMode}
-              onValueChange={(value) => {
-                setFolderViewMode(value as FolderViewMode);
-                setViewMode(value as FolderViewMode);
-              }}
-            >
-              <TabsList>
-                <TabsTrigger value="table" className={tabClassName}>
-                  <StretchHorizontal className="h-4 w-4" />
-                </TabsTrigger>
-                <TabsTrigger value="grid" className={tabClassName}>
-                  <LayoutGrid className="h-4 w-4" />
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
+        <div className="flex h-12 items-center justify-between p-1.5 pl-0">
+          {internalLoading && (
+            <div className="flex items-center gap-2 py-4">
+              <Skeleton className="h-[30px] w-[200px]" />
+            </div>
           )}
+          {!internalLoading && title && !folder && (
+            <h3 className="text-20-medium text-heading">{title}</h3>
+          )}
+
+          {folder && !internalLoading && (
+            <FolderBreadcrumb
+              folder={folder}
+              onBreadcrumbClick={onBreadcrumbClick}
+            />
+          )}
+
+          <div className="flex items-center gap-2">
+            {!fixedView && !internalLoading && (
+              <Tabs
+                defaultValue={viewMode}
+                onValueChange={(value) => {
+                  setFolderViewMode(value as FolderViewMode);
+                  setViewMode(value as FolderViewMode);
+                }}
+              >
+                <TabsList>
+                  <TabsTrigger value="table" className={tabClassName}>
+                    <StretchHorizontal className="h-4 w-4" />
+                  </TabsTrigger>
+                  <TabsTrigger value="grid" className={tabClassName}>
+                    <LayoutGrid className="h-4 w-4" />
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+            )}
+          </div>
         </div>
       </div>
 

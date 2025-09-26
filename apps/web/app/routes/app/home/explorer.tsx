@@ -2,6 +2,7 @@ import { SYSTEM_FILE } from '@keepcloud/commons/constants';
 import { FolderView, SuggestionEmpty } from '../../../components';
 import { columns } from './columns';
 import {
+  useGetActiveFolder,
   useGetSuggestedFiles,
   useGetSuggestedFolders,
 } from '@keepcloud/web-core/react';
@@ -10,8 +11,11 @@ import {
   useBulkActionHandler,
   BULK_ACTION_CONFIGS,
 } from '../../../hooks';
+import { useEffect } from 'react';
 
 export default function ExplorerComponent() {
+  const { setActiveFolder } = useGetActiveFolder();
+
   const {
     allPageItems: suggestedFolders,
     isLoading: isLoadingSuggestedFolders,
@@ -66,6 +70,12 @@ export default function ExplorerComponent() {
       onBulkAction: handleFoldersBulkAction,
     },
   });
+  useEffect(() => {
+    setActiveFolder({
+      id: SYSTEM_FILE.MY_STORAGE.id,
+      name: SYSTEM_FILE.MY_STORAGE.name,
+    });
+  }, [setActiveFolder]);
 
   return (
     <div className="flex flex-col gap-6">
