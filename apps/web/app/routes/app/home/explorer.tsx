@@ -27,9 +27,6 @@ export default function ExplorerComponent() {
       onDownload: async (items) => {
         console.log('Downloading suggested files:', items);
       },
-      onShare: async (items) => {
-        console.log('Sharing suggested files:', items);
-      },
 
       onTrash: async (items) => {
         console.log('Moving suggested files to trash:', items);
@@ -42,8 +39,8 @@ export default function ExplorerComponent() {
       onDownload: async (items) => {
         console.log('Downloading suggested folders:', items);
       },
-      onShare: async (items) => {
-        console.log('Sharing suggested folders:', items);
+      onTrash: async (items) => {
+        console.log('Moving suggested folders to trash:', items);
       },
     },
   });
@@ -65,7 +62,7 @@ export default function ExplorerComponent() {
     baseColumns: columns,
     config: {
       enableSelection: true,
-      availableBulkActions: BULK_ACTION_CONFIGS.FOLDERS,
+      availableBulkActions: BULK_ACTION_CONFIGS.FILES,
       onBulkAction: handleFoldersBulkAction,
     },
   });

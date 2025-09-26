@@ -16,7 +16,7 @@ import {
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { StorageHelper } from '../helpers';
 import { FOLDER_VIEW_KEY } from '@keepcloud/commons/constants';
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { FolderViewMode } from '@keepcloud/commons/types';
 import { useFileListUpdater } from './use-file-list-updater.hook';
 import { FileHelper } from '@keepcloud/commons/helpers';
@@ -42,14 +42,22 @@ interface CreateFolderProps {
 
 export const useGetActiveFolder = () => {
   const setFolder = useSetAtom(activeFolderAtom);
-  return {
-    setActiveFolder(folder: ActiveFolder) {
+
+  const setActiveFolder = useCallback(
+    (folder: ActiveFolder) => {
       setFolder(folder);
     },
+    [setFolder],
+  );
+
+  const resetActiveFolder = useCallback(() => {
+    setFolder(DEFAULT_ACTIVE_FOLDER);
+  }, [setFolder]);
+
+  return {
+    setActiveFolder,
     activeFolder: useAtomValue(activeFolderAtom),
-    resetActiveFolder() {
-      setFolder(DEFAULT_ACTIVE_FOLDER);
-    },
+    resetActiveFolder,
   };
 };
 

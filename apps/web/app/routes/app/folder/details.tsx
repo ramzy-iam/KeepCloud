@@ -51,10 +51,6 @@ export default function FolderDetailsComponent({
       onDownload: async (items) => {
         console.log('Downloading folder items:', items);
       },
-      onShare: async (items) => {
-        console.log('Sharing folder items:', items);
-      },
-
       onTrash: async (items) => {
         console.log('Moving folder items to trash:', items);
       },

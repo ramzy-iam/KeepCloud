@@ -4,7 +4,6 @@ import { BulkAction } from '../components';
 
 export interface BulkActionHandlers {
   onDownload?: (items: FileMinViewDto[]) => void | Promise<void>;
-  onShare?: (items: FileMinViewDto[]) => void | Promise<void>;
   onTrash?: (items: FileMinViewDto[]) => void | Promise<void>;
   onDelete?: (items: FileMinViewDto[]) => void | Promise<void>;
   onRestore?: (items: FileMinViewDto[]) => void | Promise<void>;
@@ -55,9 +54,7 @@ export function useBulkActionHandler({
 }
 
 export const BULK_ACTION_CONFIGS = {
-  FILES: ['download', 'share', 'copy', 'move', 'star', 'trash'] as BulkAction[],
-
-  FOLDERS: ['download', 'share', 'star'] as BulkAction[],
+  FILES: ['download', 'trash'] as BulkAction[],
 
   TRASH: ['restore', 'delete'] as BulkAction[],
 };

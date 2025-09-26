@@ -9,6 +9,7 @@ import { useGetTrashedItems } from '@keepcloud/web-core/react';
 import {
   useBulkSelectionProvider,
   useBulkActionHandler,
+  BULK_ACTION_CONFIGS,
 } from '../../../../hooks';
 import { ColumnDef } from '@tanstack/react-table';
 import { FileMinViewDto } from '@keepcloud/commons/dtos';
@@ -36,7 +37,7 @@ export default function TrashComponent() {
     baseColumns: columns as ColumnDef<FileMinViewDto>[],
     config: {
       enableSelection: true,
-      availableBulkActions: ['restore', 'delete'],
+      availableBulkActions: BULK_ACTION_CONFIGS.TRASH,
       onBulkAction: handleBulkAction,
     },
   });
