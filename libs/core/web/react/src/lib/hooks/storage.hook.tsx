@@ -103,7 +103,7 @@ export const useGetFoldersForTree = ({
   staleTime,
 }: StorageQueryProps = {}) => {
   return useInfiniteListQuery<FileMinViewDto>({
-    queryKey: queryKeys.storage.tree,
+    queryKey: queryKeys.storage.tree(filters.parentId),
     listKey: `tree-${filters.parentId}`,
     enabled,
     fetchFn: async (page) =>
