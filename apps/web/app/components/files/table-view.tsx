@@ -8,10 +8,14 @@ import {
   useFileTable,
   useSidebar,
   Skeleton,
+  useDialog,
+  ROUTE_PATH,
 } from '@keepcloud/web-core/react';
 import { ColumnDef, Table } from '@tanstack/react-table';
 import { FileMinViewDto } from '@keepcloud/commons/dtos';
 import { FolderEmpty } from '../ui';
+import { useNavigate } from 'react-router';
+import { useDeviceDetection, useInteractionHandlers } from '../../utils/interaction-utils';
 
 interface TableViewProps {
   data: FileMinViewDto[];
@@ -24,6 +28,12 @@ interface TableViewProps {
   hasNextPage?: boolean;
   fetchNextPage?: () => void;
   isFetchingNextPage?: boolean;
+  selectedItems?: Set<string>;
+  onSelectionChange?: (
+    id: string,
+    selected: boolean,
+    addToSelection?: boolean,
+  ) => void;
 }
 
 interface BeforeTableProps {
@@ -32,6 +42,7 @@ interface BeforeTableProps {
 
 const BeforeTable = ({ table }: BeforeTableProps) => {
   const { isMobile } = useSidebar();
+
   return (
     <div className="flex items-center gap-2 py-4">
       <DropdownMenu>
@@ -76,11 +87,105 @@ export function TableView({
   hasNextPage,
   fetchNextPage,
   isFetchingNextPage,
+  selectedItems,
+  onSelectionChange,
 }: TableViewProps) {
+  const { openDialog } = useDialog();
+  const navigate = useNavigate();
+  const { isMobile } = useDeviceDetection();
+  const interactionHandlers = useInteractionHandlers(isMobile);
+
+  const handleItemOpen = (file: FileMinViewDto) => {
+    if (file.isFolder) {
+      const url = ROUTE_PATH.folderDetails(file.id);
+      navigate(url);
+    } else {
+      openDialog({
+        type: 'previewFile',
+        item: file,
+      });
+    }
+  };
+
+  const handleRowClick = (file: FileMinViewDto, event: React.MouseEvent) => {
+    const target = event.target as HTMLElement;
+    const isCheckboxColumn = target.closest('[data-column-id="select"]');
+    const isActionsColumn = target.closest('[data-column-id="actions"]');
+
+    // Skip actions column
+    if (isActionsColumn) return;
+
+    if (isMobile) {
+      // Mobile: checkbox clicks for selection, other clicks for opening
+      if (isCheckboxColumn && onSelectionChange) {
+        const isShiftClick = event.shiftKey;
+        onSelectionChange(file.id, !selectedItems?.has(file.id), isShiftClick);
+      } else {
+        // Mobile: tap to open
+        handleItemOpen(file);
+      }
+    } else {
+      // Desktop/Laptop: Handle checkbox clicks immediately
+      if (isCheckboxColumn && onSelectionChange) {
+        const isShiftClick = event.shiftKey;
+        onSelectionChange(file.id, !selectedItems?.has(file.id), isShiftClick);
+      } else {
+        // Use the shared interaction handlers for proper click/double-click timing
+        interactionHandlers.handleClick(
+          event,
+          file.id,
+          onSelectionChange,
+          () => handleItemOpen(file)
+        );
+      }
+    }
+  };
+
+  const handleRowDoubleClick = (file: FileMinViewDto, event: React.MouseEvent) => {
+    const target = event.target as HTMLElement;
+    const isActionsColumn = target.closest('[data-column-id="actions"]');
+
+    // Skip actions column and mobile
+    if (isActionsColumn || isMobile) return;
+
+    // Clear external selection if onSelectionChange is provided
+    if (onSelectionChange && selectedItems && selectedItems.size > 0) {
+      // Clear all selected items by setting them to unselected
+      selectedItems.forEach((itemId) => {
+        onSelectionChange(itemId, false, false);
+      });
+    }
+
+    // Use the shared interaction handlers for double-click
+    interactionHandlers.handleDoubleClick(event, () => handleItemOpen(file));
+  };
+
+  const handleRowTouchStart = (
+    file: FileMinViewDto,
+    event: React.TouchEvent,
+  ) => {
+    // Optional: Add touch feedback or other mobile-specific behavior
+  };
+
+  const handleRowTouchEnd = (file: FileMinViewDto, event: React.TouchEvent) => {
+    // Optional: Handle touch end events
+  };
+
   const { table, TableComponent } = useFileTable({
     data: isLoading ? [] : data,
     columns,
     noRowsComponent: noDataComponent,
+    onRowClick: handleRowClick,
+    onRowDoubleClick: handleRowDoubleClick,
+    onRowTouchStart: handleRowTouchStart,
+    onRowTouchEnd: handleRowTouchEnd,
+    mobileMode: isMobile,
+    externalSelection: selectedItems
+      ? {
+          selectedItems,
+          getRowId: (item: FileMinViewDto) => item.id,
+        }
+      : undefined,
   });
 
   const footer = (

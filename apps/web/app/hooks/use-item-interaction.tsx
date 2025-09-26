@@ -1,4 +1,8 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
+import {
+  useDeviceDetection,
+  useInteractionHandlers,
+} from '../utils/interaction-utils';
 
 interface UseItemInteractionOptions {
   onSelect?: (id: string, selected: boolean, addToSelection?: boolean) => void;
@@ -27,72 +31,42 @@ export function useItemInteraction({
   clickable = true,
 }: UseItemInteractionOptions): UseItemInteractionReturn {
   const longPressRef = useRef<NodeJS.Timeout | null>(null);
-  const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [isLongPressed, setIsLongPressed] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const checkMobile = () => {
-      const isMobileUserAgent =
-        /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-          navigator.userAgent,
-        );
-      setIsMobile(isMobileUserAgent);
-    };
-    checkMobile();
-  }, []);
-
-  const selectItem = useCallback(
-    (addToSelection = false) => {
-      if (!onSelect) return;
-      onSelect(itemId, true, addToSelection);
-    },
-    [onSelect, itemId],
-  );
+  const { isMobile } = useDeviceDetection();
+  const interactionHandlers = useInteractionHandlers(isMobile);
 
   const handleClick = useCallback(
     (e: React.MouseEvent) => {
-      e.stopPropagation();
       if (!clickable) return;
 
       if (!isMobile) {
-        if (clickTimeoutRef.current) {
-          clearTimeout(clickTimeoutRef.current);
-          clickTimeoutRef.current = null;
-        }
-
-        if (e.shiftKey && onSelect) {
-          selectItem(true);
-        } else if (onSelect) {
-          clickTimeoutRef.current = setTimeout(() => {
-            selectItem(false);
-            clickTimeoutRef.current = null;
-          }, 200);
-        } else {
-          onOpen?.();
-        }
+        // Use shared interaction handlers for desktop
+        interactionHandlers.handleClick(e, itemId, onSelect, onOpen);
       } else {
-        if (!isLongPressed) {
-          onOpen?.();
+        // On mobile, simple tap should clear all selections and then open the file
+        if (onSelect) {
+          // Clear all selections first
+          onSelect(itemId, false, false);
         }
+        onOpen?.();
         setIsLongPressed(false);
       }
     },
-    [isMobile, isLongPressed, clickable, selectItem, onSelect, onOpen],
+    [isMobile, clickable, itemId, onSelect, onOpen, interactionHandlers],
   );
 
   const handleDoubleClick = useCallback(
     (e: React.MouseEvent) => {
-      e.stopPropagation();
       if (!isMobile && clickable) {
-        if (clickTimeoutRef.current) {
-          clearTimeout(clickTimeoutRef.current);
-          clickTimeoutRef.current = null;
+        // Clear all selections first, then open
+        if (onSelect) {
+          onSelect(itemId, false, false);
         }
-        onOpen?.();
+        // Use shared interaction handlers for desktop
+        interactionHandlers.handleDoubleClick(e, onOpen);
       }
     },
-    [isMobile, clickable, onOpen],
+    [isMobile, clickable, onOpen, interactionHandlers, onSelect, itemId],
   );
 
   const handleTouchStart = useCallback(
@@ -103,13 +77,20 @@ export function useItemInteraction({
 
       longPressRef.current = setTimeout(() => {
         setIsLongPressed(true);
-        selectItem(false);
+        // Long press: select item and add to existing selection for multi-select
+        if (isSelected) {
+          // Deselect if already selected - keep other selections
+          onSelect(itemId, false, true);
+        } else {
+          // Select the item and add to existing selection
+          onSelect(itemId, true, true);
+        }
         if ('vibrate' in navigator) {
           navigator.vibrate(50);
         }
       }, 500);
     },
-    [isMobile, onSelect, selectItem],
+    [isMobile, onSelect, isSelected, itemId],
   );
 
   const handleTouchEnd = useCallback(
@@ -150,9 +131,6 @@ export function useItemInteraction({
     return () => {
       if (longPressRef.current) {
         clearTimeout(longPressRef.current);
-      }
-      if (clickTimeoutRef.current) {
-        clearTimeout(clickTimeoutRef.current);
       }
     };
   }, []);

@@ -14,6 +14,7 @@ export interface BulkSelectionActions {
   clearSelection: () => void;
   isItemSelected: (id: string) => boolean;
   getSelectedItems: (items: FileMinViewDto[]) => FileMinViewDto[];
+  getState: (items?: FileMinViewDto[]) => BulkSelectionState;
 }
 
 export interface UseBulkSelectionReturn
@@ -77,23 +78,40 @@ export function useBulkSelection(): UseBulkSelectionReturn {
     [selectedItems],
   );
 
-  const state = useMemo(() => {
+  const getState = useCallback(
+    (items?: FileMinViewDto[]) => {
+      const selectedCount = selectedItems.size;
+      const totalItems = items?.length || 0;
+
+      return {
+        selectedItems,
+        selectedCount,
+        isAllSelected: selectedCount > 0 && selectedCount === totalItems,
+        isIndeterminate: selectedCount > 0 && selectedCount < totalItems,
+      };
+    },
+    [selectedItems],
+  );
+
+  // Default state (without items context)
+  const defaultState = useMemo(() => {
     const selectedCount = selectedItems.size;
 
     return {
       selectedItems,
       selectedCount,
-      isAllSelected: selectedCount > 0,
-      isIndeterminate: selectedCount > 0,
+      isAllSelected: selectedCount > 0, // Default to true if any selected
+      isIndeterminate: false, // Can't determine without items
     };
   }, [selectedItems]);
 
   return {
-    ...state,
+    ...defaultState,
     toggleItem,
     toggleAll,
     clearSelection,
     isItemSelected,
     getSelectedItems,
+    getState, // New method to get state with items context
   };
 }

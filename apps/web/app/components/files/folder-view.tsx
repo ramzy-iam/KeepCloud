@@ -49,6 +49,18 @@ interface FolderViewProps {
   enableSelection?: boolean;
   onBulkAction?: (action: BulkAction, items: FileMinViewDto[]) => void;
   availableBulkActions?: BulkAction[];
+
+  // External selection state props
+  externalSelection?: {
+    selectedItems: Set<string>;
+    selectedCount: number;
+    isAllSelected: boolean;
+    isIndeterminate: boolean;
+    toggleItem: (id: string) => void;
+    toggleAll: (items: FileMinViewDto[]) => void;
+    clearSelection: () => void;
+    getSelectedItems: (items: FileMinViewDto[]) => FileMinViewDto[];
+  };
 }
 
 export const FolderView = ({
@@ -71,6 +83,7 @@ export const FolderView = ({
   enableSelection = true,
   onBulkAction,
   availableBulkActions,
+  externalSelection,
 }: FolderViewProps) => {
   const { view: preferredViewMode, setFolderViewMode } = useFolderViewMode();
   const [viewMode, setViewMode] = useState<FolderViewMode>(
@@ -79,6 +92,8 @@ export const FolderView = ({
   const [internalLoading, setInternalLoading] = useState(isLoading);
   const [selectionMode, setSelectionMode] = useState(false);
 
+  // Use external selection if provided, otherwise use internal selection
+  const internalBulkSelection = useBulkSelection();
   const {
     selectedItems,
     selectedCount,
@@ -88,7 +103,7 @@ export const FolderView = ({
     toggleAll,
     clearSelection,
     getSelectedItems,
-  } = useBulkSelection();
+  } = externalSelection || internalBulkSelection;
 
   const paginationOptions = {
     fetchNextPage,
@@ -244,6 +259,10 @@ export const FolderView = ({
           onlyFolders={displayOnlyFolders}
           columns={columns}
           isLoading={internalLoading}
+          selectedItems={selectedItems}
+          onSelectionChange={
+            enableSelection ? handleSelectionChange : undefined
+          }
           {...paginationOptions}
         />
       )}
