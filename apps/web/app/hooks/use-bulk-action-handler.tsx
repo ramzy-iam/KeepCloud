@@ -80,7 +80,6 @@ export function useBulkActionHandler({
 }
 
 export const BULK_ACTION_CONFIGS = {
-  FILES: ['download', 'trash'] as BulkAction[],
-
+  FILES: ['trash'] as BulkAction[],
   TRASH: ['restore', 'delete'] as BulkAction[],
 };

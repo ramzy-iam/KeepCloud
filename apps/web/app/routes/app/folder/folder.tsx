@@ -8,7 +8,11 @@ import { SYSTEM_FILE } from '@keepcloud/commons/constants';
 import { columns } from './columns';
 import { useEffect } from 'react';
 import { useAtomValue } from 'jotai';
-import { useBulkSelectionProvider, useBulkActionHandler } from '../../../hooks';
+import {
+  useBulkSelectionProvider,
+  useBulkActionHandler,
+  BULK_ACTION_CONFIGS,
+} from '../../../hooks';
 
 export default function FolderRootComponent() {
   const {
@@ -35,7 +39,7 @@ export default function FolderRootComponent() {
     baseColumns: columns,
     config: {
       enableSelection: true,
-      availableBulkActions: ['download', 'trash'],
+      availableBulkActions: BULK_ACTION_CONFIGS.FILES,
       onBulkAction: handleBulkAction,
     },
   });
