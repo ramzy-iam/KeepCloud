@@ -1,10 +1,10 @@
 import { useCallback } from 'react';
 import { FileMinViewDto } from '@keepcloud/commons/dtos';
-import { BulkAction } from '../components';
+import { BulkAction } from '@keepcloud/commons/types';
 import {
   useBulkMoveToTrash,
-  useBulkDelete,
   useBulkRestore,
+  useDialog,
 } from '@keepcloud/web-core/react';
 
 export interface BulkActionHandlers {
@@ -24,8 +24,8 @@ export function useBulkActionHandler({
   onActionComplete,
 }: UseBulkActionHandlerOptions = {}) {
   const bulkMoveToTrash = useBulkMoveToTrash();
-  const bulkDelete = useBulkDelete();
   const bulkRestore = useBulkRestore();
+  const { openDialog } = useDialog();
 
   const handleBulkAction = useCallback(
     async (action: BulkAction, items: FileMinViewDto[]) => {
@@ -52,7 +52,12 @@ export function useBulkActionHandler({
             if (handlers.onDelete) {
               await handlers.onDelete(items);
             } else {
-              await bulkDelete.mutateAsync(fileIds);
+              // Show confirmation dialog for bulk delete
+              openDialog({
+                type: 'bulkDeleteConfirmation',
+                context: { items, onActionComplete },
+              });
+              return; // Don't call onActionComplete here, it will be called after confirmation
             }
             break;
           case 'restore':
@@ -73,7 +78,7 @@ export function useBulkActionHandler({
         // You could add toast notifications here
       }
     },
-    [handlers, onActionComplete, bulkMoveToTrash, bulkDelete, bulkRestore],
+    [handlers, onActionComplete, bulkMoveToTrash, bulkRestore, openDialog],
   );
 
   return { handleBulkAction };

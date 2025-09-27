@@ -8,10 +8,9 @@ import {
   DropdownMenuTrigger,
   TooltipProviderWrapper,
 } from '@keepcloud/web-core/react';
-import { Download, Trash2, Share2, MoreVertical, X, Undo2 } from 'lucide-react';
+import { Download, Trash2, MoreVertical, X, Undo2 } from 'lucide-react';
 import { FileMinViewDto } from '@keepcloud/commons/dtos';
-
-export type BulkAction = 'download' | 'share' | 'trash' | 'delete' | 'restore';
+import { BulkAction } from '@keepcloud/commons/types';
 
 export interface BulkOperationMenuProps {
   selectedItems: FileMinViewDto[];
@@ -25,11 +24,10 @@ export interface BulkOperationMenuProps {
   className?: string;
 }
 
-const DEFAULT_ACTIONS: BulkAction[] = ['download', 'share', 'trash'];
+const DEFAULT_ACTIONS: BulkAction[] = ['download', 'trash'];
 
 const ACTION_ICONS: Record<BulkAction, React.ReactNode> = {
   download: <Download className="h-4 w-4" />,
-  share: <Share2 className="h-4 w-4" />,
   trash: <Trash2 className="h-4 w-4" />,
   delete: <Trash2 className="h-4 w-4" />,
   restore: <Undo2 className="h-4 w-4" />,
@@ -37,7 +35,6 @@ const ACTION_ICONS: Record<BulkAction, React.ReactNode> = {
 
 const ACTION_LABELS: Record<BulkAction, string> = {
   download: 'Download',
-  share: 'Share',
   trash: 'Move to trash',
   delete: 'Delete forever',
   restore: 'Restore',
@@ -45,7 +42,6 @@ const ACTION_LABELS: Record<BulkAction, string> = {
 
 const ACTION_TOOLTIPS: Record<BulkAction, string> = {
   download: 'Download selected items',
-  share: 'Share selected items',
   trash: 'Move to trash',
   delete: 'Delete permanently',
   restore: 'Restore from trash',

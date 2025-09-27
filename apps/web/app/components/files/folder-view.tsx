@@ -15,7 +15,8 @@ import { GridView } from './grid-view';
 import { TableView } from './table-view';
 import { FolderBreadcrumb } from './folder-breadcrumb';
 import { FolderEmpty } from '../ui';
-import { BulkOperationMenu, BulkAction } from './bulk-operation-menu';
+import { BulkAction } from '@keepcloud/commons/types';
+import { BulkOperationMenu } from './bulk-operation-menu';
 import { useBulkSelection } from '../../hooks/use-bulk-selection';
 interface FolderViewProps {
   folder?: FileMinViewDto;

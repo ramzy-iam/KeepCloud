@@ -1,15 +1,16 @@
 import { useMemo } from 'react';
 import { FileMinViewDto } from '@keepcloud/commons/dtos';
+import { BulkAction } from '@keepcloud/commons/types';
 import { ColumnDef } from '@tanstack/react-table';
 import { useBulkSelection } from './use-bulk-selection';
 import { createMobileSelectColumn } from '../routes/app/home/columns';
 import { useDeviceDetection } from '../utils/interaction-utils';
-import { BulkAction } from '../components';
+import { P } from 'node_modules/react-router/dist/development/route-data-H2S3hwhf.mjs';
 
 export interface BulkSelectionConfig {
   enableSelection?: boolean;
   availableBulkActions?: BulkAction[];
-  onBulkAction?: (action: BulkAction, items: FileMinViewDto[]) => void;
+  onBulkAction?: (action: BulkAction, items: FileMinViewDto[]) => Promise<void>;
 }
 
 export interface UseBulkSelectionProviderOptions {
@@ -28,7 +29,10 @@ export interface BulkSelectionProviderReturn {
   folderViewProps: {
     enableSelection: boolean;
     externalSelection?: ReturnType<typeof useBulkSelection>;
-    onBulkAction?: (action: BulkAction, items: FileMinViewDto[]) => void;
+    onBulkAction?: (
+      action: BulkAction,
+      items: FileMinViewDto[],
+    ) => Promise<void>;
     availableBulkActions?: BulkAction[];
   };
 
