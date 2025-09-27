@@ -6,15 +6,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  TooltipProviderWrapper,
 } from '@keepcloud/web-core/react';
-import {
-  Download,
-  Trash2,
-  Share2,
-  MoreVertical,
-  X,
-  FolderOpen,
-} from 'lucide-react';
+import { Download, Trash2, Share2, MoreVertical, X, Undo2 } from 'lucide-react';
 import { FileMinViewDto } from '@keepcloud/commons/dtos';
 
 export type BulkAction = 'download' | 'share' | 'trash' | 'delete' | 'restore';
@@ -38,7 +32,7 @@ const ACTION_ICONS: Record<BulkAction, React.ReactNode> = {
   share: <Share2 className="h-4 w-4" />,
   trash: <Trash2 className="h-4 w-4" />,
   delete: <Trash2 className="h-4 w-4" />,
-  restore: <FolderOpen className="h-4 w-4" />,
+  restore: <Undo2 className="h-4 w-4" />,
 };
 
 const ACTION_LABELS: Record<BulkAction, string> = {
@@ -47,6 +41,14 @@ const ACTION_LABELS: Record<BulkAction, string> = {
   trash: 'Move to trash',
   delete: 'Delete forever',
   restore: 'Restore',
+};
+
+const ACTION_TOOLTIPS: Record<BulkAction, string> = {
+  download: 'Download selected items',
+  share: 'Share selected items',
+  trash: 'Move to trash',
+  delete: 'Delete permanently',
+  restore: 'Restore from trash',
 };
 
 export const BulkOperationMenu: React.FC<BulkOperationMenuProps> = ({
@@ -67,18 +69,20 @@ export const BulkOperationMenu: React.FC<BulkOperationMenuProps> = ({
   };
 
   const renderActionButton = (action: BulkAction, showLabel = true) => (
-    <Button
-      key={action}
-      variant="ghost"
-      size="sm"
-      onClick={() => handleAction(action)}
-      className="flex items-center gap-2 dark:hover:bg-background"
-    >
-      {ACTION_ICONS[action]}
-      {showLabel && (
-        <span className="hidden sm:inline">{ACTION_LABELS[action]}</span>
-      )}
-    </Button>
+    <TooltipProviderWrapper content={ACTION_TOOLTIPS[action]}>
+      <Button
+        key={action}
+        variant="ghost"
+        size="sm"
+        onClick={() => handleAction(action)}
+        className="flex items-center gap-2 dark:hover:bg-background"
+      >
+        {ACTION_ICONS[action]}
+        {showLabel && (
+          <span className="hidden sm:inline">{ACTION_LABELS[action]}</span>
+        )}
+      </Button>
+    </TooltipProviderWrapper>
   );
 
   // Primary actions (always visible)

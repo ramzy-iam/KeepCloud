@@ -100,8 +100,8 @@ export function useBulkSelection(): UseBulkSelectionReturn {
     return {
       selectedItems,
       selectedCount,
-      isAllSelected: selectedCount > 0, // Default to true if any selected
-      isIndeterminate: false, // Can't determine without items
+      isAllSelected: selectedCount > 0,
+      isIndeterminate: false,
     };
   }, [selectedItems]);
 
@@ -112,6 +112,6 @@ export function useBulkSelection(): UseBulkSelectionReturn {
     clearSelection,
     isItemSelected,
     getSelectedItems,
-    getState, // New method to get state with items context
+    getState,
   };
 }

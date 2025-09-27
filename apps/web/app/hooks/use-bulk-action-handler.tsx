@@ -1,6 +1,11 @@
 import { useCallback } from 'react';
 import { FileMinViewDto } from '@keepcloud/commons/dtos';
 import { BulkAction } from '../components';
+import {
+  useBulkMoveToTrash,
+  useBulkDelete,
+  useBulkRestore,
+} from '@keepcloud/web-core/react';
 
 export interface BulkActionHandlers {
   onDownload?: (items: FileMinViewDto[]) => void | Promise<void>;
@@ -18,23 +23,44 @@ export function useBulkActionHandler({
   handlers = {},
   onActionComplete,
 }: UseBulkActionHandlerOptions = {}) {
+  const bulkMoveToTrash = useBulkMoveToTrash();
+  const bulkDelete = useBulkDelete();
+  const bulkRestore = useBulkRestore();
+
   const handleBulkAction = useCallback(
     async (action: BulkAction, items: FileMinViewDto[]) => {
-      console.log(`Executing bulk action: ${action} on ${items.length} items`);
+      const fileIds = items.map((item) => item.id);
 
       try {
         switch (action) {
           case 'download':
-            await handlers.onDownload?.(items);
+            if (handlers.onDownload) {
+              await handlers.onDownload(items);
+              return;
+            } else {
+              console.log('Downloading folder items:', items);
+            }
             break;
           case 'trash':
-            await handlers.onTrash?.(items);
+            if (handlers.onTrash) {
+              await handlers.onTrash(items);
+            } else {
+              await bulkMoveToTrash.mutateAsync(fileIds);
+            }
             break;
           case 'delete':
-            await handlers.onDelete?.(items);
+            if (handlers.onDelete) {
+              await handlers.onDelete(items);
+            } else {
+              await bulkDelete.mutateAsync(fileIds);
+            }
             break;
           case 'restore':
-            await handlers.onRestore?.(items);
+            if (handlers.onRestore) {
+              await handlers.onRestore(items);
+            } else {
+              await bulkRestore.mutateAsync(fileIds);
+            }
             break;
           default:
             console.warn(`Unhandled bulk action: ${action}`);
@@ -47,7 +73,7 @@ export function useBulkActionHandler({
         // You could add toast notifications here
       }
     },
-    [handlers, onActionComplete],
+    [handlers, onActionComplete, bulkMoveToTrash, bulkDelete, bulkRestore],
   );
 
   return { handleBulkAction };

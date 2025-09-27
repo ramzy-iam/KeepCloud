@@ -21,16 +21,7 @@ export default function TrashComponent() {
     paginationProps,
   } = useGetTrashedItems();
 
-  const { handleBulkAction } = useBulkActionHandler({
-    handlers: {
-      onRestore: async (items) => {
-        console.log('Restoring trash items:', items);
-      },
-      onDelete: async (items) => {
-        console.log('Permanently deleting trash items:', items);
-      },
-    },
-  });
+  const { handleBulkAction } = useBulkActionHandler();
 
   const trashSelection = useBulkSelectionProvider({
     items: items || [],

@@ -28,20 +28,8 @@ export default function FolderRootComponent() {
     }
   }, [authState?.user.root, activeFolder, setActiveFolder]);
 
-  // Bulk action handlers for root folder items
-  const { handleBulkAction } = useBulkActionHandler({
-    handlers: {
-      onDownload: async (items) => {
-        console.log('Downloading root folder items:', items);
-      },
+  const { handleBulkAction } = useBulkActionHandler();
 
-      onTrash: async (items) => {
-        console.log('Moving root folder items to trash:', items);
-      },
-    },
-  });
-
-  // Bulk selection for root folder items
   const rootSelection = useBulkSelectionProvider({
     items: items || [],
     baseColumns: columns,

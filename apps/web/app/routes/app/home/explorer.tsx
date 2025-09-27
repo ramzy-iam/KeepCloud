@@ -26,28 +26,9 @@ export default function ExplorerComponent() {
     paginationProps,
   } = useGetSuggestedFiles();
 
-  const { handleBulkAction: handleFilesBulkAction } = useBulkActionHandler({
-    handlers: {
-      onDownload: async (items) => {
-        console.log('Downloading suggested files:', items);
-      },
+  const { handleBulkAction: handleFilesBulkAction } = useBulkActionHandler();
 
-      onTrash: async (items) => {
-        console.log('Moving suggested files to trash:', items);
-      },
-    },
-  });
-
-  const { handleBulkAction: handleFoldersBulkAction } = useBulkActionHandler({
-    handlers: {
-      onDownload: async (items) => {
-        console.log('Downloading suggested folders:', items);
-      },
-      onTrash: async (items) => {
-        console.log('Moving suggested folders to trash:', items);
-      },
-    },
-  });
+  const { handleBulkAction: handleFoldersBulkAction } = useBulkActionHandler();
 
   // Bulk selection for suggested files
   const filesSelection = useBulkSelectionProvider({
@@ -60,7 +41,6 @@ export default function ExplorerComponent() {
     },
   });
 
-  // Bulk selection for suggested folders (simpler config)
   const foldersSelection = useBulkSelectionProvider({
     items: suggestedFolders || [],
     baseColumns: columns,

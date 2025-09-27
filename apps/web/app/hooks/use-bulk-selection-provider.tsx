@@ -25,7 +25,6 @@ export interface BulkSelectionProviderReturn {
   // Computed columns (with mobile checkboxes if needed)
   columns: ColumnDef<FileMinViewDto>[];
 
-  // Props to pass to FolderView
   folderViewProps: {
     enableSelection: boolean;
     externalSelection?: ReturnType<typeof useBulkSelection>;
@@ -33,7 +32,6 @@ export interface BulkSelectionProviderReturn {
     availableBulkActions?: BulkAction[];
   };
 
-  // Handlers
   handleBulkAction: (action: BulkAction, items: FileMinViewDto[]) => void;
 }
 
@@ -51,7 +49,6 @@ export function useBulkSelectionProvider({
     onBulkAction,
   } = config;
 
-  // Create mobile columns with selection support
   const columns = useMemo(() => {
     if (!isMobile || !enableSelection) {
       return baseColumns;
@@ -83,16 +80,20 @@ export function useBulkSelectionProvider({
     ];
   }, [isMobile, enableSelection, baseColumns, selection, items]);
 
-  const handleBulkAction = (action: BulkAction, items: FileMinViewDto[]) => {
+  const handleBulkAction = async (
+    action: BulkAction,
+    items: FileMinViewDto[],
+  ) => {
     if (onBulkAction) {
-      onBulkAction(action, items);
+      try {
+        await onBulkAction(action, items);
+
+        selection.clearSelection();
+      } catch (error) {
+        console.error(`Bulk action ${action} failed:`, error);
+      }
     } else {
       console.log(`Bulk action: ${action} on ${items.length} items:`, items);
-    }
-
-    // Clear selection after destructive actions
-    if (action === 'trash' || action === 'delete') {
-      selection.clearSelection();
     }
   };
 

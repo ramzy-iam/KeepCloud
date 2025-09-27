@@ -46,16 +46,7 @@ export default function FolderDetailsComponent({
   });
 
   // Bulk action handlers for folder items
-  const { handleBulkAction } = useBulkActionHandler({
-    handlers: {
-      onDownload: async (items) => {
-        console.log('Downloading folder items:', items);
-      },
-      onTrash: async (items) => {
-        console.log('Moving folder items to trash:', items);
-      },
-    },
-  });
+  const { handleBulkAction } = useBulkActionHandler();
 
   // Bulk selection for folder items
   const folderSelection = useBulkSelectionProvider({
