@@ -8,6 +8,11 @@ import { SYSTEM_FILE } from '@keepcloud/commons/constants';
 import { columns } from './columns';
 import { useEffect } from 'react';
 import { useAtomValue } from 'jotai';
+import {
+  useBulkSelectionProvider,
+  useBulkActionHandler,
+  BULK_ACTION_CONFIGS,
+} from '../../../hooks';
 
 export default function FolderRootComponent() {
   const {
@@ -27,14 +32,27 @@ export default function FolderRootComponent() {
     }
   }, [authState?.user.root, activeFolder, setActiveFolder]);
 
+  const { handleBulkAction } = useBulkActionHandler();
+
+  const rootSelection = useBulkSelectionProvider({
+    items: items || [],
+    baseColumns: columns,
+    config: {
+      enableSelection: true,
+      availableBulkActions: BULK_ACTION_CONFIGS.FILES,
+      onBulkAction: handleBulkAction,
+    },
+  });
+
   return (
     <div className="flex flex-col gap-6">
       <FolderView
+        columns={rootSelection.columns}
         items={items}
         title={SYSTEM_FILE.MY_STORAGE.name}
-        columns={columns}
         isLoading={isLoadingRootItems}
         currentId={SYSTEM_FILE.MY_STORAGE.id}
+        {...rootSelection.folderViewProps}
         {...paginationProps}
       />
     </div>

@@ -7,7 +7,7 @@ import {
   cn,
   useFolderViewMode,
 } from '@keepcloud/web-core/react';
-import { LayoutGrid, StretchHorizontal, CheckSquare } from 'lucide-react';
+import { LayoutGrid, StretchHorizontal } from 'lucide-react';
 import { FileMainCategory, FolderViewMode } from '@keepcloud/commons/types';
 import { FileAncestorDto, FileMinViewDto } from '@keepcloud/commons/dtos';
 import { ColumnDef } from '@tanstack/react-table';
@@ -15,7 +15,8 @@ import { GridView } from './grid-view';
 import { TableView } from './table-view';
 import { FolderBreadcrumb } from './folder-breadcrumb';
 import { FolderEmpty } from '../ui';
-import { BulkOperationMenu, BulkAction } from './bulk-operation-menu';
+import { BulkAction } from '@keepcloud/commons/types';
+import { BulkOperationMenu } from './bulk-operation-menu';
 import { useBulkSelection } from '../../hooks/use-bulk-selection';
 interface FolderViewProps {
   folder?: FileMinViewDto;
@@ -34,21 +35,33 @@ interface FolderViewProps {
     file: FileMinViewDto;
     selectionMode?: boolean;
     isSelected?: boolean;
-    onSelectionChange?: (id: string, selected: boolean) => void;
+    onSelectionChange?: (
+      id: string,
+      selected: boolean,
+      addToSelection?: boolean,
+    ) => void;
   }>;
-  /**
-   * Current folder id to subscribe to atom.
-   */
   currentId: string;
 
   hasNextPage?: boolean;
   fetchNextPage?: () => void;
   isFetchingNextPage?: boolean;
 
-  // Selection props
   enableSelection?: boolean;
   onBulkAction?: (action: BulkAction, items: FileMinViewDto[]) => void;
   availableBulkActions?: BulkAction[];
+
+  // External selection state props
+  externalSelection?: {
+    selectedItems: Set<string>;
+    selectedCount: number;
+    isAllSelected: boolean;
+    isIndeterminate: boolean;
+    toggleItem: (id: string) => void;
+    toggleAll: (items: FileMinViewDto[]) => void;
+    clearSelection: () => void;
+    getSelectedItems: (items: FileMinViewDto[]) => FileMinViewDto[];
+  };
 }
 
 export const FolderView = ({
@@ -71,6 +84,7 @@ export const FolderView = ({
   enableSelection = true,
   onBulkAction,
   availableBulkActions,
+  externalSelection,
 }: FolderViewProps) => {
   const { view: preferredViewMode, setFolderViewMode } = useFolderViewMode();
   const [viewMode, setViewMode] = useState<FolderViewMode>(
@@ -79,6 +93,8 @@ export const FolderView = ({
   const [internalLoading, setInternalLoading] = useState(isLoading);
   const [selectionMode, setSelectionMode] = useState(false);
 
+  // Use external selection if provided, otherwise use internal selection
+  const internalBulkSelection = useBulkSelection();
   const {
     selectedItems,
     selectedCount,
@@ -88,7 +104,7 @@ export const FolderView = ({
     toggleAll,
     clearSelection,
     getSelectedItems,
-  } = useBulkSelection();
+  } = externalSelection || internalBulkSelection;
 
   const paginationOptions = {
     fetchNextPage,
@@ -127,9 +143,22 @@ export const FolderView = ({
     }
   }, [selectedCount, selectionMode]);
 
-  const handleSelectionChange = (id: string, selected: boolean) => {
+  const handleSelectionChange = (
+    id: string,
+    selected: boolean,
+    addToSelection = false,
+  ) => {
     if (!enableSelection) return;
-    toggleItem(id);
+
+    if (addToSelection) {
+      toggleItem(id);
+    } else {
+      clearSelection();
+      if (selected) {
+        toggleItem(id);
+      }
+    }
+
     if (!selectionMode && selected) {
       setSelectionMode(true);
     }
@@ -150,75 +179,65 @@ export const FolderView = ({
     selectedItems: FileMinViewDto[],
   ) => {
     onBulkAction?.(action, selectedItems);
-    // Optionally clear selection after action
     if (action === 'trash' || action === 'delete') {
       clearSelection();
       setSelectionMode(false);
     }
   };
 
-  const toggleSelectionMode = () => {
-    if (!enableSelection) return;
-    if (selectionMode) {
-      clearSelection();
-      setSelectionMode(false);
-    } else {
-      setSelectionMode(true);
-    }
-  };
-
   return (
     <div className={cn('mb-8 flex h-full flex-col gap-3', className)}>
-      {/* Bulk Operation Menu */}
-      {enableSelection && (
-        <BulkOperationMenu
-          selectedItems={getSelectedItems(filteredItems)}
-          selectedCount={selectedCount}
-          onSelectAll={handleSelectAll}
-          onClearSelection={handleClearSelection}
-          isAllSelected={isAllSelected}
-          isIndeterminate={isIndeterminate}
-          onBulkAction={handleBulkAction}
-          availableActions={availableBulkActions}
-        />
-      )}
-
-      <div className="sticky -top-[1px] z-[1] flex h-12 items-center justify-between bg-background p-1.5 pl-0">
-        {internalLoading && (
-          <div className="flex items-center gap-2 py-4">
-            <Skeleton className="h-[30px] w-[200px]" />
-          </div>
-        )}
-        {!internalLoading && title && !folder && (
-          <h3 className="text-20-medium text-heading">{title}</h3>
-        )}
-
-        {folder && !internalLoading && (
-          <FolderBreadcrumb
-            folder={folder}
-            onBreadcrumbClick={onBreadcrumbClick}
+      <div className="sticky top-0 z-[3] bg-background">
+        {enableSelection && (
+          <BulkOperationMenu
+            selectedItems={getSelectedItems(filteredItems)}
+            selectedCount={selectedCount}
+            onSelectAll={handleSelectAll}
+            onClearSelection={handleClearSelection}
+            isAllSelected={isAllSelected}
+            isIndeterminate={isIndeterminate}
+            onBulkAction={handleBulkAction}
+            availableActions={availableBulkActions}
           />
         )}
 
-        <div className="flex items-center gap-2">
-          {!fixedView && !internalLoading && (
-            <Tabs
-              defaultValue={viewMode}
-              onValueChange={(value) => {
-                setFolderViewMode(value as FolderViewMode);
-                setViewMode(value as FolderViewMode);
-              }}
-            >
-              <TabsList>
-                <TabsTrigger value="table" className={tabClassName}>
-                  <StretchHorizontal className="h-4 w-4" />
-                </TabsTrigger>
-                <TabsTrigger value="grid" className={tabClassName}>
-                  <LayoutGrid className="h-4 w-4" />
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
+        <div className="flex h-12 items-center justify-between p-1.5 pl-0">
+          {internalLoading && (
+            <div className="flex items-center gap-2 py-4">
+              <Skeleton className="h-[30px] w-[200px]" />
+            </div>
           )}
+          {!internalLoading && title && !folder && (
+            <h3 className="text-20-medium text-heading">{title}</h3>
+          )}
+
+          {folder && !internalLoading && (
+            <FolderBreadcrumb
+              folder={folder}
+              onBreadcrumbClick={onBreadcrumbClick}
+            />
+          )}
+
+          <div className="flex items-center gap-2">
+            {!fixedView && !internalLoading && (
+              <Tabs
+                defaultValue={viewMode}
+                onValueChange={(value) => {
+                  setFolderViewMode(value as FolderViewMode);
+                  setViewMode(value as FolderViewMode);
+                }}
+              >
+                <TabsList>
+                  <TabsTrigger value="table" className={tabClassName}>
+                    <StretchHorizontal className="h-4 w-4" />
+                  </TabsTrigger>
+                  <TabsTrigger value="grid" className={tabClassName}>
+                    <LayoutGrid className="h-4 w-4" />
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+            )}
+          </div>
         </div>
       </div>
 
@@ -243,6 +262,10 @@ export const FolderView = ({
           onlyFolders={displayOnlyFolders}
           columns={columns}
           isLoading={internalLoading}
+          selectedItems={selectedItems}
+          onSelectionChange={
+            enableSelection ? handleSelectionChange : undefined
+          }
           {...paginationOptions}
         />
       )}

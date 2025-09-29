@@ -2,6 +2,7 @@ export * from './create-folder';
 export * from './rename-resource';
 export * from './trashed-resource';
 export * from './delete-permanently-resource';
+export * from './bulk-delete-confirmation';
 export * from './file-preview';
 export * from './folder-not-found';
 export * from './file-info';

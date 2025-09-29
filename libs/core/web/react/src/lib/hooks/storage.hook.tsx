@@ -4,6 +4,9 @@ import {
   FileMinViewDto,
   UserStorageDto,
   StorageBreakdownDto,
+  BulkDeleteResultDto,
+  BulkTrashResultDto,
+  BulkRestoreResultDto,
 } from '@keepcloud/commons/dtos';
 import { StorageService, ApiError } from '../services';
 import { SYSTEM_FILE } from '@keepcloud/commons/constants';
@@ -199,4 +202,52 @@ export const useRefreshSuggestions = () => {
       queryKey: queryKeys.storage.suggestedFolders,
     });
   };
+};
+
+export const useBulkMoveToTrash = () => {
+  const refreshStorageData = useRefreshStorageData();
+
+  return useMutation<BulkTrashResultDto[], ApiError, string[]>({
+    mutationFn: (fileIds) => StorageService.bulkMoveToTrash(fileIds),
+    onSuccess: (results) => {
+      results.forEach((result) => {
+        if (result.success) {
+          removeFileEverywhere(result.id);
+        }
+      });
+      refreshStorageData();
+    },
+  });
+};
+
+export const useBulkRestore = () => {
+  const refreshStorageData = useRefreshStorageData();
+
+  return useMutation<BulkRestoreResultDto[], ApiError, string[]>({
+    mutationFn: (fileIds) => StorageService.bulkRestore(fileIds),
+    onSuccess: (results) => {
+      results.forEach((result) => {
+        if (result.success) {
+          removeFileEverywhere(result.id);
+        }
+      });
+      refreshStorageData();
+    },
+  });
+};
+
+export const useBulkDelete = () => {
+  const refreshStorageData = useRefreshStorageData();
+
+  return useMutation<BulkDeleteResultDto[], ApiError, string[]>({
+    mutationFn: (fileIds) => StorageService.bulkDelete(fileIds),
+    onSuccess: (results) => {
+      results.forEach((result) => {
+        if (result.success) {
+          removeFileEverywhere(result.id);
+        }
+      });
+      refreshStorageData();
+    },
+  });
 };
