@@ -22,6 +22,12 @@ import {
   TrashedFileDto,
   UserStorageDto,
   StorageBreakdownDto,
+  BulkDeleteDto,
+  BulkDeleteResultDto,
+  BulkTrashDto,
+  BulkTrashResultDto,
+  BulkRestoreDto,
+  BulkRestoreResultDto,
 } from '@keepcloud/commons/dtos';
 import { UserProfileDto } from '@keepcloud/commons/dtos';
 
@@ -118,5 +124,32 @@ export class StorageController {
   @Serialize(StorageBreakdownDto)
   getStorageBreakdown(@CurrentUser() user: UserProfileDto) {
     return this.storageService.getStorageBreakdown(user.id);
+  }
+
+  @Post('bulk/delete')
+  @Serialize(BulkDeleteResultDto)
+  async bulkDelete(
+    @Body() dto: BulkDeleteDto,
+    @CurrentUser() user: UserProfileDto,
+  ) {
+    return this.storageService.bulkDelete(user.id, dto.fileIds);
+  }
+
+  @Post('bulk/trash')
+  @Serialize(BulkTrashResultDto)
+  async bulkMoveToTrash(
+    @Body() dto: BulkTrashDto,
+    @CurrentUser() user: UserProfileDto,
+  ) {
+    return this.storageService.bulkMoveToTrash(user.id, dto.fileIds);
+  }
+
+  @Post('bulk/restore')
+  @Serialize(BulkRestoreResultDto)
+  async bulkRestore(
+    @Body() dto: BulkRestoreDto,
+    @CurrentUser() user: UserProfileDto,
+  ) {
+    return this.storageService.bulkRestore(user.id, dto.fileIds);
   }
 }

@@ -2,59 +2,38 @@ import { Minus, MoreVertical } from 'lucide-react';
 
 import {
   Button,
-  Checkbox,
   useFileIcon,
   useTrashedFileMenu,
 } from '@keepcloud/web-core/react';
 import { DayjsHelper, FileHelper } from '@keepcloud/commons/helpers';
 import { OwnerIcon, FileLocationBreadcrumb } from '../../../../components';
-import { ColumnDef } from '@tanstack/react-table';
+import { ColumnDef, Row } from '@tanstack/react-table';
 import { TrashedFileDto, UserProfileDto } from '@keepcloud/commons/dtos';
 
 interface RenderActionMenuProps {
   file: TrashedFileDto;
 }
 
-export const columns: ColumnDef<TrashedFileDto>[] = [
-  {
-    id: 'select',
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && 'indeterminate')
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
+const NameColumn = ({ row }: { row: Row<TrashedFileDto> }) => {
+  const file = row.original;
+  const Icon = useFileIcon(row.original);
 
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
+  return (
+    <div className="flex max-w-[200px] items-center gap-2 overflow-hidden text-14-medium text-secondary-foreground sm:max-w-[400px] lg:max-w-[600px]">
+      <span className="flex-shrink-0">{Icon && <Icon />}</span>
+      <span className="truncate">{file.name}</span>
+    </div>
+  );
+};
+
+export const columns: ColumnDef<TrashedFileDto>[] = [
   {
     accessorKey: 'name',
     header: 'Name',
     meta: {
       name: 'Name',
     },
-    cell: ({ row }) => {
-      const Icon = useFileIcon(row.original);
-
-      return (
-        <div className="flex cursor-pointer items-center gap-2 truncate text-14-medium text-secondary-foreground">
-          <Icon />
-          <div>{row.getValue('name')}</div>
-        </div>
-      );
-    },
+    cell: NameColumn,
     enableHiding: false,
   },
   {

@@ -4,6 +4,7 @@ import {
   IsEnum,
   IsOptional,
   IsBoolean,
+  IsArray,
 } from '../validators';
 import { ErrorCode, FileFormat } from '../constants';
 
@@ -13,42 +14,6 @@ import { BaseFilterDto } from './base.dto';
 import castHelper from '../helpers/shared/cast.helper';
 import { UserProfileDto } from './user.dto';
 import { FilePermissionDto } from './file-sharing.dto';
-
-export class CreateFileDto {
-  @IsNotEmpty(ErrorCode.FILE_KEY_REQUIRED)
-  @IsString()
-  storagePath: string;
-
-  @IsNotEmpty(ErrorCode.FILE_NAME_REQUIRED)
-  @IsString()
-  filename: string;
-
-  @IsNotEmpty(ErrorCode.PARENT_ID_REQUIRED)
-  @IsString(ErrorCode.PARENT_ID_REQUIRED)
-  parentId: string;
-}
-
-export class CreateFolderDto {
-  @IsNotEmpty(ErrorCode.FOLDER_NAME_REQUIRED)
-  @IsString(ErrorCode.FOLDER_NAME_REQUIRED)
-  name: string;
-
-  @IsNotEmpty(ErrorCode.PARENT_ID_REQUIRED)
-  @IsString(ErrorCode.PARENT_ID_REQUIRED)
-  @IsOptional()
-  parentId?: string;
-
-  @IsNotEmpty(ErrorCode.OWNER_ID_REQUIRED)
-  @IsString(ErrorCode.OWNER_ID_REQUIRED)
-  @IsOptional()
-  ownerId: string;
-}
-
-export class RenameFolderDto {
-  @IsNotEmpty(ErrorCode.FILE_NAME_REQUIRED)
-  @IsString(ErrorCode.FILE_NAME_REQUIRED)
-  name: string;
-}
 
 export class FileMinViewDto {
   @Expose()
@@ -92,7 +57,6 @@ export class FileMinViewDto {
   @Type(() => FilePermissionDto)
   permissions?: FilePermissionDto[];
 }
-
 export class FilePreviewDto extends FileMinViewDto {
   @Expose()
   updatedAt: Date;
@@ -119,6 +83,96 @@ export class FileAncestorDto {
 
   @Expose()
   isSystem?: boolean;
+}
+
+export class CreateFileDto {
+  @IsNotEmpty(ErrorCode.FILE_KEY_REQUIRED)
+  @IsString()
+  storagePath: string;
+
+  @IsNotEmpty(ErrorCode.FILE_NAME_REQUIRED)
+  @IsString()
+  filename: string;
+
+  @IsNotEmpty(ErrorCode.PARENT_ID_REQUIRED)
+  @IsString(ErrorCode.PARENT_ID_REQUIRED)
+  parentId: string;
+}
+
+export class CreateFolderDto {
+  @IsNotEmpty(ErrorCode.FOLDER_NAME_REQUIRED)
+  @IsString(ErrorCode.FOLDER_NAME_REQUIRED)
+  name: string;
+
+  @IsNotEmpty(ErrorCode.PARENT_ID_REQUIRED)
+  @IsString(ErrorCode.PARENT_ID_REQUIRED)
+  @IsOptional()
+  parentId?: string;
+
+  @IsNotEmpty(ErrorCode.OWNER_ID_REQUIRED)
+  @IsString(ErrorCode.OWNER_ID_REQUIRED)
+  @IsOptional()
+  ownerId: string;
+}
+
+export class RenameFolderDto {
+  @IsNotEmpty(ErrorCode.FILE_NAME_REQUIRED)
+  @IsString(ErrorCode.FILE_NAME_REQUIRED)
+  name: string;
+}
+
+export class BulkActionDto {
+  @IsString(undefined, { each: true })
+  @IsArray(undefined)
+  fileIds: string[];
+}
+
+export class BulkDeleteDto extends BulkActionDto {}
+
+export class BulkTrashDto extends BulkActionDto {}
+
+export class BulkRestoreDto extends BulkActionDto {}
+
+export class BulkDeleteResultDto {
+  @Expose()
+  id: string;
+
+  @Expose()
+  success: boolean;
+
+  @Expose()
+  file?: FileMinViewDto;
+
+  @Expose()
+  error?: string;
+}
+
+export class BulkTrashResultDto {
+  @Expose()
+  id: string;
+
+  @Expose()
+  success: boolean;
+
+  @Expose()
+  file?: FileMinViewDto;
+
+  @Expose()
+  error?: string;
+}
+
+export class BulkRestoreResultDto {
+  @Expose()
+  id: string;
+
+  @Expose()
+  success: boolean;
+
+  @Expose()
+  file?: FileMinViewDto;
+
+  @Expose()
+  error?: string;
 }
 
 export class GetOneFolderQueryDto {
