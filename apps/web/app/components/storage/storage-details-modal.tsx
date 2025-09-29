@@ -32,12 +32,14 @@ export function StorageDetailsModal({
     error,
     refetch,
   } = useGetStorageBreakdown();
-  const usagePercentage = Math.round((usedStorage / totalStorage) * 100);
-  const availableStorage = totalStorage - usedStorage;
-  const { used, total, unit } = FileHelper.formatStorageConsistent(
+  const usagePercentage = FileHelper.calculateUsagePercentage(
     usedStorage,
     totalStorage,
-    usedStorage >= FileHelper.convertToBytes(10, 'MB') ? 0 : 1,
+  );
+  const availableStorage = totalStorage - usedStorage;
+  const { used, total, unit } = FileHelper.formatStorageConsistentAuto(
+    usedStorage,
+    totalStorage,
   );
 
   const availableFormatted = FileHelper.formatBytes(availableStorage, 1, unit);
@@ -47,31 +49,31 @@ export function StorageDetailsModal({
     images: {
       type: 'images',
       size: Math.round(usedStorage * 0.4),
-      percentage: 40,
+      percentage: FileHelper.formatPercentage(40),
       count: 0,
     },
     videos: {
       type: 'videos',
       size: Math.round(usedStorage * 0.3),
-      percentage: 30,
+      percentage: FileHelper.formatPercentage(30),
       count: 0,
     },
     documents: {
       type: 'documents',
       size: Math.round(usedStorage * 0.2),
-      percentage: 20,
+      percentage: FileHelper.formatPercentage(20),
       count: 0,
     },
     audio: {
       type: 'audio',
       size: Math.round(usedStorage * 0.05),
-      percentage: 5,
+      percentage: FileHelper.formatPercentage(5),
       count: 0,
     },
     other: {
       type: 'other',
       size: Math.round(usedStorage * 0.05),
-      percentage: 5,
+      percentage: FileHelper.formatPercentage(5),
       count: 0,
     },
     totalFiles: 0,
@@ -187,9 +189,15 @@ export function StorageDetailsModal({
                       </div>
                       <div className="text-right text-heading">
                         <div className="text-sm font-medium">
-                          {FileHelper.formatBytes(item.value, 1, unit)}
+                          {FileHelper.formatBytes(
+                            item.value,
+                            FileHelper.getStorageDecimalPlaces(item.value),
+                            unit,
+                          )}
                         </div>
-                        <div className="text-xs">{item.percentage}%</div>
+                        <div className="text-xs">
+                          {FileHelper.formatPercentage(item.percentage)}%
+                        </div>
                       </div>
                     </div>
                   );
