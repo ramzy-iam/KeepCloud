@@ -12,6 +12,7 @@ import {
   CurrentUser,
   Serialize,
   StorageService,
+  FileSharingService,
 } from '@keepcloud/core/services';
 import {
   FileMinViewDto,
@@ -26,66 +27,85 @@ import { UserProfileDto } from '@keepcloud/commons/dtos';
 
 @Controller('storage')
 export class StorageController {
-  constructor(private readonly storageService: StorageService) {}
+  constructor(
+    private readonly storageService: StorageService,
+    private readonly fileSharingService: FileSharingService,
+  ) {}
 
   @Get('my-storage')
   @Serialize(new PaginationDto(FileMinViewDto))
-  getRootItems(@Query() filters: FolderFilterDto) {
-    return this.storageService.getRootItems(filters);
+  getRootItems(
+    @Query() filters: FolderFilterDto,
+    @CurrentUser() user: UserProfileDto,
+  ) {
+    return this.storageService.getRootItems(user.id, filters);
   }
 
   @Get('shared-with-me')
   @Serialize(new PaginationDto(FileMinViewDto))
-  getSharedWithMe(@Query() filters: FolderFilterDto) {
-    return this.storageService.getSharedWithMe(filters);
+  getSharedWithMe(
+    @Query() filters: FolderFilterDto,
+    @CurrentUser() user: UserProfileDto,
+  ) {
+    return this.storageService.getSharedWithMe(user.id, filters);
   }
 
   @Get('trash')
   @Serialize(new PaginationDto(TrashedFileDto))
-  getTrashedItems(@Query() filters: FolderFilterDto) {
-    return this.storageService.getTrashedItems(filters);
+  getTrashedItems(
+    @Query() filters: FolderFilterDto,
+    @CurrentUser() user: UserProfileDto,
+  ) {
+    return this.storageService.getTrashedItems(user.id, filters);
   }
 
   @Get('suggested-folders')
   @Serialize(new PaginationDto(FileMinViewDto))
-  getSuggestedFolders() {
-    return this.storageService.getSuggestedFolders();
+  getSuggestedFolders(@CurrentUser() user: UserProfileDto) {
+    return this.storageService.getSuggestedFolders(user.id);
   }
 
   @Get('suggested-files')
   @Serialize(new PaginationDto(FileMinViewDto))
-  getSuggestedFiles() {
-    return this.storageService.getSuggestedFiles();
+  getSuggestedFiles(@CurrentUser() user: UserProfileDto) {
+    return this.storageService.getSuggestedFiles(user.id);
   }
 
   @Get('tree')
   @Serialize(new PaginationDto(FileMinViewDto))
-  getFoldersForTree(@Query() filters: FolderFilterDto) {
-    return this.storageService.getFoldersForTree(filters);
+  getFoldersForTree(
+    @Query() filters: FolderFilterDto,
+    @CurrentUser() user: UserProfileDto,
+  ) {
+    return this.storageService.getFoldersForTree(user.id, filters);
   }
 
   @Patch('resources/:id/rename')
   @Serialize(FileMinViewDto)
-  rename(@Param('id') id: string, @Body() dto: RenameFolderDto) {
-    return this.storageService.rename(id, dto.name);
+  rename(
+    @Param('id') id: string,
+    @Body() dto: RenameFolderDto,
+    @CurrentUser() user: UserProfileDto,
+  ) {
+    return this.storageService.rename(user.id, id, dto.name);
   }
 
   @Post('resources/:id/restore')
   @Serialize(FileMinViewDto)
-  restore(@Param('id') id: string) {
-    return this.storageService.restore(id);
+  restore(@Param('id') id: string, @CurrentUser() user: UserProfileDto) {
+    return this.storageService.restore(user.id, id);
   }
 
   @Post('resources/:id/trash')
   @Serialize(FileMinViewDto)
-  moveToTrash(@Param('id') id: string) {
-    return this.storageService.moveToTrash(id);
+  moveToTrash(@Param('id') id: string, @CurrentUser() user: UserProfileDto) {
+    return this.storageService.moveToTrash(user.id, id);
   }
 
   @Delete('resources/:id')
   @Serialize(FileMinViewDto)
-  delete(@Param('id') id: string) {
-    return this.storageService.delete(id);
+  delete(@Param('id') id: string, @CurrentUser() user: UserProfileDto) {
+    return this.storageService.delete(user.id, id);
   }
 
   @Get('usage')

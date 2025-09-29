@@ -12,6 +12,7 @@ import { FileType } from '@prisma/client';
 import { BaseFilterDto } from './base.dto';
 import castHelper from '../helpers/shared/cast.helper';
 import { UserProfileDto } from './user.dto';
+import { FilePermissionDto } from './file-sharing.dto';
 
 export class CreateFileDto {
   @IsNotEmpty(ErrorCode.FILE_KEY_REQUIRED)
@@ -40,7 +41,7 @@ export class CreateFolderDto {
   @IsNotEmpty(ErrorCode.OWNER_ID_REQUIRED)
   @IsString(ErrorCode.OWNER_ID_REQUIRED)
   @IsOptional()
-  ownerId?: string;
+  ownerId: string;
 }
 
 export class RenameFolderDto {
@@ -86,6 +87,10 @@ export class FileMinViewDto {
   @Expose()
   @Type(() => UserProfileDto)
   owner: UserProfileDto;
+
+  @Expose()
+  @Type(() => FilePermissionDto)
+  permissions?: FilePermissionDto[];
 }
 
 export class FilePreviewDto extends FileMinViewDto {

@@ -11,10 +11,17 @@ interface GridViewProps {
   noDataComponent?: React.ReactNode;
   CustomFileSystemItem?: React.FC<{
     file: FileMinViewDto;
+    selectionMode?: boolean;
+    isSelected?: boolean;
+    onSelectionChange?: (id: string, selected: boolean) => void;
   }>;
   hasNextPage?: boolean;
   fetchNextPage?: () => void;
   isFetchingNextPage?: boolean;
+  // Selection props
+  selectionMode?: boolean;
+  selectedItems?: Set<string>;
+  onSelectionChange?: (id: string, selected: boolean) => void;
 }
 
 export const GridView = ({
@@ -27,6 +34,9 @@ export const GridView = ({
   hasNextPage,
   fetchNextPage,
   isFetchingNextPage,
+  selectionMode = false,
+  selectedItems = new Set(),
+  onSelectionChange,
 }: GridViewProps) => {
   if (isLoading) {
     return (
@@ -41,7 +51,7 @@ export const GridView = ({
     );
   }
 
-  let itemsToDisplay: FileMinViewDto[] = onlyFolders
+  const itemsToDisplay: FileMinViewDto[] = onlyFolders
     ? data.filter((item) => !item.format)
     : data;
 
@@ -58,7 +68,13 @@ export const GridView = ({
             <h4 className="mb-2 text-16-medium text-heading">Folders</h4>
             <div className="flex flex-wrap gap-3 sm:flex-row md:gap-8">
               {folders.map((item) => (
-                <CustomFileSystemItem key={item.id} file={item} />
+                <CustomFileSystemItem
+                  key={item.id}
+                  file={item}
+                  selectionMode={selectionMode}
+                  isSelected={selectedItems.has(item.id)}
+                  onSelectionChange={onSelectionChange}
+                />
               ))}
             </div>
           </div>
@@ -68,7 +84,13 @@ export const GridView = ({
             <h4 className="mb-2 text-16-medium text-heading">Files</h4>
             <div className="flex flex-wrap gap-3 sm:flex-row md:gap-8">
               {files.map((item) => (
-                <CustomFileSystemItem key={item.id} file={item} />
+                <CustomFileSystemItem
+                  key={item.id}
+                  file={item}
+                  selectionMode={selectionMode}
+                  isSelected={selectedItems.has(item.id)}
+                  onSelectionChange={onSelectionChange}
+                />
               ))}
             </div>
           </div>
@@ -100,7 +122,13 @@ export const GridView = ({
       ) : (
         <>
           {itemsToDisplay.map((item) => (
-            <CustomFileSystemItem key={item.id} file={item} />
+            <CustomFileSystemItem
+              key={item.id}
+              file={item}
+              selectionMode={selectionMode}
+              isSelected={selectedItems.has(item.id)}
+              onSelectionChange={onSelectionChange}
+            />
           ))}
           {hasNextPage && (
             <div className="mt-4 flex w-full justify-center">

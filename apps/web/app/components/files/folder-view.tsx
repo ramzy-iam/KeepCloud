@@ -7,7 +7,7 @@ import {
   cn,
   useFolderViewMode,
 } from '@keepcloud/web-core/react';
-import { LayoutGrid, StretchHorizontal } from 'lucide-react';
+import { LayoutGrid, StretchHorizontal, CheckSquare } from 'lucide-react';
 import { FileMainCategory, FolderViewMode } from '@keepcloud/commons/types';
 import { FileAncestorDto, FileMinViewDto } from '@keepcloud/commons/dtos';
 import { ColumnDef } from '@tanstack/react-table';
@@ -15,6 +15,8 @@ import { GridView } from './grid-view';
 import { TableView } from './table-view';
 import { FolderBreadcrumb } from './folder-breadcrumb';
 import { FolderEmpty } from '../ui';
+import { BulkOperationMenu, BulkAction } from './bulk-operation-menu';
+import { useBulkSelection } from '../../hooks/use-bulk-selection';
 interface FolderViewProps {
   folder?: FileMinViewDto;
   items?: FileMinViewDto[];
@@ -28,7 +30,12 @@ interface FolderViewProps {
   isLoading?: boolean;
   onBreadcrumbClick?: (ancestor: FileAncestorDto) => void;
   noDataComponent?: React.ReactNode;
-  CustomFileSystemItem?: React.FC<{ file: FileMinViewDto }>;
+  CustomFileSystemItem?: React.FC<{
+    file: FileMinViewDto;
+    selectionMode?: boolean;
+    isSelected?: boolean;
+    onSelectionChange?: (id: string, selected: boolean) => void;
+  }>;
   /**
    * Current folder id to subscribe to atom.
    */
@@ -37,6 +44,11 @@ interface FolderViewProps {
   hasNextPage?: boolean;
   fetchNextPage?: () => void;
   isFetchingNextPage?: boolean;
+
+  // Selection props
+  enableSelection?: boolean;
+  onBulkAction?: (action: BulkAction, items: FileMinViewDto[]) => void;
+  availableBulkActions?: BulkAction[];
 }
 
 export const FolderView = ({
@@ -56,12 +68,27 @@ export const FolderView = ({
   hasNextPage,
   fetchNextPage,
   isFetchingNextPage,
+  enableSelection = true,
+  onBulkAction,
+  availableBulkActions,
 }: FolderViewProps) => {
   const { view: preferredViewMode, setFolderViewMode } = useFolderViewMode();
   const [viewMode, setViewMode] = useState<FolderViewMode>(
     fixedView ?? preferredViewMode,
   );
   const [internalLoading, setInternalLoading] = useState(isLoading);
+  const [selectionMode, setSelectionMode] = useState(false);
+
+  const {
+    selectedItems,
+    selectedCount,
+    isAllSelected,
+    isIndeterminate,
+    toggleItem,
+    toggleAll,
+    clearSelection,
+    getSelectedItems,
+  } = useBulkSelection();
 
   const paginationOptions = {
     fetchNextPage,
@@ -91,10 +118,71 @@ export const FolderView = ({
       setFolderViewMode(preferredViewMode);
       setViewMode(preferredViewMode);
     }
-  }, [preferredViewMode, fixedView, setFolderViewMode]);
+  }, [preferredViewMode, fixedView, setFolderViewMode, viewMode]);
+
+  // Auto-exit selection mode when no items are selected
+  useEffect(() => {
+    if (selectedCount === 0 && selectionMode) {
+      setSelectionMode(false);
+    }
+  }, [selectedCount, selectionMode]);
+
+  const handleSelectionChange = (id: string, selected: boolean) => {
+    if (!enableSelection) return;
+    toggleItem(id);
+    if (!selectionMode && selected) {
+      setSelectionMode(true);
+    }
+  };
+
+  const handleSelectAll = () => {
+    if (!enableSelection) return;
+    toggleAll(filteredItems);
+  };
+
+  const handleClearSelection = () => {
+    clearSelection();
+    setSelectionMode(false);
+  };
+
+  const handleBulkAction = (
+    action: BulkAction,
+    selectedItems: FileMinViewDto[],
+  ) => {
+    onBulkAction?.(action, selectedItems);
+    // Optionally clear selection after action
+    if (action === 'trash' || action === 'delete') {
+      clearSelection();
+      setSelectionMode(false);
+    }
+  };
+
+  const toggleSelectionMode = () => {
+    if (!enableSelection) return;
+    if (selectionMode) {
+      clearSelection();
+      setSelectionMode(false);
+    } else {
+      setSelectionMode(true);
+    }
+  };
 
   return (
     <div className={cn('mb-8 flex h-full flex-col gap-3', className)}>
+      {/* Bulk Operation Menu */}
+      {enableSelection && (
+        <BulkOperationMenu
+          selectedItems={getSelectedItems(filteredItems)}
+          selectedCount={selectedCount}
+          onSelectAll={handleSelectAll}
+          onClearSelection={handleClearSelection}
+          isAllSelected={isAllSelected}
+          isIndeterminate={isIndeterminate}
+          onBulkAction={handleBulkAction}
+          availableActions={availableBulkActions}
+        />
+      )}
+
       <div className="sticky -top-[1px] z-[1] flex h-12 items-center justify-between bg-background p-1.5 pl-0">
         {internalLoading && (
           <div className="flex items-center gap-2 py-4">
@@ -111,8 +199,9 @@ export const FolderView = ({
             onBreadcrumbClick={onBreadcrumbClick}
           />
         )}
-        {!fixedView && !internalLoading && (
-          <div className="flex gap-2">
+
+        <div className="flex items-center gap-2">
+          {!fixedView && !internalLoading && (
             <Tabs
               defaultValue={viewMode}
               onValueChange={(value) => {
@@ -129,9 +218,10 @@ export const FolderView = ({
                 </TabsTrigger>
               </TabsList>
             </Tabs>
-          </div>
-        )}
+          )}
+        </div>
       </div>
+
       {viewMode === 'grid' ? (
         <GridView
           data={filteredItems}
@@ -140,6 +230,11 @@ export const FolderView = ({
           isLoading={internalLoading}
           noDataComponent={noDataComponent}
           CustomFileSystemItem={CustomFileSystemItem}
+          selectionMode={enableSelection ? selectionMode : false}
+          selectedItems={selectedItems}
+          onSelectionChange={
+            enableSelection ? handleSelectionChange : undefined
+          }
           {...paginationOptions}
         />
       ) : (

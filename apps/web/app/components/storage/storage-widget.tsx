@@ -1,4 +1,4 @@
-import { Button, cn, useTheme } from '@keepcloud/web-core/react';
+import { Button, cn, useSidebar, useTheme } from '@keepcloud/web-core/react';
 import { FileHelper } from '@keepcloud/commons/helpers';
 import { StorageWidgetSkeleton } from './storage-widget-skeleton';
 import { StorageWidgetError } from './storage-widget-error';
@@ -25,6 +25,7 @@ export function StorageWidget({
   onRetry,
 }: StorageWidgetProps) {
   const { isDarkMode } = useTheme();
+  const { isMobile } = useSidebar();
 
   if (error) {
     return <StorageWidgetError onRetry={onRetry} className={className} />;
@@ -34,11 +35,13 @@ export function StorageWidget({
     return <StorageWidgetSkeleton className={className} />;
   }
 
-  const usagePercentage = Math.round((usedStorage / totalStorage) * 100);
-  const { used, total } = FileHelper.formatStorageConsistent(
+  const usagePercentage = FileHelper.calculateUsagePercentage(
     usedStorage,
     totalStorage,
-    usedStorage >= FileHelper.convertToBytes(10, 'MB') ? 0 : 1,
+  );
+  const { used, total } = FileHelper.formatStorageConsistentAuto(
+    usedStorage,
+    totalStorage,
   );
 
   return (
@@ -95,7 +98,10 @@ export function StorageWidget({
           {onSeeDetails && (
             <button
               onClick={onSeeDetails}
-              className="hover:text-primary-600 cursor-pointer text-12 text-heading transition-colors"
+              className={cn(
+                `hover:text-primary-600 cursor-pointer text-12 text-heading transition-colors hover:underline`,
+                isMobile && 'underline',
+              )}
             >
               Details
             </button>

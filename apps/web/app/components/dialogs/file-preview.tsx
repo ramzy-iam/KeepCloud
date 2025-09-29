@@ -6,16 +6,23 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
+  DialogDescription,
   dialogAtom,
   useFilePreviewer,
   TooltipProviderWrapper,
   Button,
+  useSidebar,
+  cn,
+  useTheme,
 } from '@keepcloud/web-core/react';
 import { DownloadIcon } from 'lucide-react';
 
 export const FilePreviewDialog = () => {
   const [dialogState, setDialogState] = useAtom(dialogAtom);
   const file = dialogState.context.item as FileMinViewDto;
+  const { isMobile } = useSidebar();
+  const { isDarkMode } = useTheme();
 
   const { PreviewComponent, error, downloadUrl } = useFilePreviewer({
     file,
@@ -27,14 +34,26 @@ export const FilePreviewDialog = () => {
 
   return (
     <Dialog open={true} onOpenChange={handleClose}>
-      <DialogContent className="w-full gap-0 overflow-auto md:h-[95svh] md:max-w-[80svw]!">
-        <DialogHeader className="flex h-auto w-full max-w-full flex-row items-center justify-between gap-0 overflow-x-hidden text-left">
+      <DialogContent
+        hideCloseButton={isMobile}
+        className="w-full gap-0 overflow-auto md:h-[95svh] md:max-w-[80svw]!"
+      >
+        <DialogHeader className="flex h-auto w-full max-w-full flex-row items-center justify-between gap-0 overflow-x-hidden text-left text-heading">
+          <DialogDescription className="sr-only">
+            Preview of the selected document.
+          </DialogDescription>
           <TooltipProviderWrapper content={file.name} sideOffset={-12}>
             <DialogTitle className="w-min max-w-full truncate p-4">
               {file.name ?? 'File Preview'}
             </DialogTitle>
           </TooltipProviderWrapper>
-          <div className="mr-2 flex gap-6">
+          <div
+            className={cn(
+              'flex gap-6',
+              !isMobile && 'mr-10',
+              isMobile && 'mr-2',
+            )}
+          >
             <TooltipProviderWrapper content={'Download'} sideOffset={4}>
               <div>
                 {downloadUrl && (
@@ -54,7 +73,7 @@ export const FilePreviewDialog = () => {
           </div>
         </DialogHeader>
 
-        <div className="flex max-h-[80svh] min-h-[80svh] items-center justify-center overflow-auto md:max-h-[80svh] md:p-4">
+        <div className="flex max-h-[70svh] min-h-[70svh] items-center justify-center overflow-auto md:max-h-[80svh] md:min-h-[80svh] md:p-4">
           {error ? (
             <p className="text-sm text-muted-foreground">
               No preview available for this file type or the file is not
@@ -64,6 +83,18 @@ export const FilePreviewDialog = () => {
             PreviewComponent
           )}
         </div>
+
+        {isMobile && (
+          <DialogFooter className="mt-4 w-full max-w-full px-4">
+            <Button
+              variant={isDarkMode ? 'primary' : 'outline'}
+              className="w-full"
+              onClick={handleClose}
+            >
+              Close
+            </Button>
+          </DialogFooter>
+        )}
       </DialogContent>
     </Dialog>
   );

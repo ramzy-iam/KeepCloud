@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { File } from '../../entities';
+import { File } from '../../models';
 import { BaseRepository } from '../base';
 import { PrismaService, Prisma } from '../../prisma';
 import { FileAncestorDto } from '@keepcloud/commons/dtos';
@@ -17,7 +17,7 @@ export class FileRepository extends BaseRepository<
   Prisma.FileOrderByWithRelationInput
 > {
   constructor(protected readonly prismaService: PrismaService) {
-    super('file');
+    super('file', prismaService);
   }
 
   get scoped(): FileScope {
@@ -120,15 +120,73 @@ export class FileRepository extends BaseRepository<
     return file.isFolder;
   }
 
-  getRootFolder(userId?: string): Promise<File> {
-    const scope = this.scoped;
-    if (userId) {
-      scope.filterByOwnerId(userId);
-    }
-    return scope
+  getRootFolder(userId: string): Promise<File> {
+    return this.scoped
+      .filterByOwnerId(userId)
       .filterByParentId(null)
       .filterByExactName(SYSTEM_FILE.MY_STORAGE.code)
       .filterByIsSystem(true)
       .getOneOrFail();
+  }
+
+  /**
+   * Check if user has access to a file/folder through ancestor permissions
+   * This checks if any parent folder in the hierarchy has permissions for the user
+   */
+  async hasAncestorAccess(fileId: string, userId: string): Promise<boolean> {
+    // First check direct access (owner, treeOwner, or direct permissions)
+    const directAccess = await this.prisma.file.findFirst({
+      where: {
+        id: fileId,
+        OR: [
+          { ownerId: userId },
+          { treeOwnerId: userId },
+          {
+            permissions: {
+              some: {
+                userId: userId,
+              },
+            },
+          },
+        ],
+      },
+    });
+
+    if (directAccess) {
+      return true;
+    }
+
+    // Check if any ancestor has permissions for this user
+    const file = await this.prisma.file.findFirst({
+      where: { id: fileId },
+      select: { id: true, left: true, right: true, treeOwnerId: true },
+    });
+
+    if (!file) {
+      return false;
+    }
+
+    // Find all ancestors (parents) of this file using nested set model
+    const ancestors = await this.prisma.file.findMany({
+      where: {
+        treeOwnerId: file.treeOwnerId,
+        left: { lt: file.left },
+        right: { gt: file.right },
+        permissions: {
+          some: {
+            userId: userId,
+          },
+        },
+      },
+      include: {
+        permissions: {
+          where: {
+            userId: userId,
+          },
+        },
+      },
+    });
+
+    return ancestors.length > 0;
   }
 }

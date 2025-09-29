@@ -42,6 +42,11 @@ export abstract class BaseScope<
     return this;
   }
 
+  filterNotById(id: string) {
+    (this._where as { id: Prisma.StringFilter }).id = { not: id };
+    return this;
+  }
+
   filterByDeleted() {
     (
       this._where as {

@@ -16,6 +16,7 @@ export class NestedSetService {
     return this.fileRepository.prisma;
   }
   async allocateNestedSetPosition(
+    treeOwnerId: string,
     parentId: string,
     tx: Prisma.TransactionClient,
   ): Promise<{ left: number; right: number }> {
@@ -25,12 +26,12 @@ export class NestedSetService {
     const parent = await repo.findUniqueOrThrow({ where: { id: parentId } });
 
     await repo.updateMany({
-      where: { left: { gte: parent.right } },
+      where: { treeOwnerId, left: { gte: parent.right } },
       data: { left: { increment: 2 } },
     });
 
     await repo.updateMany({
-      where: { right: { gte: parent.right } },
+      where: { treeOwnerId, right: { gte: parent.right } },
       data: { right: { increment: 2 } },
     });
 
@@ -41,10 +42,10 @@ export class NestedSetService {
     return inserted;
   }
 
-  async deleteNode(id: string, ownerId: string): Promise<void> {
-    this.logger.info(`Deleting node id=${id}, ownerId=${ownerId}`);
+  async deleteNode(treeOwnerId: string, id: string): Promise<void> {
+    this.logger.info(`Deleting node id=${id}, treeOwnerId=${treeOwnerId}`);
     const node = await this.prisma.file.findUnique({
-      where: { id },
+      where: { id, treeOwnerId },
       select: { left: true, right: true },
     });
 
@@ -60,27 +61,27 @@ export class NestedSetService {
       await this.prisma.$transaction([
         // 1. Mark the node and all its descendants as deleted
         this.prisma.file.updateMany({
+          where: { treeOwnerId, left: { gte: left }, right: { lte: right } },
           data: {
             deletedAt: new Date(),
           },
-          where: { ownerId, left: { gte: left }, right: { lte: right } },
         }),
         // 2. Shift left values of remaining nodes to the left
         this.prisma.file.updateMany({
-          where: { ownerId, left: { gt: right } },
+          where: { treeOwnerId, left: { gt: right } },
           data: { left: { decrement: width } },
         }),
         // 3. Shift right values of remaining nodes to the left
         this.prisma.file.updateMany({
-          where: { ownerId, right: { gt: right } },
+          where: { treeOwnerId, right: { gt: right } },
           data: { right: { decrement: width } },
         }),
       ]);
       this.logger.info(`Node deleted successfully`);
-    } catch (err: any) {
+    } catch (err: unknown) {
       this.logger.error(
-        `Failed to delete node ${id}: ${err.message}`,
-        err.stack,
+        `Failed to delete node ${id}: ${(err as Error).message}`,
+        (err as Error).stack,
       );
       throw new InternalServerErrorException({
         message: 'Failed to delete node and update tree structure',
@@ -89,12 +90,12 @@ export class NestedSetService {
   }
 
   async moveNode(
+    treeOwnerId: string,
     id: string,
     newParentId: string | null,
-    ownerId: string,
   ): Promise<void> {
     this.logger.info(
-      `Moving node id=${id} to newParentId=${newParentId}, ownerId=${ownerId}`,
+      `Moving node id=${id} to newParentId=${newParentId}, treeOwnerId=${treeOwnerId}`,
     );
     const node = await this.prisma.file.findUnique({
       where: { id },
@@ -109,7 +110,10 @@ export class NestedSetService {
     const { left, right } = node;
     const width = right - left + 1;
 
-    if (newParentId && (await this.isDescendant(newParentId, id))) {
+    if (
+      newParentId &&
+      (await this.isDescendant(treeOwnerId, newParentId, id))
+    ) {
       this.logger.warn(
         `Cannot move node ${id} into its own descendant ${newParentId}`,
       );
@@ -121,7 +125,7 @@ export class NestedSetService {
     try {
       this.logger.debug(`Marking node subtree for temporary removal`);
       await this.prisma.file.updateMany({
-        where: { ownerId, left: { gte: left }, right: { lte: right } },
+        where: { treeOwnerId, left: { gte: left }, right: { lte: right } },
         data: {
           left: { decrement: left * 2 },
           right: { decrement: left * 2 },
@@ -131,11 +135,11 @@ export class NestedSetService {
       this.logger.debug(`Closing gap after node removal`);
       await this.prisma.$transaction([
         this.prisma.file.updateMany({
-          where: { ownerId, left: { gt: right } },
+          where: { treeOwnerId, left: { gt: right } },
           data: { left: { decrement: width } },
         }),
         this.prisma.file.updateMany({
-          where: { ownerId, right: { gt: right } },
+          where: { treeOwnerId, right: { gt: right } },
           data: { right: { decrement: width } },
         }),
       ]);
@@ -147,7 +151,7 @@ export class NestedSetService {
               select: { right: true },
             })
           )?.right ?? null)
-        : await this.getRootInsertPosition(ownerId);
+        : await this.getRootInsertPosition(treeOwnerId);
 
       if (!parentRight) {
         this.logger.warn(`Parent node ${newParentId} has no right value`);
@@ -159,11 +163,11 @@ export class NestedSetService {
       this.logger.debug(`Opening space at new position right=${parentRight}`);
       await this.prisma.$transaction([
         this.prisma.file.updateMany({
-          where: { ownerId, left: { gte: parentRight } },
+          where: { treeOwnerId, left: { gte: parentRight } },
           data: { left: { increment: width } },
         }),
         this.prisma.file.updateMany({
-          where: { ownerId, right: { gte: parentRight } },
+          where: { treeOwnerId, right: { gte: parentRight } },
           data: { right: { increment: width } },
         }),
       ]);
@@ -172,7 +176,7 @@ export class NestedSetService {
       this.logger.debug(`Shifting node subtree by ${shift}`);
       await this.prisma.file.updateMany({
         where: {
-          ownerId,
+          treeOwnerId,
           left: { lt: 0 },
           right: { lt: 0 },
         },
@@ -187,18 +191,21 @@ export class NestedSetService {
         data: { parentId: newParentId },
       });
       this.logger.info(`Node ${id} moved successfully`);
-    } catch (err: any) {
-      this.logger.error(`Failed to move node ${id}: ${err.message}`, err.stack);
+    } catch (err: unknown) {
+      this.logger.error(
+        `Failed to move node ${id}: ${(err as Error).message}`,
+        (err as Error).stack,
+      );
       throw new InternalServerErrorException({
         message: 'Failed to move node',
       });
     }
   }
 
-  async rebuildTree(ownerId: string): Promise<void> {
-    this.logger.info(`Rebuilding nested set tree for userId=${ownerId}`);
+  async rebuildTree(treeOwnerId: string): Promise<void> {
+    this.logger.info(`Rebuilding nested set tree for userId=${treeOwnerId}`);
     const nodes = await this.prisma.file.findMany({
-      where: { ownerId, deletedAt: null },
+      where: { treeOwnerId },
       select: { id: true, parentId: true },
     });
 
@@ -233,38 +240,42 @@ export class NestedSetService {
           }),
         ),
       );
-      this.logger.info(`Tree rebuilt successfully for userId=${ownerId}`);
-    } catch (err: any) {
-      this.logger.error(`Failed to rebuild tree: ${err.message}`, err.stack);
+      this.logger.info(`Tree rebuilt successfully for userId=${treeOwnerId}`);
+    } catch (err: unknown) {
+      this.logger.error(
+        `Failed to rebuild tree: ${(err as Error).message}`,
+        (err as Error).stack,
+      );
       throw new InternalServerErrorException({
         message: 'Failed to rebuild nested set tree',
       });
     }
   }
 
-  private async getRootInsertPosition(ownerId: string): Promise<number> {
+  private async getRootInsertPosition(treeOwnerId: string): Promise<number> {
     const maxRight = await this.prisma.file.aggregate({
-      where: { ownerId },
+      where: { treeOwnerId },
       _max: { right: true },
     });
     const position = (maxRight._max.right ?? 0) + 1;
     this.logger.debug(
-      `Root insert position for ownerId=${ownerId} is ${position}`,
+      `Root insert position for treeOwnerId=${treeOwnerId} is ${position}`,
     );
     return position;
   }
 
   private async isDescendant(
+    treeOwnerId: string,
     childId: string,
     ancestorId: string,
   ): Promise<boolean> {
     const child = await this.prisma.file.findUnique({
-      where: { id: childId },
+      where: { id: childId, treeOwnerId },
       select: { left: true, right: true },
     });
 
     const ancestor = await this.prisma.file.findUnique({
-      where: { id: ancestorId },
+      where: { id: ancestorId, treeOwnerId },
       select: { left: true, right: true },
     });
 

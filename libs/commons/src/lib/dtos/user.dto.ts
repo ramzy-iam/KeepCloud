@@ -1,5 +1,6 @@
 import { Expose } from 'class-transformer';
-import { MinimalDto } from './base.dto';
+import { MinimalDto, BaseFilterDto } from './base.dto';
+import { IsOptional, IsString } from '../validators';
 
 export class UserProfileDto extends MinimalDto {
   @Expose()
@@ -16,4 +17,14 @@ export class UserProfileDto extends MinimalDto {
 
   @Expose()
   root: string | null;
+}
+
+export class UserFilterDto extends BaseFilterDto {
+  @IsOptional()
+  @IsString()
+  name?: string;
+
+  @IsOptional()
+  @IsString()
+  email?: string;
 }

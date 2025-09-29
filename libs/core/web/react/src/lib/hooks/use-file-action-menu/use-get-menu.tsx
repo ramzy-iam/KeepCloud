@@ -1,5 +1,5 @@
-import { FileMinViewDto, TrashedFileDto } from '@keepcloud/commons/dtos';
-import { MenuItem } from '@keepcloud/web-core/react';
+import { FileMinViewDto } from '@keepcloud/commons/dtos';
+import { MenuItem } from '../../components';
 import { useFileMenuItems, useTrashedFileMenuItems } from './use-file-menu';
 import {
   useFolderMenuItems,
@@ -11,17 +11,17 @@ interface UseGetMenuProps {
 }
 
 export const useGetMenuItems = ({ file }: UseGetMenuProps): MenuItem[] => {
-  if (file.isFolder) {
-    return useFolderMenuItems(file);
-  }
-  return useFileMenuItems(file);
+  const folderMenu = useFolderMenuItems(file);
+  const fileMenu = useFileMenuItems(file);
+
+  return file.isFolder ? folderMenu : fileMenu;
 };
 
 export const useGetMenuTrashedItems = ({
   file,
 }: UseGetMenuProps): MenuItem[] => {
-  if (file.isFolder) {
-    return useTrashedFolderMenuItems(file);
-  }
-  return useTrashedFileMenuItems(file);
+  const trashedFolderMenu = useTrashedFolderMenuItems(file);
+  const trashedFileMenu = useTrashedFileMenuItems(file);
+
+  return file.isFolder ? trashedFolderMenu : trashedFileMenu;
 };

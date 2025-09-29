@@ -4,10 +4,11 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
   Button,
   useGetStorageBreakdown,
 } from '@keepcloud/web-core/react';
-import { HardDrive, Files, Image, Video, Music, FileText } from 'lucide-react';
+import { Files, Image, Video, Music, FileText } from 'lucide-react';
 import { FileHelper } from '@keepcloud/commons/helpers';
 import { StorageDetailsSkeleton } from './storage-details-skeleton';
 import { StorageDetailsError } from './storage-details-error';
@@ -31,12 +32,14 @@ export function StorageDetailsModal({
     error,
     refetch,
   } = useGetStorageBreakdown();
-  const usagePercentage = Math.round((usedStorage / totalStorage) * 100);
-  const availableStorage = totalStorage - usedStorage;
-  const { used, total, unit } = FileHelper.formatStorageConsistent(
+  const usagePercentage = FileHelper.calculateUsagePercentage(
     usedStorage,
     totalStorage,
-    usedStorage >= FileHelper.convertToBytes(10, 'MB') ? 0 : 1,
+  );
+  const availableStorage = totalStorage - usedStorage;
+  const { used, total, unit } = FileHelper.formatStorageConsistentAuto(
+    usedStorage,
+    totalStorage,
   );
 
   const availableFormatted = FileHelper.formatBytes(availableStorage, 1, unit);
@@ -46,31 +49,31 @@ export function StorageDetailsModal({
     images: {
       type: 'images',
       size: Math.round(usedStorage * 0.4),
-      percentage: 40,
+      percentage: FileHelper.formatPercentage(40),
       count: 0,
     },
     videos: {
       type: 'videos',
       size: Math.round(usedStorage * 0.3),
-      percentage: 30,
+      percentage: FileHelper.formatPercentage(30),
       count: 0,
     },
     documents: {
       type: 'documents',
       size: Math.round(usedStorage * 0.2),
-      percentage: 20,
+      percentage: FileHelper.formatPercentage(20),
       count: 0,
     },
     audio: {
       type: 'audio',
       size: Math.round(usedStorage * 0.05),
-      percentage: 5,
+      percentage: FileHelper.formatPercentage(5),
       count: 0,
     },
     other: {
       type: 'other',
       size: Math.round(usedStorage * 0.05),
-      percentage: 5,
+      percentage: FileHelper.formatPercentage(5),
       count: 0,
     },
     totalFiles: 0,
@@ -124,8 +127,7 @@ export function StorageDetailsModal({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <HardDrive className="h-5 w-5" />
+          <DialogTitle className="flex items-center gap-2 text-heading">
             Storage Details
           </DialogTitle>
           <DialogDescription>
@@ -143,7 +145,7 @@ export function StorageDetailsModal({
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">Total Usage</span>
-                <span className="text-sm text-muted-foreground">
+                <span className="text-sm text-heading">
                   {used} of {total}
                 </span>
               </div>
@@ -155,7 +157,7 @@ export function StorageDetailsModal({
                 />
               </div>
 
-              <div className="flex justify-between text-xs text-muted-foreground">
+              <div className="flex justify-between text-xs text-heading">
                 <span>{usagePercentage}% used</span>
                 <span>{availableFormatted} available</span>
               </div>
@@ -163,7 +165,9 @@ export function StorageDetailsModal({
 
             {/* Storage Breakdown */}
             <div className="space-y-3">
-              <h4 className="text-sm font-medium">Storage Breakdown</h4>
+              <h4 className="text-sm font-medium text-heading">
+                Storage Breakdown
+              </h4>
               <div className="space-y-2">
                 {storageItems.map((item) => {
                   const Icon = item.icon;
@@ -183,12 +187,16 @@ export function StorageDetailsModal({
                           </span>
                         )}
                       </div>
-                      <div className="text-right">
+                      <div className="text-right text-heading">
                         <div className="text-sm font-medium">
-                          {FileHelper.formatBytes(item.value, 1, unit)}
+                          {FileHelper.formatBytes(
+                            item.value,
+                            FileHelper.getStorageDecimalPlaces(item.value),
+                            unit,
+                          )}
                         </div>
-                        <div className="text-xs text-muted-foreground">
-                          {item.percentage}%
+                        <div className="text-xs">
+                          {FileHelper.formatPercentage(item.percentage)}%
                         </div>
                       </div>
                     </div>
@@ -197,15 +205,11 @@ export function StorageDetailsModal({
               </div>
             </div>
 
-            {/* Actions */}
-            <div className="flex gap-2 pt-4">
+            <DialogFooter>
               <Button variant="outline" onClick={onClose} className="flex-1">
                 Close
               </Button>
-              <Button variant="primary" className="flex-1">
-                Manage Storage
-              </Button>
-            </div>
+            </DialogFooter>
           </div>
         )}
       </DialogContent>

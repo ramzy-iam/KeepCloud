@@ -1,7 +1,7 @@
 import { PAGINATION } from '@keepcloud/commons/constants';
 import { PaginationDto, MetaDto } from '@keepcloud/commons/dtos';
 import { GenericPrismaModel } from './model';
-import { Prisma, RLSContextService } from '../../prisma';
+import { Prisma, PrismaService } from '../../prisma';
 import { PrismaClient } from '@prisma/client';
 
 export interface Scoped<T> {
@@ -17,12 +17,15 @@ export abstract class BaseRepository<
   Include extends object,
   OrderByWithRelationInput extends object,
 > {
-  constructor(private modelName: Prisma.TypeMap['meta']['modelProps']) {}
+  constructor(
+    private modelName: Prisma.TypeMap['meta']['modelProps'],
+    protected readonly prismaService: PrismaService,
+  ) {}
 
   abstract get scoped(): unknown;
 
   get model() {
-    return RLSContextService.prisma[
+    return this.prismaService.client[
       this.modelName
     ] as unknown as GenericPrismaModel<
       T,
@@ -36,7 +39,7 @@ export abstract class BaseRepository<
   }
 
   get prisma(): PrismaClient {
-    return RLSContextService.prisma;
+    return this.prismaService.client;
   }
 
   async findOne({

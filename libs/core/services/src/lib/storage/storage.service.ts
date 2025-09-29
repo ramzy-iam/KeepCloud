@@ -1,5 +1,10 @@
-import { Injectable } from '@nestjs/common';
-import { File, FileRepository, FileType } from '@keepcloud/core/db';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import {
+  File,
+  FilePermissionRole,
+  FileRepository,
+  FileType,
+} from '@keepcloud/core/db';
 import { PaginationDto, FolderFilterDto } from '@keepcloud/commons/dtos';
 import { ErrorCode, SYSTEM_FILE } from '@keepcloud/commons/constants';
 import {
@@ -7,24 +12,34 @@ import {
   FolderNotFoundException,
   NotFoundException,
 } from '@keepcloud/commons/backend';
+import { FilePermissionService } from '../file';
+import { NestedSetService } from './nested-set.service';
 import { SystemQueueService } from '../queues';
 import { UserService } from '../user';
 
 @Injectable()
 export class StorageService {
   constructor(
-    private readonly fileRepository: FileRepository,
-    private readonly queueService: SystemQueueService,
-    private readonly userService: UserService,
+    protected readonly fileRepository: FileRepository,
+    protected readonly nestedSetService: NestedSetService,
+    @Inject(forwardRef(() => FilePermissionService))
+    protected readonly filePermissionService: FilePermissionService,
+    protected readonly queueService: SystemQueueService,
+    protected readonly userService: UserService,
   ) {}
 
-  async getRootItems(filters: FolderFilterDto): Promise<PaginationDto<File>> {
-    const root = await this.fileRepository.getRootFolder();
+  async getRootItems(
+    userId: string,
+    filters: FolderFilterDto,
+  ): Promise<PaginationDto<File>> {
+    const root = await this.fileRepository.getRootFolder(userId);
     const scope = this.fileRepository.scoped
       .filterByParentId(root.id)
       .filterByNotTrashed()
       .orderBy({ isFolder: 'desc' }) //folder first
       .orderBy({ name: filters.order })
+      .filterByTreeOwnerId(userId)
+      .filterByOwnerId(userId)
       .joinOwner();
 
     if (filters.type) scope.filterByType(filters.type);
@@ -34,22 +49,62 @@ export class StorageService {
     return scope.getManyPaginated(filters.page, filters.pageSize);
   }
 
-  getSharedWithMe(filters: FolderFilterDto): Promise<PaginationDto<File>> {
-    return this.fileRepository.scoped
-      .filterByParentId('null')
+  async getSharedWithMe(userId: string, filters: FolderFilterDto) {
+    const { page, pageSize } = filters;
+    const fileIds = await this.fileRepository.prisma.filePermission.findMany({
+      where: {
+        userId,
+        isInherited: false,
+        file: { trashedAt: null, deletedAt: null },
+      },
+      select: { fileId: true },
+      skip: ((page as number) - 1) * (pageSize as number),
+      take: pageSize,
+    });
+
+    const scope = this.fileRepository.scoped
+      .filterByIds(fileIds.map((f) => f.fileId))
       .orderBy({ isFolder: 'desc' })
       .orderBy({ name: filters.order })
-      .getManyPaginated(filters.page, filters.pageSize);
+      .joinOwner();
+
+    if (filters.type) scope.filterByType(filters.type);
+    if (filters.name) scope.filterByName(filters.name);
+    if (filters.format) scope.filterByFormat(filters.format);
+
+    const sharedFiles = await scope.getManyPaginated(
+      filters.page,
+      filters.pageSize,
+    );
+    const items = sharedFiles.items.map(async (item) => {
+      return {
+        ...item,
+        ancestors: [
+          {
+            id: SYSTEM_FILE.SHARED_WITH_ME.id,
+            name: SYSTEM_FILE.SHARED_WITH_ME.name,
+            code: SYSTEM_FILE.SHARED_WITH_ME.code,
+            isSystem: true,
+          },
+        ],
+      };
+    });
+
+    return {
+      ...sharedFiles,
+      items: await Promise.all(items),
+    };
   }
 
-  async getTrashedItems(filters: FolderFilterDto) {
-    // Get trashed items that are top-level (their parent is not trashed)
+  async getTrashedItems(userId: string, filters: FolderFilterDto) {
+    // Get trashed items that are top-level (their parent is not trashed) and belong to current user
 
     const trashedFiles = await this.fileRepository.findManyPaginated(
       filters.page,
       filters.pageSize,
       {
         where: {
+          treeOwnerId: userId, // Filter by current user
           trashedAt: { not: null },
           deletedAt: null,
           OR: [
@@ -95,57 +150,72 @@ export class StorageService {
     };
   }
 
-  async getSuggestedFolders(): Promise<PaginationDto<File>> {
-    const root = await this.fileRepository.getRootFolder();
+  async getSuggestedFolders(userId: string): Promise<PaginationDto<File>> {
+    const root = await this.fileRepository.getRootFolder(userId);
 
     return this.fileRepository.scoped
       .filterByParentId(root.id)
+      .filterByTreeOwnerId(userId)
+      .filterByOwnerId(userId)
       .filterByType(FileType.FOLDER)
       .filterByNotTrashed()
       .joinOwner()
+      .joinPermissions()
       .orderBy({ name: 'asc' })
       .getManyPaginated(1, 15);
   }
 
-  async getSuggestedFiles(): Promise<PaginationDto<File>> {
-    const root = await this.fileRepository.getRootFolder();
+  async getSuggestedFiles(userId: string): Promise<PaginationDto<File>> {
+    const root = await this.fileRepository.getRootFolder(userId);
 
     return this.fileRepository.scoped
       .filterByParentId(root.id)
+      .filterByTreeOwnerId(userId)
+      .filterByOwnerId(userId)
       .filterByType(FileType.FILE)
       .filterByNotTrashed()
       .joinOwner()
+      .joinPermissions()
       .orderBy({ name: 'asc' })
       .getManyPaginated(1, 15);
   }
 
-  async getFoldersForTree(
-    filters: FolderFilterDto,
-  ): Promise<PaginationDto<File>> {
-    const root = await this.fileRepository.getRootFolder();
-    const parentId = filters.parentId ?? root.id;
-    return this.fileRepository.scoped
-      .filterByParentId(parentId)
-      .filterByType(FileType.FOLDER)
-      .filterByNotTrashed()
-      .orderBy({ name: filters.order })
-      .getManyPaginated(filters.page, filters.pageSize);
+  async rename(userId: string, fileId: string, newName: string): Promise<File> {
+    await this.filePermissionService.verifyUserRole(
+      fileId,
+      userId,
+      FilePermissionRole.EDITOR,
+    );
+
+    await this.filePermissionService.checkAndThrowIfTrashed(fileId);
+
+    return this.fileRepository.update({ id: fileId }, { name: newName });
   }
 
-  rename(id: string, name: string): Promise<File> {
-    return this.fileRepository.update({ id }, { name });
-  }
+  async moveToTrash(userId: string, fileId: string): Promise<File> {
+    await this.filePermissionService.verifyUserRole(
+      fileId,
+      userId,
+      FilePermissionRole.EDITOR,
+    );
 
-  async moveToTrash(id: string): Promise<File> {
-    await this.fileRepository.scoped
-      .filterById(id)
+    const resource = await this.fileRepository.scoped
+      .filterById(fileId)
+      .filterByOwnerId(userId)
       .filterByIsSystem(false)
+      .filterByNotTrashed()
       .getOneOrFail();
+
+    if (resource.trashedAt) {
+      if (this.fileRepository.isFolder(resource))
+        throw new FolderNotFoundException(fileId);
+      throw new FileNotFoundException(fileId);
+    }
 
     const trashedAt = new Date();
     const file = await this.fileRepository.update(
-      { id },
-      { trashedAt, isSystem: false },
+      { id: fileId },
+      { trashedAt },
     );
 
     // Mark all files under this node as trashed (cascade)
@@ -162,64 +232,31 @@ export class StorageService {
     return file;
   }
 
-  async delete(id: string): Promise<File> {
-    const resource = await this.fileRepository.scoped
-      .filterById(id)
-      .filterByIsSystem(false)
-      .getOneOrFail();
-
-    if (resource.deletedAt) {
-      if (this.fileRepository.isFolder(resource))
-        throw new FolderNotFoundException(id);
-      throw new FileNotFoundException(id);
-    }
-
-    const deleted = await this.fileRepository.update(
-      { id },
-      { deletedAt: new Date() },
+  async restore(userId: string, fileId: string): Promise<File> {
+    await this.filePermissionService.verifyUserRole(
+      fileId,
+      userId,
+      FilePermissionRole.EDITOR,
     );
 
-    //mark all files under this node as deleted
-    if (this.fileRepository.isFolder(deleted)) {
-      await this.fileRepository.prisma.file.updateMany({
-        where: {
-          left: { gte: deleted.left },
-          right: { lte: deleted.right },
-        },
-        data: { deletedAt: new Date() },
-      });
+    const scope = this.fileRepository.scoped
+      .filterById(fileId)
+      .filterByIsSystem(false)
+      .filterByOwnerId(userId);
+
+    const resource = await scope.getOneOrFail();
+    if (!resource.trashedAt) {
+      throw new FileNotFoundException(fileId);
     }
 
-    // delete all files under this node including the node itself
-    await this.queueService.enqueueDeleteFileAndChildrenFromStorage({
-      ownerId: deleted.ownerId,
-      fileId: id,
-    });
-
-    await this.queueService.enqueueNestedSetDeleteNode({
-      nodeId: id,
-      ownerId: deleted.ownerId,
-    });
-
-    // Sync user's storage usage to ensure accuracy
-    await this.userService.syncStorageUsage(deleted.ownerId);
-
-    return deleted;
-  }
-
-  async restore(id: string): Promise<File> {
-    await this.fileRepository.scoped
-      .filterById(id)
-      .filterByIsSystem(false)
-      .getOneOrFail();
-
     const restored = await this.fileRepository.update(
-      { id, isSystem: false },
+      { id: fileId },
       { trashedAt: null },
     );
 
     await this.fileRepository.prisma.file.updateMany({
       where: {
+        treeOwnerId: restored.treeOwnerId,
         left: { gt: restored.left },
         right: { lt: restored.right },
       },
@@ -229,9 +266,81 @@ export class StorageService {
     return restored;
   }
 
-  async getFilesUnderNode(nodeId: string, ownerId: string) {
+  async delete(userId: string, fileId: string): Promise<File> {
+    await this.filePermissionService.verifyUserRole(
+      fileId,
+      userId,
+      FilePermissionRole.EDITOR,
+    );
+
+    const scope = this.fileRepository.scoped
+      .filterById(fileId)
+      .filterByOwnerId(userId)
+      .filterByIsSystem(false)
+      .filterByOwnerId(userId)
+      .filterByTrashed();
+
+    const resource = await scope.getOneOrFail();
+
+    if (resource.deletedAt) {
+      if (this.fileRepository.isFolder(resource))
+        throw new FolderNotFoundException(fileId);
+      throw new FileNotFoundException(fileId);
+    }
+
+    const deleted = await this.fileRepository.update(
+      { id: fileId },
+      { deletedAt: new Date() },
+    );
+    const treeOwnerId = deleted.treeOwnerId;
+
+    //mark all files under this node as deleted
+    if (this.fileRepository.isFolder(deleted)) {
+      await this.fileRepository.prisma.file.updateMany({
+        where: {
+          left: { gte: deleted.left },
+          right: { lte: deleted.right },
+          treeOwnerId,
+        },
+        data: { deletedAt: new Date() },
+      });
+    }
+
+    // delete all files under this node including the node itself
+    await this.queueService.enqueueDeleteFileAndChildrenFromStorage({
+      treeOwnerId,
+      fileId,
+    });
+
+    await this.queueService.enqueueNestedSetDeleteNode({
+      nodeId: fileId,
+      treeOwnerId,
+    });
+
+    // Sync user's storage usage to ensure accuracy
+    await this.userService.syncStorageUsage(treeOwnerId);
+
+    return deleted;
+  }
+
+  async getFoldersForTree(
+    userId: string,
+    filters: FolderFilterDto,
+  ): Promise<PaginationDto<File>> {
+    const root = await this.fileRepository.getRootFolder(userId);
+    const parentId = filters.parentId ?? root.id;
+    return this.fileRepository.scoped
+      .filterByParentId(parentId)
+      .filterByOwnerId(userId)
+      .filterByType(FileType.FOLDER)
+      .filterByNotTrashed()
+      .orderBy({ name: filters.order })
+      .getManyPaginated(filters.page, filters.pageSize);
+  }
+
+  async getFilesUnderNode(treeOwnerId: string, nodeId: string) {
     const node = await this.fileRepository.prisma.file.findUnique({
-      where: { id: nodeId },
+      where: { id: nodeId, treeOwnerId },
       select: { left: true, right: true },
     });
 
@@ -242,7 +351,7 @@ export class StorageService {
 
     const files = await this.fileRepository.prisma.file.findMany({
       where: {
-        ownerId,
+        treeOwnerId,
         left: { gte: node.left },
         right: { lte: node.right },
         type: 'FILE',
@@ -251,6 +360,7 @@ export class StorageService {
       select: {
         id: true,
         ownerId: true,
+        treeOwnerId: true,
         storagePath: true,
       },
     });
@@ -287,7 +397,7 @@ export class StorageService {
     const fileStats = await this.fileRepository.prisma.file.groupBy({
       by: ['contentType'],
       where: {
-        ownerId: userId,
+        treeOwnerId: userId,
         type: 'FILE',
         deletedAt: null,
       },

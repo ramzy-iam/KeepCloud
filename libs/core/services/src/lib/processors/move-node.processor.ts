@@ -10,14 +10,14 @@ export class MoveNodeProcessor implements Processor {
   constructor(private readonly nestedSetService: NestedSetService) {}
 
   async execute(data: MoveNodeData) {
-    const { ownerId, nodeId, newParentId } = data;
+    const { treeOwnerId, nodeId, newParentId } = data;
 
     this.logger.info(
-      `Start moving nodeId=${nodeId} for ownerId=${ownerId} to newParentId=${newParentId}`,
+      `Start moving nodeId=${nodeId} for treeOwnerId=${treeOwnerId} to newParentId=${newParentId}`,
     );
 
     try {
-      await this.nestedSetService.moveNode(nodeId, newParentId, ownerId);
+      await this.nestedSetService.moveNode(treeOwnerId, nodeId, newParentId);
       this.logger.info(`Node ${nodeId} moved successfully to ${newParentId}`);
     } catch (error: any) {
       this.logger.error(

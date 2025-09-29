@@ -7,6 +7,7 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router';
 import { useEffect, useRef, useState } from 'react';
 import { ROUTE_PATH } from '../constants';
+import { queryKeys } from '../query-keys';
 
 export const useGoogleAuth = () => {
   return useMutation<
@@ -30,7 +31,7 @@ interface GetProfileProps {
 export const useGetProfile = ({ enabled }: GetProfileProps = {}) => {
   const setAuthAtom = useSetAtom(authAtom);
   return useQuery({
-    queryKey: ['profile'],
+    queryKey: queryKeys.auth.profile,
     queryFn: async () => {
       const data = await AuthService.getProfile();
       setAuthAtom((prev) => ({ ...prev, user: data }));

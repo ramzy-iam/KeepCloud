@@ -5,3 +5,4 @@ export * from './delete-permanently-resource';
 export * from './file-preview';
 export * from './folder-not-found';
 export * from './file-info';
+export * from './share-file';

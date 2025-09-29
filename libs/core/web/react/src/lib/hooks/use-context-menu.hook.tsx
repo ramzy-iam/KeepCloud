@@ -9,6 +9,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
+  TooltipProviderWrapper,
 } from '../components';
 import { cn } from '../helpers';
 
@@ -128,9 +129,11 @@ export function useContextMenu({
           className={cn('w-[285px] p-2', contentClassName)}
         >
           {label && (
-            <DropdownMenuLabel className="mb-3 text-14-medium">
-              {label}
-            </DropdownMenuLabel>
+            <TooltipProviderWrapper content={label}>
+              <DropdownMenuLabel className="mb-3 max-w-full truncate text-14-medium">
+                {label}
+              </DropdownMenuLabel>
+            </TooltipProviderWrapper>
           )}
           {menuItems.map((item, index) => (
             <React.Fragment key={item.label}>
