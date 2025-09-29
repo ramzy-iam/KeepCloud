@@ -1,13 +1,21 @@
 import { SYSTEM_FILE } from '@keepcloud/commons/constants';
-import { FolderView, SuggestionEmpty, BulkAction } from '../../../components';
+import { FolderView, SuggestionEmpty } from '../../../components';
 import { columns } from './columns';
 import {
+  useGetActiveFolder,
   useGetSuggestedFiles,
   useGetSuggestedFolders,
 } from '@keepcloud/web-core/react';
-import { FileMinViewDto } from '@keepcloud/commons/dtos';
+import {
+  useBulkSelectionProvider,
+  useBulkActionHandler,
+  BULK_ACTION_CONFIGS,
+} from '../../../hooks';
+import { useEffect } from 'react';
 
 export default function ExplorerComponent() {
+  const { setActiveFolder } = useGetActiveFolder();
+
   const {
     allPageItems: suggestedFolders,
     isLoading: isLoadingSuggestedFolders,
@@ -18,49 +26,41 @@ export default function ExplorerComponent() {
     paginationProps,
   } = useGetSuggestedFiles();
 
-  // Handle bulk operations for suggested files
-  const handleBulkAction = (action: BulkAction, items: FileMinViewDto[]) => {
-    console.log(
-      `Bulk action: ${action} on ${items.length} items:`,
-      items.map((item) => item.name),
-    );
+  const { handleBulkAction: handleFilesBulkAction } = useBulkActionHandler();
 
-    switch (action) {
-      case 'download':
-        // Implement download logic for suggested files
-        console.log('Downloading suggested files:', items);
-        // You would typically call your download API here
-        break;
-      case 'share':
-        // Implement share logic
-        console.log('Sharing suggested files:', items);
-        // Open share dialog or call share API
-        break;
-      case 'copy':
-        // Implement copy logic
-        console.log('Copying suggested files:', items);
-        break;
-      case 'move':
-        // Implement move logic
-        console.log('Moving suggested files:', items);
-        break;
-      case 'trash':
-        // Implement trash logic
-        console.log('Moving suggested files to trash:', items);
-        break;
-      case 'star':
-        // Implement star logic
-        console.log('Starring suggested files:', items);
-        break;
-      default:
-        console.log('Unhandled bulk action:', action);
-    }
-  };
+  const { handleBulkAction: handleFoldersBulkAction } = useBulkActionHandler();
+
+  // Bulk selection for suggested files
+  const filesSelection = useBulkSelectionProvider({
+    items: suggestedFiles || [],
+    baseColumns: columns,
+    config: {
+      enableSelection: true,
+      availableBulkActions: BULK_ACTION_CONFIGS.FILES,
+      onBulkAction: handleFilesBulkAction,
+    },
+  });
+
+  const foldersSelection = useBulkSelectionProvider({
+    items: suggestedFolders || [],
+    baseColumns: columns,
+    config: {
+      enableSelection: true,
+      availableBulkActions: BULK_ACTION_CONFIGS.FILES,
+      onBulkAction: handleFoldersBulkAction,
+    },
+  });
+  useEffect(() => {
+    setActiveFolder({
+      id: SYSTEM_FILE.MY_STORAGE.id,
+      name: SYSTEM_FILE.MY_STORAGE.name,
+    });
+  }, [setActiveFolder]);
 
   return (
     <div className="flex flex-col gap-6">
       <FolderView
-        columns={columns}
+        columns={foldersSelection.columns}
         items={suggestedFolders}
         title={SYSTEM_FILE.SUGGESTED_FOLDERS.name}
         fixedView="grid"
@@ -68,28 +68,17 @@ export default function ExplorerComponent() {
         isLoading={isLoadingSuggestedFolders}
         noDataComponent={<SuggestionEmpty />}
         currentId={SYSTEM_FILE.SUGGESTED_FOLDERS.id}
-        enableSelection={true}
-        onBulkAction={handleBulkAction}
-        availableBulkActions={['download', 'share', 'star']}
+        {...foldersSelection.folderViewProps}
       />
 
       <FolderView
-        columns={columns}
+        columns={filesSelection.columns}
         items={suggestedFiles}
         isLoading={isLoadingSuggestedFiles}
         title={SYSTEM_FILE.SUGGESTED_FILES.name}
         noDataComponent={<SuggestionEmpty />}
         currentId={SYSTEM_FILE.SUGGESTED_FILES.id}
-        enableSelection={true}
-        onBulkAction={handleBulkAction}
-        availableBulkActions={[
-          'download',
-          'share',
-          'copy',
-          'move',
-          'star',
-          'trash',
-        ]}
+        {...filesSelection.folderViewProps}
         {...paginationProps}
       />
     </div>

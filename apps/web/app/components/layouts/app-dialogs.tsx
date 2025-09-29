@@ -3,6 +3,7 @@ import { dialogAtom } from '@keepcloud/web-core/react';
 import {
   CreateFolderDialog,
   DeletePermanentlyDialog,
+  BulkDeleteConfirmationDialog,
   FileInfoDialog,
   FilePreviewDialog,
   FolderNotFoundDialog,
@@ -40,6 +41,9 @@ export const AppDialogs = () => {
 
     case 'deletePermanently':
       return <DeletePermanentlyDialog />;
+
+    case 'bulkDeleteConfirmation':
+      return <BulkDeleteConfirmationDialog />;
 
     case 'previewFile':
       return <FilePreviewDialog />;

@@ -5,35 +5,12 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
+  TooltipProviderWrapper,
 } from '@keepcloud/web-core/react';
-import {
-  Download,
-  Trash2,
-  Share2,
-  Copy,
-  Move,
-  MoreVertical,
-  X,
-  Archive,
-  Star,
-  FolderOpen,
-} from 'lucide-react';
+import { Download, Trash2, MoreVertical, X, Undo2 } from 'lucide-react';
 import { FileMinViewDto } from '@keepcloud/commons/dtos';
-
-export type BulkAction =
-  | 'download'
-  | 'share'
-  | 'copy'
-  | 'move'
-  | 'trash'
-  | 'delete'
-  | 'restore'
-  | 'star'
-  | 'unstar'
-  | 'archive'
-  | 'open';
+import { BulkAction } from '@keepcloud/commons/types';
 
 export interface BulkOperationMenuProps {
   selectedItems: FileMinViewDto[];
@@ -47,41 +24,27 @@ export interface BulkOperationMenuProps {
   className?: string;
 }
 
-const DEFAULT_ACTIONS: BulkAction[] = [
-  'download',
-  'share',
-  'copy',
-  'move',
-  'star',
-  'trash',
-];
+const DEFAULT_ACTIONS: BulkAction[] = ['download', 'trash'];
 
 const ACTION_ICONS: Record<BulkAction, React.ReactNode> = {
   download: <Download className="h-4 w-4" />,
-  share: <Share2 className="h-4 w-4" />,
-  copy: <Copy className="h-4 w-4" />,
-  move: <Move className="h-4 w-4" />,
   trash: <Trash2 className="h-4 w-4" />,
   delete: <Trash2 className="h-4 w-4" />,
-  restore: <FolderOpen className="h-4 w-4" />,
-  star: <Star className="h-4 w-4" />,
-  unstar: <Star className="h-4 w-4" />,
-  archive: <Archive className="h-4 w-4" />,
-  open: <FolderOpen className="h-4 w-4" />,
+  restore: <Undo2 className="h-4 w-4" />,
 };
 
 const ACTION_LABELS: Record<BulkAction, string> = {
   download: 'Download',
-  share: 'Share',
-  copy: 'Make a copy',
-  move: 'Move to',
   trash: 'Move to trash',
   delete: 'Delete forever',
   restore: 'Restore',
-  star: 'Add to starred',
-  unstar: 'Remove from starred',
-  archive: 'Archive',
-  open: 'Open',
+};
+
+const ACTION_TOOLTIPS: Record<BulkAction, string> = {
+  download: 'Download selected items',
+  trash: 'Move to trash',
+  delete: 'Delete permanently',
+  restore: 'Restore from trash',
 };
 
 export const BulkOperationMenu: React.FC<BulkOperationMenuProps> = ({
@@ -102,18 +65,20 @@ export const BulkOperationMenu: React.FC<BulkOperationMenuProps> = ({
   };
 
   const renderActionButton = (action: BulkAction, showLabel = true) => (
-    <Button
-      key={action}
-      variant="ghost"
-      size="sm"
-      onClick={() => handleAction(action)}
-      className="flex items-center gap-2 dark:hover:bg-background"
-    >
-      {ACTION_ICONS[action]}
-      {showLabel && (
-        <span className="hidden sm:inline">{ACTION_LABELS[action]}</span>
-      )}
-    </Button>
+    <TooltipProviderWrapper content={ACTION_TOOLTIPS[action]}>
+      <Button
+        key={action}
+        variant="ghost"
+        size="sm"
+        onClick={() => handleAction(action)}
+        className="flex items-center gap-2 dark:hover:bg-background"
+      >
+        {ACTION_ICONS[action]}
+        {showLabel && (
+          <span className="hidden sm:inline">{ACTION_LABELS[action]}</span>
+        )}
+      </Button>
+    </TooltipProviderWrapper>
   );
 
   // Primary actions (always visible)
@@ -161,7 +126,7 @@ export const BulkOperationMenu: React.FC<BulkOperationMenuProps> = ({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="min-w-48">
-              {secondaryActions.map((action, index) => (
+              {secondaryActions.map((action) => (
                 <React.Fragment key={action}>
                   <DropdownMenuItem
                     onClick={() => handleAction(action)}
@@ -170,9 +135,6 @@ export const BulkOperationMenu: React.FC<BulkOperationMenuProps> = ({
                     {ACTION_ICONS[action]}
                     <span>{ACTION_LABELS[action]}</span>
                   </DropdownMenuItem>
-                  {index < secondaryActions.length - 1 && action === 'move' && (
-                    <DropdownMenuSeparator />
-                  )}
                 </React.Fragment>
               ))}
             </DropdownMenuContent>

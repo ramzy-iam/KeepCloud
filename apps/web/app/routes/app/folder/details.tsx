@@ -13,6 +13,11 @@ import { useNavigate } from 'react-router';
 import { useEffect, useRef } from 'react';
 import { columns } from './columns';
 import { ErrorCode } from '@keepcloud/commons/constants';
+import {
+  useBulkSelectionProvider,
+  useBulkActionHandler,
+  BULK_ACTION_CONFIGS,
+} from '../../../hooks';
 
 export default function FolderDetailsComponent({
   params,
@@ -40,13 +45,27 @@ export default function FolderDetailsComponent({
     enabled: !!folder,
   });
 
+  // Bulk action handlers for folder items
+  const { handleBulkAction } = useBulkActionHandler();
+
+  // Bulk selection for folder items
+  const folderSelection = useBulkSelectionProvider({
+    items: folderChildren || [],
+    baseColumns: columns,
+    config: {
+      enableSelection: true,
+      availableBulkActions: BULK_ACTION_CONFIGS.FILES,
+      onBulkAction: handleBulkAction,
+    },
+  });
+
   useEffect(() => {
     if (!folder) return;
     setActiveFolder({
       id: params.folderId,
       name: folder.name,
     });
-  }, [folder]);
+  }, [folder, params.folderId, setActiveFolder]);
 
   useEffect(() => {
     if (!hasOpenedRef.current && error) {
@@ -107,11 +126,12 @@ export default function FolderDetailsComponent({
         ancestors: enhancedAncestors,
         children: folderChildren,
       }}
-      columns={columns}
+      columns={folderSelection.columns}
       title={folder.name}
       isLoading={isLoading || isLoadingChildren}
       onBreadcrumbClick={handleBreadcrumbClick}
       currentId={params.folderId}
+      {...folderSelection.folderViewProps}
       {...paginationProps}
     />
   );

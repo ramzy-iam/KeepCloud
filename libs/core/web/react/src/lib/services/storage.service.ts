@@ -5,6 +5,12 @@ import {
   TrashedFileDto,
   UserStorageDto,
   StorageBreakdownDto,
+  BulkDeleteDto,
+  BulkDeleteResultDto,
+  BulkTrashDto,
+  BulkTrashResultDto,
+  BulkRestoreDto,
+  BulkRestoreResultDto,
 } from '@keepcloud/commons/dtos';
 import { BaseHttpService } from './base.service';
 
@@ -74,6 +80,24 @@ class StorageService extends BaseHttpService {
 
   async getStorageBreakdown() {
     return this.get<StorageBreakdownDto>('/breakdown');
+  }
+
+  async bulkMoveToTrash(fileIds: string[]) {
+    return this.post<BulkTrashResultDto[], BulkTrashDto>('/bulk/trash', {
+      fileIds,
+    });
+  }
+
+  async bulkRestore(fileIds: string[]) {
+    return this.post<BulkRestoreResultDto[], BulkRestoreDto>('/bulk/restore', {
+      fileIds,
+    });
+  }
+
+  async bulkDelete(fileIds: string[]) {
+    return this.post<BulkDeleteResultDto[], BulkDeleteDto>('/bulk/delete', {
+      fileIds,
+    });
   }
 }
 

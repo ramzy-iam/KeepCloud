@@ -479,4 +479,73 @@ export class StorageService {
 
     return breakdown;
   }
+
+  async bulkMoveToTrash(userId: string, fileIds: string[]) {
+    const results = [];
+
+    for (const fileId of fileIds) {
+      try {
+        const trashedFile = await this.moveToTrash(userId, fileId);
+        results.push({
+          id: fileId,
+          success: true,
+          file: trashedFile,
+        });
+      } catch (error: unknown) {
+        results.push({
+          id: fileId,
+          success: false,
+          error: (error as Error).message,
+        });
+      }
+    }
+
+    return results;
+  }
+
+  async bulkRestore(userId: string, fileIds: string[]) {
+    const results = [];
+
+    for (const fileId of fileIds) {
+      try {
+        const restoredFile = await this.restore(userId, fileId);
+        results.push({
+          id: fileId,
+          success: true,
+          file: restoredFile,
+        });
+      } catch (error: unknown) {
+        results.push({
+          id: fileId,
+          success: false,
+          error: (error as Error).message,
+        });
+      }
+    }
+
+    return results;
+  }
+
+  async bulkDelete(userId: string, fileIds: string[]) {
+    const results = [];
+
+    for (const fileId of fileIds) {
+      try {
+        const deletedFile = await this.delete(userId, fileId);
+        results.push({
+          id: fileId,
+          success: true,
+          file: deletedFile,
+        });
+      } catch (error: unknown) {
+        results.push({
+          id: fileId,
+          success: false,
+          error: (error as Error).message,
+        });
+      }
+    }
+
+    return results;
+  }
 }
