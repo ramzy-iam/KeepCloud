@@ -16,10 +16,14 @@ on:
         options:
           - dev
           - production
+      branch:
+        description: 'Branch to deploy (only used for dev)'
+        required: false
+        default: develop
 
 jobs:
   web:
-    name: Web (${{ (github.ref == 'refs/heads/develop' || github.event.inputs.environment == 'dev') && 'Dev' || 'Production' }})
+    name: Web (${{ github.event.inputs.environment || (github.ref == 'refs/heads/develop' && 'Dev' || 'Production') }})
     if: |
       github.ref == 'refs/heads/develop' ||
       (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'dev') ||
@@ -28,10 +32,11 @@ jobs:
     uses: ./.github/workflows/deploy-web.yml
     with:
       environment: ${{ (github.ref == 'refs/heads/develop' || github.event.inputs.environment == 'dev') && 'Dev' || 'Production' }}
+      branch: ${{ github.event.inputs.environment == 'production' && 'main' || (github.event.inputs.branch || github.ref_name) }}
     secrets: inherit
 
   api:
-    name: API (${{ (github.ref == 'refs/heads/develop' || github.event.inputs.environment == 'dev') && 'Dev' || 'Production' }})
+    name: API (${{ github.event.inputs.environment || (github.ref == 'refs/heads/develop' && 'Dev' || 'Production') }})
     if: |
       github.ref == 'refs/heads/develop' ||
       (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'dev') ||
@@ -40,4 +45,5 @@ jobs:
     uses: ./.github/workflows/deploy-api.yml
     with:
       environment: ${{ (github.ref == 'refs/heads/develop' || github.event.inputs.environment == 'dev') && 'Dev' || 'Production' }}
+      branch: ${{ github.event.inputs.environment == 'production' && 'main' || (github.event.inputs.branch || github.ref_name) }}
     secrets: inherit
