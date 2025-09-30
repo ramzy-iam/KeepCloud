@@ -16,10 +16,6 @@ on:
         options:
           - dev
           - production
-      branch:
-        description: 'Branch to deploy (only used for dev)'
-        required: false
-        default: develop
 
 jobs:
   web:
