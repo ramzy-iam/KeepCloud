@@ -6,7 +6,7 @@ export const FolderEmpty = () => {
         Drag and drop files here
       </h3>
       <p className="text-12 md:text-14">
-        or click on the button <span className="text-heading">"New"</span>
+        or click on the button <span className="text-heading">"Upload"</span>
       </p>
     </div>
   );
