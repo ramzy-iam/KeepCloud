@@ -19,25 +19,27 @@ on:
 
 jobs:
   web:
-    name: Web (${{ (github.ref == 'refs/heads/develop' || github.event.inputs.environment == 'dev') && 'Dev' || 'Production' }})
+    name: Web (${{ github.event.inputs.environment || (github.ref == 'refs/heads/develop' && 'Dev' || 'Production') }})
     if: |
       github.ref == 'refs/heads/develop' ||
       (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'dev') ||
       (github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.base_ref == 'main') ||
-      (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production')
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production' && github.base_ref == 'main')
     uses: ./.github/workflows/deploy-web.yml
     with:
       environment: ${{ (github.ref == 'refs/heads/develop' || github.event.inputs.environment == 'dev') && 'Dev' || 'Production' }}
+      branch: ${{ github.event.inputs.environment == 'production' && 'main' || github.ref_name }}
     secrets: inherit
 
   api:
-    name: API (${{ (github.ref == 'refs/heads/develop' || github.event.inputs.environment == 'dev') && 'Dev' || 'Production' }})
+    name: API (${{ github.event.inputs.environment || (github.ref == 'refs/heads/develop' && 'Dev' || 'Production') }})
     if: |
       github.ref == 'refs/heads/develop' ||
       (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'dev') ||
       (github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.base_ref == 'main') ||
-      (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production')
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production' && github.base_ref == 'main')
     uses: ./.github/workflows/deploy-api.yml
     with:
       environment: ${{ (github.ref == 'refs/heads/develop' || github.event.inputs.environment == 'dev') && 'Dev' || 'Production' }}
+      branch: ${{ github.event.inputs.environment == 'production' && 'main' || github.ref_name }}
     secrets: inherit

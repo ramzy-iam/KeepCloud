@@ -5,38 +5,48 @@ import { Env } from '../config';
 
 const { combine, label, printf, colorize, timestamp } = format;
 
-// Helper to format objects nicely in logs
-function formatLogValue(value: any): string {
+function formatLogValue(value: unknown): string {
   if (typeof value === 'object' && value !== null) {
     return util.inspect(value, { depth: null, colors: false, compact: false });
   }
   return String(value);
 }
 
-const myFormat = printf(({ timestamp, level, message, label, ...meta }) => {
-  const splatSymbol = Symbol.for('splat');
-  const additionalArgs = ((meta[splatSymbol] as unknown[]) || []).map(
-    formatLogValue,
-  );
-  const combinedMessage = additionalArgs.length
-    ? `${message}, ${additionalArgs.join(', ')}`
-    : message;
+const myFormat = (useColors: boolean) =>
+  printf(({ timestamp, level, message, label, ...meta }) => {
+    const splatSymbol = Symbol.for('splat');
+    const additionalArgs = ((meta[splatSymbol] as unknown[]) || []).map(
+      formatLogValue,
+    );
+    const combinedMessage = additionalArgs.length
+      ? `${message}, ${additionalArgs.join(', ')}`
+      : message;
 
-  const colorizer = colorize({
-    message: true,
-    colors: { info: 'blue', error: 'red', debug: 'yellow', warn: 'magenta' },
+    let coloredLevel = level.toUpperCase();
+    let coloredMessage = combinedMessage;
+    let coloredLabel = `[${label}]`;
+
+    if (useColors) {
+      const colorizer = colorize({
+        message: true,
+        colors: {
+          info: 'blue',
+          error: 'red',
+          debug: 'yellow',
+          warn: 'magenta',
+        },
+      });
+
+      coloredLevel = colorizer.colorize(level, level.toUpperCase());
+      coloredMessage = colorizer.colorize(level, combinedMessage as string);
+      coloredLabel = colorizer.colorize(level, `[${label}]`);
+    }
+
+    return `${timestamp} ${coloredLabel} ${coloredLevel}: ${coloredMessage}`;
   });
 
-  const coloredLevel = colorizer.colorize(level, level.toUpperCase());
-  const coloredMessage = colorizer.colorize(level, combinedMessage as string);
-
-  const coloredLabel = colorizer.colorize(level, `[${label}]`);
-
-  return `${timestamp} ${coloredLabel} ${coloredLevel}: ${coloredMessage}`;
-});
-
 function getLogLevel(): string {
-  const level = Env.LOG_LEVEL?.toLowerCase();
+  const level = Env.LOG_LEVEL;
   if (level && ['error', 'warn', 'info', 'debug'].includes(level)) {
     return level;
   }
@@ -48,12 +58,14 @@ export class Logger {
   private static defaultLogger: Logger;
 
   constructor(programName: string) {
+    const isProduction = Env.NODE_ENV === 'production';
+
     this.logger = winston.createLogger({
       level: getLogLevel(),
       format: combine(
         label({ label: programName }),
         timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-        myFormat,
+        myFormat(!isProduction), // disable colors in production
       ),
       transports: [
         new winston.transports.Console(),
@@ -62,7 +74,7 @@ export class Logger {
           format: combine(
             label({ label: programName }),
             timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-            myFormat, // no colorize here for clean file logs
+            myFormat(false), // never use colors in file
           ),
         }),
       ],
