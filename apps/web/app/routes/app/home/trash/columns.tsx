@@ -71,9 +71,8 @@ export const columns: ColumnDef<TrashedFileDto>[] = [
     header: () => <div>Trashed On</div>,
     enableHiding: false,
     cell: ({ row }) => {
-      const formatted = DayjsHelper.new(row.getValue('trashedAt')).format(
-        'YYYY-MM-DD HH:mm:ss',
-      );
+      const formatted = DayjsHelper.formatLocal(row.getValue('trashedAt'));
+
       return (
         <div className="truncate text-14-medium text-secondary-foreground">
           {formatted}

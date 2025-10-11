@@ -67,4 +67,16 @@ export class DayjsHelper {
       DayjsHelper.new(startDate).isSame(endDate, unit)
     );
   }
+
+  static formatLocal(
+    date: dayjs.ConfigType,
+    formatStr = 'YYYY-MM-DD HH:mm:ss',
+    excludeSeconds = true,
+  ) {
+    let dateInstance = dayjs(date).utc().local();
+    if (excludeSeconds) {
+      dateInstance = dateInstance.set('second', 0).set('millisecond', 0);
+    }
+    return dateInstance.format(formatStr);
+  }
 }
