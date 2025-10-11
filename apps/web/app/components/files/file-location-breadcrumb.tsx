@@ -138,6 +138,7 @@ export const FileLocationBreadcrumb = ({
   const nearestAncestor = ancestors[ancestors.length - 1];
   const TriggerContent = (
     <div
+      onClick={(e) => e.stopPropagation()}
       className={`flex w-full max-w-[130px] cursor-pointer items-center gap-2 overflow-hidden ${className}`}
     >
       <span className="flex-shrink-0">
