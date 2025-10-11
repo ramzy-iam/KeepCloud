@@ -71,7 +71,7 @@ export class DayjsHelper {
   static formatLocal(
     date: dayjs.ConfigType,
     formatStr = 'YYYY-MM-DD HH:mm:ss',
-    excludeSeconds = true,
+    excludeSeconds = false,
   ) {
     let dateInstance = dayjs(date).utc().local();
     if (excludeSeconds) {
