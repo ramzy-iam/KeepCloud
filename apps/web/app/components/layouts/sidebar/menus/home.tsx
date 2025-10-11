@@ -116,7 +116,7 @@ export const HomeMenu = () => {
             >
               <div>
                 {link.icon}
-                <span className="text-12-medium">{link.label}</span>
+                <span className="text-14-medium">{link.label}</span>
               </div>
             </MenuButton>
           )}
