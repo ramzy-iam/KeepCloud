@@ -17,6 +17,7 @@ import {
 } from '@keepcloud/commons/backend';
 import { ErrorCode } from '@keepcloud/commons/constants';
 import { NotificationService } from '../notifications';
+import { FolderService } from '../folder';
 
 @Injectable()
 export class AuthService {
@@ -28,6 +29,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: AppConfigService,
     private readonly notificationService: NotificationService,
+    private readonly folderService: FolderService,
   ) {
     this.logger = new Logger(AuthService.name);
   }
@@ -45,8 +47,9 @@ export class AuthService {
         });
       }
 
-      // Send welcome email for new users
+      // Handle new user setup
       if (isNewUser) {
+        // Send welcome email for new users
         try {
           await this.notificationService.sendWelcomeEmail(
             user.email,
@@ -63,6 +66,28 @@ export class AuthService {
             this.logger.error(
               `Failed to send welcome email to ${user.email}: ${String(emailError)}`,
             );
+          }
+        }
+
+        // Create initial folder structure if enabled
+        if (this.configService.env.CREATE_INITIAL_FOLDERS_ON_SIGNUP) {
+          try {
+            await this.createInitialUserFolders(user.id);
+            this.logger.log(
+              `Created initial folder structure for new user: ${user.email}`,
+            );
+          } catch (folderError: unknown) {
+            // Log folder creation error but don't fail authentication
+            if (folderError instanceof Error) {
+              this.logger.error(
+                `Failed to create initial folders for ${user.email}: ${folderError.message}`,
+                folderError.stack,
+              );
+            } else {
+              this.logger.error(
+                `Failed to create initial folders for ${user.email}: ${String(folderError)}`,
+              );
+            }
           }
         }
       }
@@ -165,5 +190,85 @@ export class AuthService {
       picture: user.picture,
       root: rootFolder.id,
     };
+  }
+
+  private async createInitialUserFolders(userId: string): Promise<void> {
+    this.logger.log(`Creating initial folders for user: ${userId}`);
+
+    // Predefined folder structure with 17 folders in nested arrangement
+    const folderStructure = [
+      // Root level folders
+      { name: 'Documents', parentPath: [] },
+      { name: 'Photos', parentPath: [] },
+      { name: 'Projects', parentPath: [] },
+      { name: 'Archives', parentPath: [] },
+      { name: 'Videos', parentPath: [] },
+      { name: 'Memory', parentPath: [] },
+
+      // Second level folders under Documents
+      { name: 'Personal', parentPath: ['Documents'] },
+      { name: 'Work', parentPath: ['Documents'] },
+      { name: 'Finance', parentPath: ['Documents'] },
+
+      // Second level folders under Photos
+      { name: 'Family', parentPath: ['Photos'] },
+      { name: 'Travel', parentPath: ['Photos'] },
+
+      // Second level folders under Projects
+      { name: 'Active', parentPath: ['Projects'] },
+      { name: 'Completed', parentPath: ['Projects'] },
+
+      // Third level folders
+      { name: 'Contracts', parentPath: ['Documents', 'Work'] },
+      { name: 'Reports', parentPath: ['Documents', 'Work'] },
+      { name: 'Vacation 2025', parentPath: ['Photos', 'Travel'] },
+      { name: 'Web Development', parentPath: ['Projects', 'Active'] },
+    ];
+
+    const createdFolders = new Map<string, string>();
+
+    for (const folderDef of folderStructure) {
+      try {
+        let parentId: string | undefined = undefined;
+
+        if (folderDef.parentPath.length > 0) {
+          const parentPath = folderDef.parentPath.join('/');
+          parentId = createdFolders.get(parentPath);
+
+          if (!parentId) {
+            this.logger.warn(
+              `Parent folder not found for path: ${parentPath}, skipping folder: ${folderDef.name}`,
+            );
+            continue;
+          }
+        }
+
+        // Create the folder
+        const folder = await this.folderService.create({
+          name: folderDef.name,
+          parentId,
+          ownerId: userId,
+        });
+
+        // Store the folder ID for potential child folders
+        const currentPath = [...folderDef.parentPath, folderDef.name].join('/');
+        createdFolders.set(currentPath, folder.id);
+
+        this.logger.log(
+          `Created folder: ${folderDef.name} (${folder.id}) under parent: ${parentId || 'root'}`,
+        );
+      } catch (folderError: unknown) {
+        const errorMessage =
+          folderError instanceof Error ? folderError.message : 'Unknown error';
+        this.logger.error(
+          `Failed to create folder ${folderDef.name}: ${errorMessage}`,
+        );
+        // Continue with other folders even if one fails
+      }
+    }
+
+    this.logger.log(
+      `Successfully created initial folder structure for user: ${userId}`,
+    );
   }
 }

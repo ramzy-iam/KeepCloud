@@ -35,6 +35,8 @@ export const envSchema = z.object({
 
   JWT_SECRET_EXPIRES_IN: z.string().default('1h'),
   JWT_REFRESH_SECRET_EXPIRES_IN: z.string().default('15d'),
+
+  CREATE_INITIAL_FOLDERS_ON_SIGNUP: z.stringbool().default(false),
 });
 
 export type EnvVariables = z.infer<typeof envSchema>;

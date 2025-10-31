@@ -53,6 +53,7 @@ provider:
     TEMPLATES_BUCKET: ${env:TEMPLATES_BUCKET, 'templates-rzlab'}
     SUPPORT_EMAIL: ${env:SUPPORT_EMAIL, 'ramsesfeukeng@gmail.com'}
     NO_REPLY_EMAIL: ${env:NO_REPLY_EMAIL, 'no-reply@heyramzy.com'}
+    CREATE_INITIAL_FOLDERS_ON_SIGNUP: ${env:CREATE_INITIAL_FOLDERS_ON_SIGNUP}
   iam:
     role:
       statements:
