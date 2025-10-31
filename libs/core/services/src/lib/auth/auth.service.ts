@@ -5,7 +5,6 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
-import { MailService } from '../notifications/mail.service';
 import { FileRepository, User } from '@keepcloud/core/db';
 import { TokenPayload } from 'google-auth-library';
 import { OAuthService } from './oauth.service';
@@ -17,7 +16,6 @@ import {
   UnauthorizedException,
 } from '@keepcloud/commons/backend';
 import { ErrorCode } from '@keepcloud/commons/constants';
-import { SystemQueueService } from '../queues';
 import { NotificationService } from '../notifications';
 
 @Injectable()
@@ -104,11 +102,11 @@ export class AuthService {
     const payload: AccessTokenPayload = { sub, email, picture };
     const accessToken = this.jwtService.sign(payload, {
       secret: this.configService.env.JWT_SECRET,
-      expiresIn: '15d',
+      expiresIn: this.configService.env.JWT_SECRET_EXPIRES_IN,
     });
     const refreshToken = this.jwtService.sign(payload, {
       secret: this.configService.env.JWT_REFRESH_SECRET,
-      expiresIn: '15d',
+      expiresIn: this.configService.env.JWT_REFRESH_SECRET_EXPIRES_IN,
     });
     return { accessToken, refreshToken };
   }
