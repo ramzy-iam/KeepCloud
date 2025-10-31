@@ -58,6 +58,7 @@ jobs:
       TEMPLATES_BUCKET: ${{ vars.TEMPLATES_BUCKET }}
       SUPPORT_EMAIL: ${{ vars.SUPPORT_EMAIL }}
       NO_REPLY_EMAIL: ${{ vars.NO_REPLY_EMAIL }}
+      CREATE_INITIAL_FOLDERS_ON_SIGNUP: ${{ vars.CREATE_INITIAL_FOLDERS_ON_SIGNUP }}
 
     steps:
       - uses: actions/checkout@v4
