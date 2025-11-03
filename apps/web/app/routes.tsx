@@ -14,7 +14,7 @@ export default [
       ...prefix('home', [
         index('./routes/app/redirect-explorer.tsx'),
         route('/explorer', './routes/app/home/explorer.tsx'),
-        // route('/shared-with-me', './routes/app/home/shared-with-me.tsx'),
+        route('/shared-with-me', './routes/app/home/shared-with-me.tsx'),
       ]),
       ...prefix('folders', [
         index('./routes/app/folder/folder.tsx'),
