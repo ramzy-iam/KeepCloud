@@ -39,16 +39,16 @@ export const useFolderMenuItems = (file: FileMinViewDto): MenuItem[] => {
         }),
       className: itemClassName,
     },
-    // {
-    //   label: 'Share',
-    //   icon: <Share className={iconClassName} />,
-    //   onClick: () =>
-    //     openDialog({
-    //       type: 'shareFile',
-    //       item: file,
-    //     }),
-    //   className: itemClassName,
-    // },
+    {
+      label: 'Share',
+      icon: <Share className={iconClassName} />,
+      onClick: () =>
+        openDialog({
+          type: 'shareFile',
+          item: file,
+        }),
+      className: itemClassName,
+    },
     {
       label: 'Info',
       icon: <Info className={iconClassName} />,

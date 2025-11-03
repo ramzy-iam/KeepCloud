@@ -260,7 +260,9 @@ export function ShareFile({
             </div>
 
             <div className="space-y-3">
-              <label className="text-sm font-medium">Message (optional)</label>
+              <label className="mb-1 text-sm font-medium">
+                Message (optional)
+              </label>
               <Textarea
                 placeholder="Add a message..."
                 value={shareMessage}
