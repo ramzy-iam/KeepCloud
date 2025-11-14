@@ -10,12 +10,19 @@ interface UseUploadTriggerOptions {
 }
 
 export function useUploadTrigger({
-  maxFileSize = FileHelper.convertToBytes(10, 'MB'),
-}: UseUploadTriggerOptions) {
+  maxFileSize,
+}: UseUploadTriggerOptions = {}) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { uploads, uploadFile, cancelUpload, clearUploads, retryUpload } =
     useUploadManager();
   const { data: storageInfo } = useGetUserStorage();
+
+  // Calculate effective max file size based on remaining storage
+  const effectiveMaxFileSize =
+    maxFileSize ??
+    (storageInfo
+      ? storageInfo.totalStorage - storageInfo.usedStorage
+      : FileHelper.convertToBytes(10, 'MB')); // Fallback to 10MB if no storage info
 
   const checkStorageSpace = useCallback(
     (files: File[]): { canUpload: boolean; rejectedFiles: File[] } => {
@@ -74,9 +81,9 @@ export function useUploadTrigger({
 
     // Filter files by size first
     const validSizeFiles = files.filter((file) => {
-      if (file.size > maxFileSize) {
+      if (file.size > effectiveMaxFileSize) {
         toast.error(`File too large: ${file.name}`, {
-          description: `Maximum file size is ${FileHelper.formatBytes(maxFileSize)}`,
+          description: `Maximum file size is ${FileHelper.formatBytes(effectiveMaxFileSize)}`,
         });
         return false;
       }

@@ -53,7 +53,7 @@ const ActionButton = ({ action }: { action: IActionButton }) => {
 
 export const QuickActionButtons = ({
   className,
-  maxFileSize = FileHelper.convertToBytes(10, 'MB'),
+  maxFileSize,
 }: QuickActionButtonsProps) => {
   const { openDialog } = useDialog();
   const { activeFolder } = useGetActiveFolder();
