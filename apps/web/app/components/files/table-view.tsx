@@ -15,7 +15,10 @@ import { ColumnDef, Table } from '@tanstack/react-table';
 import { FileMinViewDto } from '@keepcloud/commons/dtos';
 import { FolderEmpty } from '../ui';
 import { useNavigate } from 'react-router';
-import { useDeviceDetection, useInteractionHandlers } from '../../utils/interaction-utils';
+import {
+  useDeviceDetection,
+  useInteractionHandlers,
+} from '../../utils/interaction-utils';
 
 interface TableViewProps {
   data: FileMinViewDto[];
@@ -121,7 +124,12 @@ export function TableView({
         const isShiftClick = event.shiftKey;
         onSelectionChange(file.id, !selectedItems?.has(file.id), isShiftClick);
       } else {
-        // Mobile: tap to open
+        // Mobile: tap to open - clear selection first if any items are selected
+        if (onSelectionChange && selectedItems && selectedItems.size > 0) {
+          selectedItems.forEach((itemId) => {
+            onSelectionChange(itemId, false, false);
+          });
+        }
         handleItemOpen(file);
       }
     } else {
@@ -131,17 +139,17 @@ export function TableView({
         onSelectionChange(file.id, !selectedItems?.has(file.id), isShiftClick);
       } else {
         // Use the shared interaction handlers for proper click/double-click timing
-        interactionHandlers.handleClick(
-          event,
-          file.id,
-          onSelectionChange,
-          () => handleItemOpen(file)
+        interactionHandlers.handleClick(event, file.id, onSelectionChange, () =>
+          handleItemOpen(file),
         );
       }
     }
   };
 
-  const handleRowDoubleClick = (file: FileMinViewDto, event: React.MouseEvent) => {
+  const handleRowDoubleClick = (
+    file: FileMinViewDto,
+    event: React.MouseEvent,
+  ) => {
     const target = event.target as HTMLElement;
     const isActionsColumn = target.closest('[data-column-id="actions"]');
 
