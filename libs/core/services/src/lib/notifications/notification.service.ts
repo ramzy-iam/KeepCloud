@@ -10,7 +10,7 @@ export class NotificationService {
   private readonly logger = new Logger(NotificationService.name);
 
   constructor(private readonly systemQueueService: SystemQueueService) {
-    this.frontendUrl = Env.FRONTEND_URL;
+    this.frontendUrl = Env.VITE_FRONTEND_URL;
     this.supportEmail = Env.SUPPORT_EMAIL;
   }
 
