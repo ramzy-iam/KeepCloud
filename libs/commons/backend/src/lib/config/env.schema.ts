@@ -17,7 +17,7 @@ export const envSchema = z.object({
   API_ALLOWED_ORIGIN_LIST: z.string().default('http://localhost:4200'),
   SYSTEM_QUEUE_URL: z.string().default('redis://localhost:6379'),
   FILE_BUCKET: z.string(),
-  FRONTEND_URL: z.url().default('http://keepcloud.heyramzy.com'),
+  VITE_FRONTEND_URL: z.url().default('http://keepcloud.heyramzy.com'),
   TEMPLATES_BUCKET: z.string().default('templates-rzlab'),
   SUPPORT_EMAIL: z.email().default('ramesfeukeng@gmail.com'),
   GOOGLE_CLIENT_SECRET: z.string(),

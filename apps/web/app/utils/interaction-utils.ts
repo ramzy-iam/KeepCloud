@@ -82,7 +82,7 @@ export const useInteractionHandlers = (
         clickTimeoutRef.current = setTimeout(() => {
           selectItem(itemId, onSelect, false);
           clickTimeoutRef.current = null;
-        }, 300); // Increased from 200ms to 300ms for better touchpad support
+        }, 300);
       } else {
         onOpen?.();
       }

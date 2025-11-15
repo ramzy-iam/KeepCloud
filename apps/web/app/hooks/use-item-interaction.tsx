@@ -45,7 +45,8 @@ export function useItemInteraction({
       } else {
         // On mobile, simple tap should clear all selections and then open the file
         if (onSelect) {
-          // Clear all selections first
+          // Clear all selections by calling onSelect with the current item and selected=false, addToSelection=false
+          // The FolderView's handleSelectionChange will clear all selections when addToSelection is false
           onSelect(itemId, false, false);
         }
         onOpen?.();

@@ -49,7 +49,7 @@ provider:
       Ref: SystemQueue
     API_ALLOWED_ORIGIN_LIST: ${env:API_ALLOWED_ORIGIN_LIST}
     DATABASE_URL: ${env:DATABASE_URL}
-    FRONTEND_URL: ${env:FRONTEND_URL, 'http://keepcloud.heyramzy.com'}
+    VITE_FRONTEND_URL: ${env:VITE_FRONTEND_URL, 'http://keepcloud.heyramzy.com'}
     TEMPLATES_BUCKET: ${env:TEMPLATES_BUCKET, 'templates-rzlab'}
     SUPPORT_EMAIL: ${env:SUPPORT_EMAIL, 'ramsesfeukeng@gmail.com'}
     NO_REPLY_EMAIL: ${env:NO_REPLY_EMAIL, 'no-reply@heyramzy.com'}

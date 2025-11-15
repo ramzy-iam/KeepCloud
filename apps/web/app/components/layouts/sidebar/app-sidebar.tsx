@@ -11,6 +11,7 @@ import {
   useGetUserStorage,
 } from '@keepcloud/web-core/react';
 import { UserProfileIcon } from '../../user';
+import { Logomark } from '../../logo';
 import { UserProfileDto } from '@keepcloud/commons/dtos';
 import { HomeMenu } from './menus/home';
 import { NavLink, useLocation } from 'react-router';
@@ -85,12 +86,7 @@ export function AppSidebar({ user }: Readonly<AppSidebarProps>) {
               <div className="flex h-full w-[88px] flex-col items-center justify-between p-6 text-foreground">
                 <div className="flex h-full flex-col items-center gap-y-6">
                   <NavLink to={'/'}>
-                    <img
-                      src="/assets/svg/logomark.svg"
-                      alt="logo"
-                      width={40}
-                      height={40}
-                    />
+                    <Logomark />
                   </NavLink>
                   <div className="relative flex flex-col items-center justify-between gap-6">
                     {SidebarItems.map((item) => (
