@@ -2,7 +2,6 @@ import * as React from 'react';
 import { FileMinViewDto } from '@keepcloud/commons/dtos';
 import { useGetMenuItems, useGetMenuTrashedItems } from './use-get-menu';
 import { useContextMenu } from '../use-context-menu.hook';
-import { MenuItem } from '../../components';
 
 interface UseFileMenuProps {
   file: FileMinViewDto;
@@ -18,7 +17,7 @@ interface UseFileMenuReturn {
 export const useFileMenu = ({ file }: UseFileMenuProps): UseFileMenuReturn => {
   const fileName = file.name;
 
-  const menuItems: MenuItem[] = useGetMenuItems({ file });
+  const menuItems = useGetMenuItems({ file });
 
   const { ContextMenu, openMenu, closeMenu, isMenuOpen } = useContextMenu({
     menuItems,
