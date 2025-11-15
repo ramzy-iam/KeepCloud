@@ -22,6 +22,7 @@ import {
   UserProfileIcon,
 } from '../../components';
 import ScreenLoader from './loader';
+import { UploadProvider } from '../../contexts/upload-context';
 
 const ProfileIcon = ({ user }: { user: UserProfileDto }) => {
   const { isMobile } = useSidebar();
@@ -112,25 +113,27 @@ export default function BaseLayout() {
 
   return (
     <div className="h-svh overflow-hidden">
-      <SidebarProvider className="h-full">
-        <AppSidebar user={user} />
-        <main className="flex h-full w-full flex-col border-0 border-x border-section-border">
-          <div className="flex h-[72px] items-center justify-between border-b border-section-border px-2 py-5 md:px-8">
-            <div className="flex items-center gap-2.5 text-14">
-              <SidebarTrigger />
-              <GlobalSearch />
+      <UploadProvider>
+        <SidebarProvider className="h-full">
+          <AppSidebar user={user} />
+          <main className="flex h-full w-full flex-col border-0 border-x border-section-border">
+            <div className="flex h-[72px] items-center justify-between border-b border-section-border px-2 py-5 md:px-8">
+              <div className="flex items-center gap-2.5 text-14">
+                <SidebarTrigger />
+                <GlobalSearch />
+              </div>
+              <div className="flex items-center gap-2.5">
+                <ProfileIcon user={user} />
+                <ModeToggle />
+              </div>
             </div>
-            <div className="flex items-center gap-2.5">
-              <ProfileIcon user={user} />
-              <ModeToggle />
+            <div className="mt-6 mb-2 grid h-[calc(100%-72px)] max-h-[calc(100%-72px)] grid-rows-12 overflow-x-hidden">
+              <Outlet />
             </div>
-          </div>
-          <div className="mt-6 mb-2 grid h-[calc(100%-72px)] max-h-[calc(100%-72px)] grid-rows-12 overflow-x-hidden">
-            <Outlet />
-          </div>
-        </main>
-        <AppDialogsWrapper />
-      </SidebarProvider>
+          </main>
+          <AppDialogsWrapper />
+        </SidebarProvider>
+      </UploadProvider>
     </div>
   );
 }

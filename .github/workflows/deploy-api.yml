@@ -54,7 +54,7 @@ jobs:
       LOG_LEVEL: info
       API_ALLOWED_ORIGIN_LIST: ${{ vars.API_ALLOWED_ORIGIN_LIST }}
       DOMAIN_NAME: ${{ vars.DOMAIN_NAME }}
-      FRONTEND_URL: ${{ vars.FRONTEND_URL }}
+      VITE_FRONTEND_URL: ${{ vars.VITE_FRONTEND_URL }}
       TEMPLATES_BUCKET: ${{ vars.TEMPLATES_BUCKET }}
       SUPPORT_EMAIL: ${{ vars.SUPPORT_EMAIL }}
       NO_REPLY_EMAIL: ${{ vars.NO_REPLY_EMAIL }}

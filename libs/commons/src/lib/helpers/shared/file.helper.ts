@@ -175,16 +175,12 @@ export class FileHelper {
 
   /**
    * Gets appropriate decimal places for storage formatting based on file size
-   * - For files < 1MB: 2 decimal places
-   * - For files 1-10MB: 1 decimal place
-   * - For files >= 10MB: 0 decimal places
+   * - For files < 100MB: 2 decimal places
+   * - For files >= 1GB : 1 decimal places
    */
   getStorageDecimalPlaces(storageBytes: number): number {
-    if (storageBytes < this.convertToBytes(1, 'MB')) {
+    if (storageBytes < this.convertToBytes(100, 'MB')) {
       return 2;
-    }
-    if (storageBytes >= this.convertToBytes(10, 'MB')) {
-      return 0;
     }
     return 1;
   }
@@ -192,8 +188,13 @@ export class FileHelper {
   /**
    * Formats storage with consistent decimal places for used and total values
    */
-  formatStorageConsistentAuto(usedStorage: number, totalStorage: number) {
-    const decimalPlaces = this.getStorageDecimalPlaces(usedStorage);
+  formatStorageConsistentAuto(
+    usedStorage: number,
+    totalStorage: number,
+    defaultDecimalPlaces?: number,
+  ): { used: string; total: string; unit: string } {
+    const decimalPlaces =
+      defaultDecimalPlaces ?? this.getStorageDecimalPlaces(usedStorage);
     return this.formatStorageConsistent(
       usedStorage,
       totalStorage,

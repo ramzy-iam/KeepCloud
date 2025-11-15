@@ -4,6 +4,7 @@ export const envSchema = z.object({
   VITE_GOOGLE_CLIENT_ID: z.string(),
   VITE_API_BASE_URL: z.string(),
   VITE_DOMAIN_NAME: z.string(),
+  VITE_BETA_MODE: z.stringbool().default(false),
 });
 
 export type EnvVariables = z.infer<typeof envSchema>;

@@ -40,9 +40,10 @@ export function StorageDetailsModal({
   const { used, total, unit } = FileHelper.formatStorageConsistentAuto(
     usedStorage,
     totalStorage,
+    2,
   );
 
-  const availableFormatted = FileHelper.formatBytes(availableStorage, 1, unit);
+  const availableFormatted = FileHelper.formatBytes(availableStorage, 2, unit);
 
   // Default breakdown if not provided or loading
   const breakdown = breakdownData ?? {
@@ -189,11 +190,7 @@ export function StorageDetailsModal({
                       </div>
                       <div className="text-right text-heading">
                         <div className="text-sm font-medium">
-                          {FileHelper.formatBytes(
-                            item.value,
-                            FileHelper.getStorageDecimalPlaces(item.value),
-                            unit,
-                          )}
+                          {FileHelper.formatBytes(item.value, 2, unit)}
                         </div>
                         <div className="text-xs">
                           {FileHelper.formatPercentage(item.percentage)}%
