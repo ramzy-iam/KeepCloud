@@ -10,6 +10,7 @@ import {
 } from '@keepcloud/commons/dtos';
 import { StorageService, ApiError } from '../services';
 import { SYSTEM_FILE } from '@keepcloud/commons/constants';
+import { FileHelper } from '@keepcloud/commons/helpers';
 import { useGetActiveFolder } from './folder.hook';
 import {
   updateFileEverywhere,
@@ -135,25 +136,37 @@ export const useRenameResource = ({ parentId }: RenameResourceProps) => {
 };
 
 export const useMoveToTrash = ({ parentId }: { parentId: string }) => {
+  const invalidateCache = useInvalidateFileOperationCache();
+
   return useMutation<FileMinViewDto, ApiError, string>({
     mutationFn: (id) => StorageService.moveToTrash(id),
     onSuccess: (_, id) => {
       removeFileEverywhere(id);
+      invalidateCache(parentId);
     },
   });
 };
 
 export const useRestoreResource = () => {
   const { removeItem } = useFileListUpdater(SYSTEM_FILE.TRASH.id);
+  const invalidateCache = useInvalidateFileOperationCache();
+
   return useMutation<FileMinViewDto, ApiError, string>({
     mutationFn: (id) => StorageService.restore(id),
-    onSuccess: (_, id) => {
+    onSuccess: (restoredFile, id) => {
+      // Remove from trash
       removeItem(id);
+
+      // Invalidate cache for the folder where the file was restored to
+      if (restoredFile.parentId) {
+        invalidateCache(restoredFile.parentId);
+      }
     },
   });
 };
 
 export const useDeletePermanently = () => {
+  const queryClient = useQueryClient();
   const { removeItem } = useFileListUpdater(SYSTEM_FILE.TRASH.id);
   const refreshStorageData = useRefreshStorageData();
   return useMutation<FileMinViewDto, ApiError, string>({
@@ -161,6 +174,7 @@ export const useDeletePermanently = () => {
     onSuccess: (_, id) => {
       removeItem(id);
       updateFileEverywhere(id, () => null);
+      queryClient.invalidateQueries({ queryKey: queryKeys.storage.trash });
       refreshStorageData();
     },
   });
@@ -204,17 +218,70 @@ export const useRefreshSuggestions = () => {
   };
 };
 
+/**
+ * Invalidates cache for file operations that affect folder contents
+ * Used when files are moved to trash, restored, or permanently deleted
+ */
+export const useInvalidateFileOperationCache = () => {
+  const queryClient = useQueryClient();
+  const refreshSuggestions = useRefreshSuggestions();
+
+  return (parentId: string) => {
+    const actualParentId = FileHelper.getValidParentId(parentId);
+
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.folder.children(actualParentId),
+    });
+
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.storage.myStorage,
+    });
+
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.storage.tree(actualParentId),
+    });
+
+    // Also invalidate the tree for the original parent if it's different
+    if (parentId !== actualParentId) {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.storage.tree(parentId),
+      });
+    }
+
+    // Always invalidate trash cache since files are moved to/from trash
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.storage.trash,
+    });
+
+    // Refresh suggestions as they might be affected
+    refreshSuggestions();
+  };
+};
+
 export const useBulkMoveToTrash = () => {
   const refreshStorageData = useRefreshStorageData();
+  const invalidateCache = useInvalidateFileOperationCache();
 
   return useMutation<BulkTrashResultDto[], ApiError, string[]>({
     mutationFn: (fileIds) => StorageService.bulkMoveToTrash(fileIds),
     onSuccess: (results) => {
+      const parentIds = new Set<string>();
+
       results.forEach((result) => {
         if (result.success) {
           removeFileEverywhere(result.id);
+          // Collect unique parent IDs from successful operations
+          if (result.file?.parentId) {
+            parentIds.add(result.file.parentId);
+          }
         }
       });
+
+      // Invalidate cache for all affected parent folders
+      parentIds.forEach((parentId) => {
+        invalidateCache(parentId);
+      });
+
       refreshStorageData();
     },
   });
@@ -238,6 +305,7 @@ export const useBulkRestore = () => {
 
 export const useBulkDelete = () => {
   const refreshStorageData = useRefreshStorageData();
+  const queryClient = useQueryClient();
 
   return useMutation<BulkDeleteResultDto[], ApiError, string[]>({
     mutationFn: (fileIds) => StorageService.bulkDelete(fileIds),
@@ -247,6 +315,7 @@ export const useBulkDelete = () => {
           removeFileEverywhere(result.id);
         }
       });
+      queryClient.invalidateQueries({ queryKey: queryKeys.storage.trash });
       refreshStorageData();
     },
   });
