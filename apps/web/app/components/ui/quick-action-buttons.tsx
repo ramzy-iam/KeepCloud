@@ -9,19 +9,17 @@ import {
   renderMenuItem,
   useDialog,
   useGetActiveFolder,
-  useUploadTrigger,
 } from '@keepcloud/web-core/react';
-import { FileHelper } from '@keepcloud/commons/helpers';
+import { useGlobalUpload } from '../../contexts/upload-context';
 
 interface IActionButton {
-  icon: React.ComponentType<any>;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   label: string;
   menuItems: MenuItem[];
 }
 
 interface QuickActionButtonsProps {
   className?: string;
-  maxFileSize?: number;
 }
 
 const iconClassName = 'mr-2 h-4 w-4 text-neutral-300';
@@ -51,16 +49,10 @@ const ActionButton = ({ action }: { action: IActionButton }) => {
   );
 };
 
-export const QuickActionButtons = ({
-  className,
-  maxFileSize,
-}: QuickActionButtonsProps) => {
+export const QuickActionButtons = ({ className }: QuickActionButtonsProps) => {
   const { openDialog } = useDialog();
   const { activeFolder } = useGetActiveFolder();
-
-  const { UploadHandler, triggerUpload } = useUploadTrigger({
-    maxFileSize,
-  });
+  const { triggerUpload } = useGlobalUpload();
 
   const actions: IActionButton[] = [
     {
@@ -100,7 +92,6 @@ export const QuickActionButtons = ({
         className,
       )}
     >
-      <UploadHandler />
       {actions.map((action) => (
         <ActionButton
           key={`${action.label}-${action.icon.name}`}
