@@ -166,15 +166,16 @@ export const useRestoreResource = () => {
 };
 
 export const useDeletePermanently = () => {
-  const queryClient = useQueryClient();
   const { removeItem } = useFileListUpdater(SYSTEM_FILE.TRASH.id);
   const refreshStorageData = useRefreshStorageData();
+  const invalidateGlobalCache = useInvalidateGlobalFileCache();
+
   return useMutation<FileMinViewDto, ApiError, string>({
     mutationFn: (id) => StorageService.deletePermanently(id),
     onSuccess: (_, id) => {
       removeItem(id);
       updateFileEverywhere(id, () => null);
-      queryClient.invalidateQueries({ queryKey: queryKeys.storage.trash });
+      invalidateGlobalCache();
       refreshStorageData();
     },
   });
@@ -219,22 +220,17 @@ export const useRefreshSuggestions = () => {
 };
 
 /**
- * Invalidates cache for file operations that affect folder contents
- * Used when files are moved to trash, restored, or permanently deleted
+ * Invalidates cache for parent-specific file operations
+ * Used to invalidate folder contents and tree views for specific parent folders
  */
-export const useInvalidateFileOperationCache = () => {
+export const useInvalidateParentCache = () => {
   const queryClient = useQueryClient();
-  const refreshSuggestions = useRefreshSuggestions();
 
   return (parentId: string) => {
     const actualParentId = FileHelper.getValidParentId(parentId);
 
     queryClient.invalidateQueries({
       queryKey: queryKeys.folder.children(actualParentId),
-    });
-
-    queryClient.invalidateQueries({
-      queryKey: queryKeys.storage.myStorage,
     });
 
     queryClient.invalidateQueries({
@@ -247,20 +243,48 @@ export const useInvalidateFileOperationCache = () => {
         queryKey: queryKeys.storage.tree(parentId),
       });
     }
+  };
+};
 
-    // Always invalidate trash cache since files are moved to/from trash
+/**
+ * Invalidates global cache for file operations
+ * Used to invalidate general storage, trash, and suggestions cache
+ */
+export const useInvalidateGlobalFileCache = () => {
+  const queryClient = useQueryClient();
+  const refreshSuggestions = useRefreshSuggestions();
+
+  return () => {
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.storage.myStorage,
+    });
+
     queryClient.invalidateQueries({
       queryKey: queryKeys.storage.trash,
     });
 
-    // Refresh suggestions as they might be affected
     refreshSuggestions();
+  };
+};
+
+/**
+ * Invalidates cache for file operations that affect folder contents
+ * Used when files are moved to trash, restored, or permanently deleted
+ */
+export const useInvalidateFileOperationCache = () => {
+  const invalidateParentCache = useInvalidateParentCache();
+  const invalidateGlobalCache = useInvalidateGlobalFileCache();
+
+  return (parentId: string) => {
+    invalidateParentCache(parentId);
+    invalidateGlobalCache();
   };
 };
 
 export const useBulkMoveToTrash = () => {
   const refreshStorageData = useRefreshStorageData();
-  const invalidateCache = useInvalidateFileOperationCache();
+  const invalidateParentCache = useInvalidateParentCache();
+  const invalidateGlobalCache = useInvalidateGlobalFileCache();
 
   return useMutation<BulkTrashResultDto[], ApiError, string[]>({
     mutationFn: (fileIds) => StorageService.bulkMoveToTrash(fileIds),
@@ -279,9 +303,11 @@ export const useBulkMoveToTrash = () => {
 
       // Invalidate cache for all affected parent folders
       parentIds.forEach((parentId) => {
-        invalidateCache(parentId);
+        invalidateParentCache(parentId);
       });
 
+      // Invalidate global cache only once
+      invalidateGlobalCache();
       refreshStorageData();
     },
   });
@@ -289,15 +315,31 @@ export const useBulkMoveToTrash = () => {
 
 export const useBulkRestore = () => {
   const refreshStorageData = useRefreshStorageData();
+  const invalidateParentCache = useInvalidateParentCache();
+  const invalidateGlobalCache = useInvalidateGlobalFileCache();
 
   return useMutation<BulkRestoreResultDto[], ApiError, string[]>({
     mutationFn: (fileIds) => StorageService.bulkRestore(fileIds),
     onSuccess: (results) => {
+      const parentIds = new Set<string>();
+
       results.forEach((result) => {
         if (result.success) {
           removeFileEverywhere(result.id);
+          // Collect unique parent IDs from successful operations
+          if (result.file?.parentId) {
+            parentIds.add(result.file.parentId);
+          }
         }
       });
+
+      // Invalidate cache for all affected parent folders
+      parentIds.forEach((parentId) => {
+        invalidateParentCache(parentId);
+      });
+
+      // Invalidate global cache only once
+      invalidateGlobalCache();
       refreshStorageData();
     },
   });
@@ -305,7 +347,7 @@ export const useBulkRestore = () => {
 
 export const useBulkDelete = () => {
   const refreshStorageData = useRefreshStorageData();
-  const queryClient = useQueryClient();
+  const invalidateGlobalCache = useInvalidateGlobalFileCache();
 
   return useMutation<BulkDeleteResultDto[], ApiError, string[]>({
     mutationFn: (fileIds) => StorageService.bulkDelete(fileIds),
@@ -315,7 +357,10 @@ export const useBulkDelete = () => {
           removeFileEverywhere(result.id);
         }
       });
-      queryClient.invalidateQueries({ queryKey: queryKeys.storage.trash });
+
+      // For permanent deletion, we only need to invalidate global cache once
+      // since files are already removed from trash
+      invalidateGlobalCache();
       refreshStorageData();
     },
   });
