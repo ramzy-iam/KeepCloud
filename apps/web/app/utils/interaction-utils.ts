@@ -70,6 +70,14 @@ export const useInteractionHandlers = (
     e.preventDefault();
     e.stopPropagation();
 
+    // Prevent text selection when using shift key
+    if (e.shiftKey) {
+      // Clear any existing selection
+      if (window.getSelection) {
+        window.getSelection()?.removeAllRanges();
+      }
+    }
+
     if (!isMobile) {
       if (clickTimeoutRef.current) {
         clearTimeout(clickTimeoutRef.current);
@@ -126,7 +134,16 @@ export const createInteractionHandlers = (
     ) => void,
     onOpen?: () => void,
   ) => {
+    e.preventDefault();
     e.stopPropagation();
+
+    // Prevent text selection when using shift key
+    if (e.shiftKey) {
+      // Clear any existing selection
+      if (window.getSelection) {
+        window.getSelection()?.removeAllRanges();
+      }
+    }
 
     if (!isMobile) {
       if (e.shiftKey && onSelect) {

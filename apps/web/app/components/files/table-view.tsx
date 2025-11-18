@@ -15,6 +15,7 @@ import { ColumnDef, Table } from '@tanstack/react-table';
 import { FileMinViewDto } from '@keepcloud/commons/dtos';
 import { FolderEmpty } from '../ui';
 import { useNavigate } from 'react-router';
+import { useRef } from 'react';
 import {
   useDeviceDetection,
   useInteractionHandlers,
@@ -97,6 +98,7 @@ export function TableView({
   const navigate = useNavigate();
   const { isMobile } = useDeviceDetection();
   const interactionHandlers = useInteractionHandlers(isMobile);
+  const lastSelectedIndexRef = useRef<number>(-1);
 
   const handleItemOpen = (file: FileMinViewDto) => {
     if (file.isFolder) {
@@ -107,6 +109,58 @@ export function TableView({
         type: 'previewFile',
         item: file,
       });
+    }
+  };
+
+  const handleSelectionWithRange = (
+    itemId: string,
+    selected: boolean,
+    addToSelection: boolean,
+    event?: React.MouseEvent,
+  ) => {
+    if (!onSelectionChange) return;
+
+    const currentIndex = data.findIndex((item) => item.id === itemId);
+    const isShiftClick = event?.shiftKey || addToSelection;
+
+    if (isShiftClick && currentIndex >= 0 && selected) {
+      let lastIndex = lastSelectedIndexRef.current;
+
+      // If no last selected index, try to find the last selected item in the data
+      if (lastIndex < 0 && selectedItems && selectedItems.size > 0) {
+        for (let i = data.length - 1; i >= 0; i--) {
+          if (selectedItems.has(data[i].id)) {
+            lastIndex = i;
+            break;
+          }
+        }
+      }
+
+      if (lastIndex >= 0) {
+        // Handle range selection (only when selecting, not deselecting)
+        const startIndex = Math.min(lastIndex, currentIndex);
+        const endIndex = Math.max(lastIndex, currentIndex);
+
+        for (let i = startIndex; i <= endIndex; i++) {
+          const item = data[i];
+          if (item && !selectedItems?.has(item.id)) {
+            onSelectionChange(item.id, true, true);
+          }
+        }
+      } else {
+        // No previous selection found, just select the current item
+        onSelectionChange(itemId, selected, addToSelection);
+        lastSelectedIndexRef.current = currentIndex;
+      }
+    } else {
+      // Regular selection
+      onSelectionChange(itemId, selected, addToSelection);
+      if (selected) {
+        lastSelectedIndexRef.current = currentIndex;
+      } else {
+        // When deselecting, reset the last selected index to avoid confusion
+        lastSelectedIndexRef.current = -1;
+      }
     }
   };
 
@@ -121,8 +175,12 @@ export function TableView({
     if (isMobile) {
       // Mobile: checkbox clicks for selection, other clicks for opening
       if (isCheckboxColumn && onSelectionChange) {
-        const isShiftClick = event.shiftKey;
-        onSelectionChange(file.id, !selectedItems?.has(file.id), isShiftClick);
+        handleSelectionWithRange(
+          file.id,
+          !selectedItems?.has(file.id),
+          event.shiftKey,
+          event,
+        );
       } else {
         // Mobile: tap to open - clear selection first if any items are selected
         if (onSelectionChange && selectedItems && selectedItems.size > 0) {
@@ -135,12 +193,26 @@ export function TableView({
     } else {
       // Desktop/Laptop: Handle checkbox clicks immediately
       if (isCheckboxColumn && onSelectionChange) {
-        const isShiftClick = event.shiftKey;
-        onSelectionChange(file.id, !selectedItems?.has(file.id), isShiftClick);
+        handleSelectionWithRange(
+          file.id,
+          !selectedItems?.has(file.id),
+          event.shiftKey,
+          event,
+        );
       } else {
         // Use the shared interaction handlers for proper click/double-click timing
-        interactionHandlers.handleClick(event, file.id, onSelectionChange, () =>
-          handleItemOpen(file),
+        interactionHandlers.handleClick(
+          event,
+          file.id,
+          (id, selected, addToSelection) => {
+            handleSelectionWithRange(
+              id,
+              selected,
+              addToSelection || false,
+              event,
+            );
+          },
+          () => handleItemOpen(file),
         );
       }
     }
