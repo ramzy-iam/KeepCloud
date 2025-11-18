@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { FileMinViewDto } from '@keepcloud/commons/dtos';
+import { FileMinViewDto, TrashedFileDto } from '@keepcloud/commons/dtos';
 import { useAtom } from 'jotai';
 import {
   Dialog,
@@ -17,6 +17,10 @@ import {
   useTheme,
 } from '@keepcloud/web-core/react';
 import { DownloadIcon } from 'lucide-react';
+
+const isTrashedFile = (file: FileMinViewDto): file is TrashedFileDto => {
+  return 'trashedAt' in file && file.trashedAt !== null;
+};
 
 export const FilePreviewDialog = () => {
   const [dialogState, setDialogState] = useAtom(dialogAtom);
@@ -56,7 +60,7 @@ export const FilePreviewDialog = () => {
           >
             <TooltipProviderWrapper content={'Download'} sideOffset={4}>
               <div>
-                {downloadUrl && (
+                {downloadUrl && !isTrashedFile(file) && (
                   <a
                     href={downloadUrl}
                     target="_blank"
@@ -74,7 +78,12 @@ export const FilePreviewDialog = () => {
         </DialogHeader>
 
         <div className="flex max-h-[70svh] min-h-[70svh] items-center justify-center overflow-auto md:max-h-[80svh] md:min-h-[80svh] md:p-4">
-          {error ? (
+          {isTrashedFile(file) ? (
+            <p className="text-sm text-muted-foreground">
+              This file is in the trash. Please restore it first before
+              previewing.
+            </p>
+          ) : error ? (
             <p className="text-sm text-muted-foreground">
               No preview available for this file type or the file is not
               accessible. Please try downloading it instead.
