@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   CreateFileDto,
   CreatePresignedPostBody,
@@ -10,30 +10,34 @@ import {
 import { ApiError, FileService } from '../services';
 import { toast } from 'sonner';
 import { useGetActiveFolder } from './folder.hook';
-import { useFileListUpdater } from './use-file-list-updater.hook';
 import { FileHelper } from '@keepcloud/commons/helpers';
 import { useRefreshStorageData, useRefreshSuggestions } from './storage.hook';
 import { queryKeys } from '../query-keys';
+import { insertFileToList } from './use-file-list-updater.hook';
 
 interface UploadFileProps {
   onProgress?: (progress: number, file: File) => void;
+}
+
+interface FileWithUploadMeta extends FileMinViewDto {
+  __uploadTargetParentId?: string;
 }
 
 export const useUploadFile = ({ onProgress }: UploadFileProps) => {
   const { mutateAsync: getPresignedPost } = useGetPresignedPost();
   const { mutateAsync: createFile } = useCreateFile();
   const { activeFolder } = useGetActiveFolder();
-  const parentId = activeFolder.id;
-
-  const finalParentId = FileHelper.getValidParentId(parentId);
-  const { insertItem } = useFileListUpdater(finalParentId);
+  const queryClient = useQueryClient();
 
   return useMutation<
-    FileMinViewDto,
+    FileWithUploadMeta,
     ApiError,
     { file: File; abortController?: AbortController }
   >({
     mutationFn: async ({ file, abortController }) => {
+      // Capture the active folder at the time of operation start
+      const targetParentId = FileHelper.getValidParentId(activeFolder.id);
+
       // Step 1: Get presigned URL
       onProgress?.(5, file);
       const presignedPost = await getPresignedPost({ filename: file.name });
@@ -95,13 +99,19 @@ export const useUploadFile = ({ onProgress }: UploadFileProps) => {
 
               const result = await createFile({
                 storagePath: presignedPost.key,
-                parentId: activeFolder.id,
+                parentId: targetParentId, // Use the folder that was active when operation started
                 filename: file.name,
               });
 
+              // Store the target parent ID in the result for the onSuccess callback
+              const resultWithTargetFolder = {
+                ...result,
+                __uploadTargetParentId: targetParentId,
+              };
+
               clearInterval(timer);
               onProgress?.(100, file); // Jump to 100% once done
-              resolve(result);
+              resolve(resultWithTargetFolder);
             } catch (error) {
               reject(error);
             }
@@ -123,7 +133,14 @@ export const useUploadFile = ({ onProgress }: UploadFileProps) => {
       });
     },
     onSuccess: (data, variables) => {
-      insertItem(data, 'start');
+      const targetParentId = data.__uploadTargetParentId;
+
+      insertFileToList(data, targetParentId, 'start');
+      if (targetParentId)
+        queryClient.refetchQueries({
+          queryKey: queryKeys.folder.children(targetParentId),
+        });
+      queryClient.refetchQueries({ queryKey: queryKeys.storage.myStorage });
     },
 
     onError: (error, variables) => {
