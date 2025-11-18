@@ -136,10 +136,13 @@ export const useUploadFile = ({ onProgress }: UploadFileProps) => {
       const targetParentId = data.__uploadTargetParentId;
 
       insertFileToList(data, targetParentId, 'start');
-      if (targetParentId)
-        queryClient.refetchQueries({
-          queryKey: queryKeys.folder.children(targetParentId),
-        });
+      setTimeout(() => {
+        if (targetParentId)
+          queryClient.refetchQueries({
+            queryKey: queryKeys.folder.children(targetParentId),
+          });
+        queryClient.refetchQueries({ queryKey: queryKeys.storage.myStorage });
+      }, 1000);
     },
 
     onError: (error, variables) => {
