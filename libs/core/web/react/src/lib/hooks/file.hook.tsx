@@ -140,7 +140,6 @@ export const useUploadFile = ({ onProgress }: UploadFileProps) => {
         queryClient.refetchQueries({
           queryKey: queryKeys.folder.children(targetParentId),
         });
-      queryClient.refetchQueries({ queryKey: queryKeys.storage.myStorage });
     },
 
     onError: (error, variables) => {
