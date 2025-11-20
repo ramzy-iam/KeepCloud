@@ -415,7 +415,7 @@ export function ShareFile({
       {selectedUserIds.length === 0 && (
         <>
           <ClipboardInput
-            value={`${Env.VITE_FRONTEND_URL}/${item.isFolder ? 'folders' : 'files'}/0B8MXxVL7sSStfjlBVnhQUk92SGVpSGl3WmFCQVMySE5EbGllOE9BU2hZeFk3SFhaQV9XWWc?resourcekey=0-UX80l5-84OSFv0QHOw4ejw&usp=sharing`}
+            value={`${Env.VITE_FRONTEND_URL}/${item.isFolder ? 'folders' : 'files'}/${item.id}`}
             placeholder="Share link will appear here"
             onCopy={(link) => console.log('Copied link:', link)}
           />
