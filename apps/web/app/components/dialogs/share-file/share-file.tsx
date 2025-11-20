@@ -18,6 +18,7 @@ import {
   Textarea,
   Checkbox,
   cn,
+  Env,
 } from '@keepcloud/web-core/react';
 import {
   FileMinViewDto,
@@ -26,7 +27,15 @@ import {
 } from '@keepcloud/commons/dtos';
 import { FilePermissionRole } from '@keepcloud/commons/types';
 
-import { useGetUsers } from '@keepcloud/web-core/react';
+import {
+  useGetUsers,
+  useShareFile,
+  useShareFilePublic,
+  useUnshareFilePublic,
+  useUpdatePermissionRole,
+  useRevokePermission,
+  useGetFilePermissions,
+} from '@keepcloud/web-core/react';
 import { OwnerIcon } from '../../ui/owner-icon';
 import { ClipboardInput } from '../../ui/clipboard-input';
 import { useAtomValue } from 'jotai';
@@ -55,6 +64,30 @@ const PUBLIC_ACCESS_ROLE = {
   EDIT: 'edit',
 } as const;
 
+const mapFilePermissionToPublicRole = (
+  fileRole: FilePermissionRole,
+): PublicAccessRole => {
+  switch (fileRole) {
+    case FilePermissionRole.EDITOR:
+      return PUBLIC_ACCESS_ROLE.EDIT;
+    case FilePermissionRole.VIEWER:
+    default:
+      return PUBLIC_ACCESS_ROLE.VIEW;
+  }
+};
+
+const mapPublicRoleToFilePermission = (
+  publicRole: PublicAccessRole,
+): FilePermissionRole => {
+  switch (publicRole) {
+    case PUBLIC_ACCESS_ROLE.EDIT:
+      return FilePermissionRole.EDITOR;
+    case PUBLIC_ACCESS_ROLE.VIEW:
+    default:
+      return FilePermissionRole.VIEWER;
+  }
+};
+
 type PublicAccessType =
   (typeof PUBLIC_ACCESS_TYPE)[keyof typeof PUBLIC_ACCESS_TYPE];
 type PublicAccessRole =
@@ -76,7 +109,9 @@ export function ShareFile({
   const [publicAccessRole, setPublicAccessRole] = useState<PublicAccessRole>(
     PUBLIC_ACCESS_ROLE.VIEW,
   );
-  const [shareMessage, setShareMessage] = useState('');
+  const [shareMessage, setShareMessage] = useState<string | undefined>(
+    undefined,
+  );
   const [sendNotification, setSendNotification] = useState(true);
 
   // Handle clearing selection when parent triggers it
@@ -84,7 +119,7 @@ export function ShareFile({
     if (clearSelectionTrigger !== undefined && clearSelectionTrigger > 0) {
       setSelectedUserIds([]);
       setSelectedRole(FilePermissionRole.VIEWER);
-      setShareMessage('');
+      setShareMessage(undefined);
       setSendNotification(true);
       onSelectionChange?.(false);
     }
@@ -92,12 +127,40 @@ export function ShareFile({
 
   const currentUser = useAtomValue(authAtom)?.user as UserProfileDto;
 
-  const isLoadingPermissions = false;
-  const refetchPermissions = () => console.log('Refetch permissions called');
+  const { mutateAsync: shareFile, isPending: isSharing } = useShareFile();
+  const { mutateAsync: shareFilePublic, isPending: isSharingPublic } =
+    useShareFilePublic();
+  const { mutateAsync: unshareFilePublic } = useUnshareFilePublic();
+  const { mutateAsync: updatePermissionRole } = useUpdatePermissionRole();
+  const { mutateAsync: revokePermission } = useRevokePermission();
+
+  const { data: filePermissions, isLoading: isLoadingPermissions } =
+    useGetFilePermissions({
+      fileId: item.id,
+      enabled: true,
+    });
+
+  // Check for public sharing and update state accordingly
+  useEffect(() => {
+    if (filePermissions) {
+      const publicPermission = filePermissions.find(
+        (permission) => permission.userId === null && permission.user === null,
+      );
+
+      if (publicPermission) {
+        setPublicAccessType(PUBLIC_ACCESS_TYPE.ANYONE);
+        setPublicAccessRole(
+          mapFilePermissionToPublicRole(publicPermission.role),
+        );
+      } else {
+        setPublicAccessType(PUBLIC_ACCESS_TYPE.LIMITED);
+      }
+    }
+  }, [filePermissions]);
 
   // Get users from API - load initial users for the dropdown
   const { data: usersResponse, isLoading: isLoadingUsers } = useGetUsers({
-    filters: { pageSize: 10, page: 1 }, // Load first 10 users for selection
+    filters: { pageSize: 10, page: 1, noAccessOnFileId: item.id },
     staleTime: 30 * 1000, // Cache results for 30 seconds
   });
 
@@ -112,12 +175,14 @@ export function ShareFile({
     if (selectedUserIds.length === 0) return;
 
     try {
-      console.log('Sharing file with users:', {
+      await shareFile({
         fileId: item.id,
-        userIds: selectedUserIds,
-        role: selectedRole,
-        message: shareMessage,
-        sendNotification: sendNotification,
+        dto: {
+          userIds: selectedUserIds,
+          role: selectedRole,
+          message: shareMessage,
+          sendNotification: sendNotification,
+        },
       });
 
       // Reset form
@@ -126,23 +191,88 @@ export function ShareFile({
       setShareMessage('');
       setSendNotification(true);
       onSelectionChange?.(false);
-      refetchPermissions();
     } catch (error) {
       console.error('Failed to share file:', error);
     }
   };
 
-  // Mock handlers for now
   const handleRoleChange = async (
     permissionId: string,
     newRole: FilePermissionRole,
   ) => {
-    console.log('Update permission called:', { permissionId, newRole });
+    try {
+      await updatePermissionRole({
+        fileId: item.id,
+        permissionId,
+        dto: { role: newRole },
+      });
+    } catch (error) {
+      console.error('Failed to update permission role:', error);
+    }
   };
 
   const handleRemoveAccess = async (permissionId: string) => {
-    console.log('Remove access called:', { permissionId });
+    try {
+      await revokePermission({
+        fileId: item.id,
+        permissionId,
+      });
+    } catch (error) {
+      console.error('Failed to remove access:', error);
+    }
   };
+  // Public access handlers
+  const handlePublicAccessTypeChange = async (value: PublicAccessType) => {
+    setPublicAccessType(value);
+
+    try {
+      if (value === PUBLIC_ACCESS_TYPE.LIMITED) {
+        // Remove public sharing
+        await unshareFilePublic(item.id);
+        setPublicAccessRole(PUBLIC_ACCESS_ROLE.VIEW);
+      } else if (value === PUBLIC_ACCESS_TYPE.ANYONE) {
+        // Enable public sharing
+        await shareFilePublic({
+          fileId: item.id,
+          dto: {
+            role: mapPublicRoleToFilePermission(publicAccessRole),
+          },
+        });
+      }
+    } catch (error) {
+      console.error('Failed to update public access:', error);
+      // Revert the UI state on error
+      setPublicAccessType(
+        value === PUBLIC_ACCESS_TYPE.LIMITED
+          ? PUBLIC_ACCESS_TYPE.ANYONE
+          : PUBLIC_ACCESS_TYPE.LIMITED,
+      );
+    }
+  };
+
+  const handlePublicAccessRoleChange = async (value: PublicAccessRole) => {
+    setPublicAccessRole(value);
+
+    if (publicAccessType === PUBLIC_ACCESS_TYPE.ANYONE) {
+      try {
+        await shareFilePublic({
+          fileId: item.id,
+          dto: {
+            role: mapPublicRoleToFilePermission(value),
+          },
+        });
+      } catch (error) {
+        console.error('Failed to update public access role:', error);
+        // Revert the UI state on error
+        setPublicAccessRole(
+          value === PUBLIC_ACCESS_ROLE.VIEW
+            ? PUBLIC_ACCESS_ROLE.EDIT
+            : PUBLIC_ACCESS_ROLE.VIEW,
+        );
+      }
+    }
+  };
+
   console.log('Rendering SharePeopleTab with item:', item);
 
   // Main view
@@ -273,7 +403,9 @@ export function ShareFile({
             </div>
 
             <div className="flex justify-end">
-              <Button onClick={handleShare}>Send</Button>
+              <Button onClick={handleShare} disabled={isSharing}>
+                {isSharing ? 'Sharing...' : 'Send'}
+              </Button>
             </div>
           </>
         )}
@@ -283,9 +415,7 @@ export function ShareFile({
       {selectedUserIds.length === 0 && (
         <>
           <ClipboardInput
-            value={
-              'https://keepcloud.com/folders/0B8MXxVL7sSStfjlBVnhQUk92SGVpSGl3WmFCQVMySE5EbGllOE9BU2hZeFk3SFhaQV9XWWc?resourcekey=0-UX80l5-84OSFv0QHOw4ejw&usp=sharing'
-            }
+            value={`${Env.VITE_FRONTEND_URL}/${item.isFolder ? 'folders' : 'files'}/0B8MXxVL7sSStfjlBVnhQUk92SGVpSGl3WmFCQVMySE5EbGllOE9BU2hZeFk3SFhaQV9XWWc?resourcekey=0-UX80l5-84OSFv0QHOw4ejw&usp=sharing`}
             placeholder="Share link will appear here"
             onCopy={(link) => console.log('Copied link:', link)}
           />
@@ -307,7 +437,7 @@ export function ShareFile({
                 ))}
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="md-pr-3 max-h-[150px] space-y-3 overflow-y-auto pr-2">
                 {/* Owner */}
                 <div className="flex items-center justify-between gap-12">
                   <div className="flex items-center gap-3">
@@ -331,11 +461,13 @@ export function ShareFile({
                   <span className="text-12">owner</span>
                 </div>
 
-                {/* Shared users - exclude the owner from permissions list */}
-                {item.permissions
+                {/* Shared users - exclude the owner and public permissions from list */}
+                {filePermissions
                   ?.filter(
                     (permission: FilePermissionDto) =>
-                      permission.user.id !== item.owner.id,
+                      permission?.user?.id &&
+                      permission.user.id !== item.owner.id &&
+                      permission.userId !== null, // Exclude public permissions
                   )
                   .map((permission: FilePermissionDto) => {
                     return (
@@ -411,11 +543,7 @@ export function ShareFile({
                 {publicAccessType === PUBLIC_ACCESS_TYPE.ANYONE && (
                   <Select
                     value={publicAccessRole}
-                    onValueChange={(value: PublicAccessRole) => {
-                      setPublicAccessRole(value);
-                      console.log('Update public access role:', value);
-                      // TODO: Implement public access role update
-                    }}
+                    onValueChange={handlePublicAccessRoleChange}
                   >
                     <SelectTrigger
                       className="h-min! w-min! border-0 bg-transparent! p-0 text-12! text-heading hover:bg-none!"
@@ -438,15 +566,7 @@ export function ShareFile({
             <div className="w-full">
               <Select
                 value={publicAccessType}
-                onValueChange={(value: PublicAccessType) => {
-                  setPublicAccessType(value);
-                  if (value === PUBLIC_ACCESS_TYPE.LIMITED) {
-                    // Reset to view when switching back to limited
-                    setPublicAccessRole(PUBLIC_ACCESS_ROLE.VIEW);
-                  }
-                  console.log('Update public access type:', value);
-                  // TODO: Implement public access update
-                }}
+                onValueChange={handlePublicAccessTypeChange}
               >
                 <SelectTrigger className="h-[52px]! w-full px-4 py-3">
                   <div className="flex items-center gap-2">

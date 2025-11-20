@@ -27,4 +27,8 @@ export class UserFilterDto extends BaseFilterDto {
   @IsOptional()
   @IsString()
   email?: string;
+
+  @IsOptional()
+  @IsString()
+  noAccessOnFileId?: string;
 }

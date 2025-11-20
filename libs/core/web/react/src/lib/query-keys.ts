@@ -60,6 +60,8 @@ export const fileKeys = {
   detail: (id: string) => createQueryKey('file', id),
   presignedGet: (fileId: string) =>
     createQueryKey('file', fileId, 'presigned-get'),
+  permissions: (fileId: string) =>
+    createQueryKey('file', fileId, 'permissions'),
 } as const;
 
 /**

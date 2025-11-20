@@ -148,6 +148,13 @@ export class FileRepository extends BaseRepository<
               },
             },
           },
+          {
+            permissions: {
+              some: {
+                userId: null,
+              },
+            },
+          },
         ],
       },
     });

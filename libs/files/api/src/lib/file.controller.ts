@@ -23,6 +23,7 @@ import {
   ShareFileDto,
   FilePermissionDto,
   FileDetailsDto,
+  ShareFilePublicDto,
 } from '@keepcloud/commons/dtos';
 
 @Controller('files')
@@ -53,13 +54,29 @@ export class FileController {
     return this.fileService.generatePresignedGet(user.id, fileId);
   }
 
+  @Post(':fileId/share/public')
+  async shareFilePublic(
+    @Param('fileId') fileId: string,
+    @CurrentUser() currentUser: User,
+    @Body() dto: ShareFilePublicDto,
+  ) {
+    return this.fileSharingService.shareFilePublic(fileId, currentUser.id, dto);
+  }
+
   @Post(':fileId/share')
   async shareFile(
     @Param('fileId') fileId: string,
     @CurrentUser() currentUser: User,
     @Body() dto: ShareFileDto,
   ) {
-    return this.fileSharingService.shareFile(fileId, currentUser.id, dto);
+    await this.fileSharingService.shareFile(fileId, currentUser.id, dto);
+  }
+  @Delete(':fileId/public-share')
+  async unshareFilePublic(
+    @Param('fileId') fileId: string,
+    @CurrentUser() currentUser: User,
+  ) {
+    return this.fileSharingService.unshareFilePublic(fileId, currentUser.id);
   }
 
   @Delete(':fileId/permission/:permissionId')
@@ -68,7 +85,7 @@ export class FileController {
     @Param('permissionId') permissionId: string,
     @CurrentUser() currentUser: User,
   ): Promise<void> {
-    return this.fileSharingService.revokePermission(
+    await this.fileSharingService.revokePermission(
       fileId,
       permissionId,
       currentUser.id,
@@ -81,7 +98,7 @@ export class FileController {
     @CurrentUser() currentUser: User,
     @Body() dto: UpdateFilePermissionDto,
   ) {
-    return this.fileSharingService.updatePermissionRole(
+    await this.fileSharingService.updatePermissionRole(
       permissionId,
       currentUser.id,
       dto,

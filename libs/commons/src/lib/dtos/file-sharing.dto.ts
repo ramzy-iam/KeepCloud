@@ -4,6 +4,8 @@ import {
   IsEnum,
   IsArray,
   ArrayNotEmpty,
+  IsOptional,
+  IsBoolean,
 } from '../validators';
 
 import { ErrorCode } from '../constants';
@@ -141,6 +143,20 @@ export class ShareFileDto {
   @IsString(ErrorCode.INVALID_STRING, { each: true })
   userIds: string[];
 
+  @IsEnum(FilePermissionRole, ErrorCode.INVALID_PERMISSION_ROLE)
+  role: FilePermissionRole;
+
+  @IsOptional()
+  @IsBoolean()
+  sendNotification?: boolean | null;
+
+  @IsOptional()
+  @IsString(ErrorCode.INVALID_STRING)
+  @IsNotEmpty(ErrorCode.INVALID_STRING)
+  message?: string | null;
+}
+
+export class ShareFilePublicDto {
   @IsEnum(FilePermissionRole, ErrorCode.INVALID_PERMISSION_ROLE)
   role: FilePermissionRole;
 }

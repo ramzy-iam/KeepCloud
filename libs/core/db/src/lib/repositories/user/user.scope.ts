@@ -43,4 +43,15 @@ export class UserScope extends BaseScope<
     this._include.plan = true;
     return this;
   }
+
+  filterByNoAccessToFile(fileId?: string) {
+    if (!fileId) return this;
+    if (!this._where.filePermissions) {
+      this._where.filePermissions = {};
+    }
+    this._where.filePermissions.none = {
+      fileId: fileId,
+    };
+    return this;
+  }
 }

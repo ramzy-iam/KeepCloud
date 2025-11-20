@@ -8,7 +8,11 @@ import {
   FileLink,
   FilePermissionRole,
 } from '@keepcloud/core/db';
-import { UpdateFilePermissionDto, ShareFileDto } from '@keepcloud/commons/dtos';
+import {
+  UpdateFilePermissionDto,
+  ShareFileDto,
+  ShareFilePublicDto,
+} from '@keepcloud/commons/dtos';
 import {
   FileNotFoundException,
   ForbiddenException,
@@ -28,7 +32,7 @@ export class FileSharingService {
   private async _shareFileWithUser(
     fileId: string,
     currentUserId: string,
-    userId: string,
+    userId: string | null,
     role: FilePermissionRole,
     isInherited = false,
   ) {
@@ -46,7 +50,7 @@ export class FileSharingService {
       .filterByFileId(fileId)
       .filterByUserId(userId)
       .getOne();
-
+    console.log('existingPermission', existingPermission);
     if (existingPermission) {
       // Update existing permission
       const updated = await this.filePermissionRepository.update(
@@ -59,7 +63,7 @@ export class FileSharingService {
     // Create new permission
     const permission = await this.filePermissionRepository.create({
       file: { connect: { id: fileId } },
-      user: { connect: { id: userId } },
+      ...(userId ? { user: { connect: { id: userId } } } : {}),
       grantedBy: { connect: { id: currentUserId } },
       role,
       isInherited,
@@ -122,8 +126,18 @@ export class FileSharingService {
         errors.push(`Failed to share with user ${userId}: ${message}`);
       }
     }
+    return;
+    // return { results, errors };
+  }
 
-    return { results, errors };
+  async shareFilePublic(
+    fileId: string,
+    currentUserId: string,
+    dto: ShareFilePublicDto,
+  ) {
+    await this.validateSharingPermissions(fileId, currentUserId);
+    await this._shareFileWithUser(fileId, currentUserId, null, dto.role);
+    return { message: 'File shared publicly successfully' };
   }
 
   async updatePermissionRole(
@@ -150,8 +164,6 @@ export class FileSharingService {
       { id: permissionId },
       { role: dto.role },
     );
-
-    return this.getPermissionDetails(updated.id);
   }
 
   /**
@@ -469,6 +481,16 @@ export class FileSharingService {
         fileId: {
           in: descendants.map((d) => d.id),
         },
+      },
+    });
+  }
+
+  async unshareFilePublic(fileId: string, currentUserId: string) {
+    await this.validateSharingPermissions(fileId, currentUserId);
+    return this.filePermissionRepository.prisma.filePermission.deleteMany({
+      where: {
+        fileId,
+        userId: null,
       },
     });
   }

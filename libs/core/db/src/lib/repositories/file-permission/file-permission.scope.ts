@@ -26,8 +26,12 @@ export class FilePermissionScope extends BaseScope<
     return this;
   }
 
-  filterByUserId(userId: string) {
-    this._where.userId = userId;
+  filterByUserId(userId: string | null, strict = true) {
+    if (strict) {
+      this._where.userId = userId;
+    } else {
+      this._where.OR = [{ userId: userId }, { userId: null }];
+    }
     return this;
   }
 

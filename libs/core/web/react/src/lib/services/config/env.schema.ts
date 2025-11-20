@@ -5,6 +5,7 @@ export const envSchema = z.object({
   VITE_API_BASE_URL: z.string(),
   VITE_DOMAIN_NAME: z.string(),
   VITE_BETA_MODE: z.stringbool().default(false),
+  VITE_FRONTEND_URL: z.url().default('http://keepcloud.heyramzy.com'),
 });
 
 export type EnvVariables = z.infer<typeof envSchema>;

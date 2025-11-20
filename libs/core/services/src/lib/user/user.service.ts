@@ -151,6 +151,7 @@ export class UserService {
     return this.userRepository.scoped
       .searchByNameOrEmail(query)
       .filterNotById(currentUserId)
+      .filterByNoAccessToFile(filters.noAccessOnFileId)
       .getManyPaginated(page, pageSize);
   }
 }
