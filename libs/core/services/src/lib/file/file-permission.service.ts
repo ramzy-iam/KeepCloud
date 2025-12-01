@@ -252,6 +252,7 @@ export class FilePermissionService {
   async createInheritedPermissionForTreeOwner(
     fileId: string,
     creatorId: string,
+    parentPermissionId?: string | null,
   ): Promise<void> {
     const file = await this.fileRepository.scoped.filterById(fileId).getOne();
 
@@ -289,6 +290,7 @@ export class FilePermissionService {
         role: FilePermissionRole.EDITOR,
         grantedById: creatorId,
         isInherited: true,
+        inheritedFromId: parentPermissionId,
       },
     });
   }

@@ -35,6 +35,7 @@ export class FileSharingService {
     userId: string | null,
     role: FilePermissionRole,
     isInherited = false,
+    parentPermissionId?: string | null,
   ) {
     await this.validateSharingPermissions(fileId, currentUserId);
 
@@ -50,7 +51,6 @@ export class FileSharingService {
       .filterByFileId(fileId)
       .filterByUserId(userId)
       .getOne();
-    console.log('existingPermission', existingPermission);
     if (existingPermission) {
       // Update existing permission
       const updated = await this.filePermissionRepository.update(
@@ -67,6 +67,9 @@ export class FileSharingService {
       grantedBy: { connect: { id: currentUserId } },
       role,
       isInherited,
+      inheritedFrom: parentPermissionId
+        ? { connect: { id: parentPermissionId } }
+        : undefined,
     });
 
     return this.getPermissionDetails(permission.id);
@@ -160,7 +163,7 @@ export class FileSharingService {
     // Validate permissions on the file
     await this.validateSharingPermissions(permission.fileId, currentUserId);
 
-    const updated = await this.filePermissionRepository.update(
+    await this.filePermissionRepository.update(
       { id: permissionId },
       { role: dto.role },
     );

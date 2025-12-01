@@ -25,6 +25,9 @@ model FilePermission {
 
   // whether this permission is inherited from a parent folder
   isInherited Boolean @default(false)
+  inheritedFrom   FilePermission? @relation("InheritedFrom", fields: [inheritedFromId], references: [id])
+  inheritedFromId String?
+  inheritedChildren FilePermission[] @relation("InheritedFrom") // opposite field
 
   @@unique([fileId, userId]) // one permission per user per file
   @@index([fileId])
